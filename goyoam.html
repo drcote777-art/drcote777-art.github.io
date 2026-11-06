@@ -2002,7 +2002,16 @@ const CTX=[
   const m=new T.MeshLambertMaterial({color:0xffffff});new T.TextureLoader().load("paint_suwol.jpg",t=>{m.map=t;m.needsUpdate=true});
   const p=new T.Mesh(new T.PlaneGeometry(1.42,2.86),m);p.position.z=.045;g.add(p);
   const sg=new T.Mesh(new T.PlaneGeometry(1.5,.36),signTex("수월관음도",60));sg.position.set(0,-1.78,.05);g.add(sg)}catch(e){}})();
+/* 요사채 벽: 고려 불화 두 점 (위키미디어 공용, 퍼블릭 도메인 사진) */
+(()=>{try{const Y=16+1.75;[["paint_amita3.jpg",-17.0,-272.9,0,1.13,2.2,"아미타삼존도"],["paint_amita8.jpg",-17.0,-255.1,Math.PI,1.15,2.2,"아미타팔대보살도"]].forEach(([src,x,z,ry,w,h,t])=>{
+  const g=new T.Group();g.position.set(x,Y,z);g.rotation.y=ry;S.add(g);
+  box(w+.16,h+.16,.05,lam(0x5a2a1c),0,0,0,g);box(w+.06,h+.06,.02,lam(0xc9b27a),0,0,.03,g);
+  const m=new T.MeshBasicMaterial({color:0xd9d2c4});new T.TextureLoader().load(src,tx=>{m.map=tx;m.needsUpdate=true});
+  const p=new T.Mesh(new T.PlaneGeometry(w,h),m);p.position.z=.045;g.add(p);
+  const sg=new T.Mesh(new T.PlaneGeometry(1.3,.32),signTex(t,t.length>6?50:58));sg.position.set(0,-h/2-.28,.05);g.add(sg)})}catch(e){}})();
 const INFO=[
+ {n:"아미타삼존도",x:-17,z:-271.6,r:1.9,d:"고려 13세기경에 그린 불화예요. 가운데 연꽃 대좌에 앉은 아미타불을 양옆의 두 보살이 모시고 있어요. 아미타불은 서방 극락정토의 부처님으로, 이름을 부르며 기도하면 극락으로 이끌어 주신다고 믿었어요. 실제 그림(114.9×59.1cm)은 미국 뉴욕 메트로폴리탄 미술관에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
+ {n:"아미타팔대보살도",x:-17,z:-256.4,r:1.9,d:"고려 후기에 그린 불화예요. 서 계신 아미타불 둘레를 여덟 보살이 둘러싸고, 위쪽 구름 속에는 극락의 누각이 보여요. 고려 불화는 고운 비단에 붉은 옷과 금빛 무늬를 섬세하게 그린 것으로 이름나 있어요. 실제 그림(173.1×91.1cm)은 일본 교토의 조쿄지(淨敎寺)에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
  {n:"수월관음도",x:6.3,z:-289.1,r:1.9,d:"고려 14세기 중엽에 비단에 먹과 색, 금으로 그린 불화예요. 관음보살이 물가 바위에 편안히 앉아 있고, 아래쪽에는 선재동자가 가르침을 구하러 찾아와 있어요. 실제 그림(98.3×47.7cm)은 미국 워싱턴의 스미스소니언 국립아시아미술관(프리어 갤러리)에 있고, 미술관이 누구나 쓸 수 있게(CC0) 공개한 사진을 걸었어요."},
  {n:"일주문",x:0,z:-30,r:5,d:"절의 첫 번째 문이에요. 기둥이 한 줄로 서 있어 한마음으로 들어간다는 뜻이 있어요. 대웅전 쪽을 향해 합장 반배해 보세요."},
  {n:"약수터",x:SPRING.x,z:SPRING.z,r:3.8,d:"시원한 약수로 손을 씻고 목을 축여요. 기력이 조금 차올라요."},
