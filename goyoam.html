@@ -2068,7 +2068,28 @@ let ridgeLast=-1;
 function ridgeTick(dt){const k=WX.kind,bf=k==="rain"?170:k==="snow"?150:k==="cloudy"?240:300,bn=k==="sunny"?50:30,rv=ridgeV(),clear=k==="rain"||k==="snow"?.45:1;
   S.fog.far=bf+(2300*clear-bf)*rv;S.fog.near=bn+(220-bn)*rv;const cf=700+1900*rv;if(Math.abs(cf-ridgeLast)>5){ridgeLast=cf;C.far=cf;C.updateProjectionMatrix()}
   if(window.__seaN){window.__seaN.offset.x+=dt*.004;window.__seaN.offset.y+=dt*.006}}
+/* 공양간·찻집·요사채에 거는 옛 그림 (위키미디어 공용, 퍼블릭 도메인 사진) */
+const ARTS2=[["paint_podae.jpg",17.2,18.0,-221.5,Math.PI,1.1,2.0,"포대화상도"],["paint_jijang.jpg",-21.45,17.9,-259.4,Math.PI/2,.9,2.0,"지장보살도"],["paint_dalma.jpg",15.3,17.75,-245.5,0,1.2,1.67,"달마도"]];
+(()=>{try{ARTS2.forEach(([src,x,y,z,ry,w,h,t])=>{
+  const g=new T.Group();g.position.set(x,y,z);g.rotation.y=ry;S.add(g);
+  box(w+.16,h+.16,.05,lam(0x5a2a1c),0,0,0,g);box(w+.06,h+.06,.02,lam(0xc9b27a),0,0,.03,g);
+  const m=new T.MeshBasicMaterial({color:0xd9d2c4});new T.TextureLoader().load(src,tx=>{m.map=tx;m.needsUpdate=true});
+  const p=new T.Mesh(new T.PlaneGeometry(w,h),m);p.position.z=.045;g.add(p);
+  const sg=new T.Mesh(new T.PlaneGeometry(1.2,.3),signTex(t,t.length>5?52:58));sg.position.set(0,-h/2-.26,.05);g.add(sg)})}catch(e){}})();
+/* 찻집 다향: 다선일미 족자 */
+(()=>{try{const c=document.createElement("canvas");c.width=256;c.height=800;const g=c.getContext("2d");
+  g.fillStyle="#6b4a2e";g.fillRect(0,0,256,800);g.fillStyle="#efe4cc";g.fillRect(22,40,212,700);
+  for(let i=0;i<900;i++){g.fillStyle=`rgba(150,120,80,${Math.random()*.08})`;g.fillRect(22+Math.random()*212,40+Math.random()*700,2+Math.random()*4,1+Math.random()*3)}
+  g.fillStyle="#1d1712";g.font="bold 120px serif";g.textAlign="center";g.textBaseline="middle";["茶","禪","一","味"].forEach((ch,i)=>g.fillText(ch,128,140+i*150));
+  g.fillStyle="#b3261e";g.fillRect(172,676,34,34);g.fillStyle="#efe4cc";g.font="bold 20px serif";g.fillText("印",189,694);
+  const tx=new T.CanvasTexture(c);const gp=new T.Group();gp.position.set(18.7,17.55,-245.5);S.add(gp);
+  const m=new T.Mesh(new T.PlaneGeometry(.72,2.25),new T.MeshBasicMaterial({map:tx,color:0xe8e2d6}));m.position.z=.02;gp.add(m);
+  cyl(.03,.03,.86,lam(0x3a2414),0,1.15,.04,gp,8).rotation.z=Math.PI/2;cyl(.035,.035,.86,lam(0x3a2414),0,-1.15,.04,gp,8).rotation.z=Math.PI/2}catch(e){}})();
 const INFO=[
+ {n:"달마도",x:15.3,z:-244.2,r:1.5,d:"조선의 화원 김명국(호 연담·취옹)이 1630~40년대 통신사를 따라 일본에 갔을 때 그린 것으로 알려진 달마도예요. 선종을 처음 연 달마대사를 몇 번의 거침없는 붓질로 그려 냈어요. 종이에 먹으로 그렸고 크기는 83×57cm, 실제 그림은 국립중앙박물관에 있어요. 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
+ {n:"다선일미 족자",x:18.7,z:-244.2,r:1.7,d:"茶禪一味(다선일미)는 ‘차와 선은 한 맛’이라는 뜻이에요. 차를 우리고 마시는 한 동작 한 동작에 마음을 모으면 그것이 곧 참선이라는 가르침으로, 조선 후기 초의선사가 차 문화를 일으키며 널리 알려졌어요. 차 한 잔을 천천히 음미해 보세요."},
+ {n:"포대화상도",x:17.2,z:-222.9,r:1.8,d:"조선 17세기 화가 김명국(호 취옹)이 먹으로 그린 포대화상이에요. 포대화상은 커다란 자루를 메고 다니며 사람들에게 복을 나눠 주었다는 중국 당나라 말의 스님으로, 늘 웃는 배불뚝이 모습이라 넉넉함과 복을 상징해요. 공양간에 잘 어울리지요. 실제 그림은 미국 브루클린 미술관에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
+ {n:"지장보살도",x:-20,z:-259.4,r:1.8,d:"고려 14세기 전반에 그린 지장보살도예요. 지장보살은 지옥에서 괴로워하는 이들까지 모두 구하기 전에는 성불하지 않겠다고 서원한 보살로, 머리를 깎은 스님 모습에 손에는 석장과 여의주를 들고 계세요. 실제 그림은 미국 뉴욕 메트로폴리탄 미술관에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
  {n:"고요봉 전망대",x:15,z:-350,r:5,d:"고요암 뒤 산마루의 전망대예요. 아래로 대웅전 지붕과 절 마당이 내려다보이고, 날이 맑으면 멀리 산자락 너머로 바다가 보여요. 나무 의자에 앉아 바람 소리를 들으며 쉬어 가세요."},
  {n:"아미타삼존도",x:-17,z:-271.6,r:1.9,d:"고려 13세기경에 그린 불화예요. 가운데 연꽃 대좌에 앉은 아미타불을 양옆의 두 보살이 모시고 있어요. 아미타불은 서방 극락정토의 부처님으로, 이름을 부르며 기도하면 극락으로 이끌어 주신다고 믿었어요. 실제 그림(114.9×59.1cm)은 미국 뉴욕 메트로폴리탄 미술관에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
  {n:"아미타팔대보살도",x:-17,z:-256.4,r:1.9,d:"고려 후기에 그린 불화예요. 서 계신 아미타불 둘레를 여덟 보살이 둘러싸고, 위쪽 구름 속에는 극락의 누각이 보여요. 고려 불화는 고운 비단에 붉은 옷과 금빛 무늬를 섬세하게 그린 것으로 이름나 있어요. 실제 그림(173.1×91.1cm)은 일본 교토의 조쿄지(淨敎寺)에 있고, 위키미디어 공용의 퍼블릭 도메인 사진을 걸었어요."},
