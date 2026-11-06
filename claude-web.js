@@ -83,10 +83,23 @@
       const r=await fetch(u);if(!r.ok)throw{code:"tool_error",retryable:true};const j=await r.json(),c=j.current||{};const wc=c.weather_code|0;
       return{payload:{currentConditions:{iconCode:wmoToAcc(wc),temperatureValue:c.temperature_2m,phrase:WMO_KO(wc),extended:{windValue:c.wind_speed_10m||0,gusts:String(c.wind_gusts_10m||0)}}}}}};
 
+  /* ---------- AI 대화: Cloudflare Worker 를 거쳐 Gemini ---------- */
+  const AI_URL=window.AI_URL||"";
+  const SAMPLE=AI_URL?async function(input,opts){opts=opts||{};
+    const prompt=typeof input==="string"?input:(input||[]).map(m=>(m.role==="assistant"?"대답: ":"")+m.content).join("\n");
+    let r;try{r=await fetch(AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt}),signal:opts.signal})}
+    catch(e){throw{code:"network",message:String(e&&e.message||e)}}
+    let j={};try{j=await r.json()}catch(e){}
+    if(r.status===429)throw{code:"rate_limited",message:"rate"};
+    if(!r.ok||!j.text)throw{code:"upstream",message:String(j.error||r.status)};
+    try{opts.onText&&opts.onText({text:j.text,delta:j.text})}catch(e){}
+    return{text:j.text,truncated:false}}:null;
+
   let roomP=null;
   window.claude={WEB:true,use(name){
     if(name==="user")return Promise.resolve(USER);
     if(name==="mcp")return Promise.resolve(MCP);
+    if(name==="sample")return Promise.resolve(SAMPLE);
     if(!fdb)return Promise.resolve(null);
     if(name==="db")return Promise.resolve(DB);
     if(name==="room"){if(!roomP)roomP=Promise.resolve(mkRoom());return roomP}
