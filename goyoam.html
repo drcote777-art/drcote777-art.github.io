@@ -198,7 +198,7 @@ body.bigtext .pcard p,body.bigtext .wish{font-size:15px}body.bigtext .item b{fon
       <h2>고요암 가는 길</h2>
       <p>설치 없이 바로 들어가는 산사입니다. 법당에서 조용히 합장하고 염주를 굴리거나, 산길부터 천천히 걸어 올라가 보세요. 같은 링크로 들어온 친구가 함께 보입니다.</p>
       <label for="nick">이름</label>
-      <input id="nick" maxlength="10" placeholder="비워 두면 '순례자'">
+      <input id="nick" maxlength="10" placeholder="이름 (예: 표주인)" required>
       <label>성별</label>
       <div class="chips" id="sexChips"></div>
       <label>옷 색깔</label>
@@ -1109,7 +1109,7 @@ function buildSw(){const el=$("sws");el.innerHTML="";COLORS.forEach(c=>{const b=
   const sc=$("sexChips");sc.innerHTML="";[["m","남자"],["f","여자"]].forEach(([v,l])=>{const b=document.createElement("button");b.type="button";b.className="chipb";b.textContent=l;b.setAttribute("aria-pressed",me.look.s===v);
     b.onclick=()=>{if(me.look.s!==v)me.look=defLook(v,me.color);buildSw()};sc.appendChild(b)})}
 $("nick").value=me.name;buildSw();
-$("setup").addEventListener("submit",e=>{e.preventDefault();const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";setTimeout(()=>{if(mode==="quiet"){goTo("hall");setQuiet(true)}},60);me.name=($("nick").value||"").trim().slice(0,10)||"순례자";
+$("setup").addEventListener("submit",e=>{e.preventDefault();{const v=($("nick").value||"").trim();if(!v||v==="순례자"||v==="손님"){$("nick").value="";$("nick").placeholder="이름을 꼭 적어 주세요 (예: 표주인)";$("nick").style.outline="2px solid #c0392b";$("nick").focus();try{toast("이름을 적어야 들어갈 수 있어요. 가족이 누가 왔는지 알아볼 수 있어요",true)}catch(x){}return}}const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";setTimeout(()=>{if(mode==="quiet"){goTo("hall");setQuiet(true)}},60);me.name=($("nick").value||"").trim().slice(0,10)||"순례자";
   ls.set("tp_name",me.name);ls.set("tp_color",me.color);me.look.tc=me.color;applyLook();
   $("sheet").hidden=true;initAudio();initChant();initRec();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}pushP(true);const Z0=zoneOf(me.z);zoneName=Z0[1];$("zone").textContent=Z0[1];if(!seenZone.size)showZone(Z0);saveMerit();{let lv=0;try{lv=+localStorage.getItem("tp_lastvisit")||0}catch(e){}if(Date.now()-lv>10*60000){try{localStorage.setItem("tp_lastvisit",String(Date.now()))}catch(e){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"순례자",ts:Date.now(),u:VID,dv:DEV}),3000)}}setTimeout(()=>toast(wxGreeting()),2500)});
 $("meBtn").onclick=()=>{renderLook();$("lookP").hidden=false;$("panel").hidden=true};
