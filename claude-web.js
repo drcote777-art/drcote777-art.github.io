@@ -56,19 +56,28 @@
     posR.on("child_added",s=>up(s.key,"p",s.val()));posR.on("child_changed",s=>up(s.key,"p",s.val()));posR.on("child_removed",s=>rm(s.key,"p"));
     metaR.on("child_added",s=>up(s.key,"m",s.val()));metaR.on("child_changed",s=>up(s.key,"m",s.val()));metaR.on("child_removed",s=>rm(s.key,"m"));
     // 오래 멈춘 접속(창을 그냥 닫은 경우 등) 정리
-    setInterval(()=>{myMeta.child("_t").set(Date.now()).catch(()=>{});const now=Date.now();
+    // 같은 휴대폰에서 탭을 여러 개 열었거나 화면을 내려 둔 탭이 '또 다른 나'로 남지 않게
+    let paused=false,hideT=0,lastP=null;
+    const pause=()=>{if(paused)return;paused=true;myPos.remove().catch(()=>{});myMeta.remove().catch(()=>{})};
+    const resume=()=>{if(!paused)return;paused=false;lastMeta="";lastPos="";if(lastP)api.presence(lastP)};
+    document.addEventListener("visibilitychange",()=>{clearTimeout(hideT);if(document.hidden)hideT=setTimeout(pause,20000);else resume()});
+    addEventListener("pagehide",pause);
+    try{const bc=new BroadcastChannel("tab_"+SITE);bc.onmessage=e=>{if(e.data&&e.data.hello&&e.data.peer!==PEER){pause();stale()}};bc.postMessage({hello:1,peer:PEER})}catch(e){}
+    function stale(){if(document.getElementById("staleTab"))return;const d=document.createElement("div");d.id="staleTab";d.style.cssText="position:fixed;inset:0;z-index:99999;background:rgba(20,16,12,.86);color:#f5ead6;display:grid;place-items:center;text-align:center;padding:24px;font:16px/1.6 sans-serif";
+      d.innerHTML='<div>이 화면은 다른 탭에서 다시 열려서 멈췄어요.<br>같은 사람이 둘로 보이지 않게 하려는 거예요.<br><br><button type="button" style="font:inherit;padding:10px 18px;border-radius:999px;border:0;background:#f5ead6;color:#2c241d">여기서 계속하기</button></div>';d.querySelector("button").onclick=()=>location.reload();document.body.append(d)}
+    setInterval(()=>{if(paused)return;if(lastMeta){const m=JSON.parse(lastMeta);m._t=Date.now();myMeta.set(m).catch(()=>{})}const now=Date.now();
       metaR.once("value").then(s=>s.forEach(c=>{const v=c.val()||{};if(c.key!==PEER&&now-(v._t||0)>120000){metaR.child(c.key).remove();posR.child(c.key).remove()}})).catch(()=>{})},45000);
     const writePos=()=>{posTimer=0;if(!pendingPos)return;const s=JSON.stringify(pendingPos);if(s!==lastPos){lastPos=s;lastPosAt=Date.now();myPos.set(pendingPos).catch(()=>{})}pendingPos=null};
     const joinT=Date.now();const evSubs={};
-    return{
-      presence(p){p=clean(p||{});const fp={},mp={};for(const k in p){if(FAST.includes(k))fp[k]=p[k];else mp[k]=p[k]}
+    const api={
+      presence(p){p=clean(p||{});lastP=p;if(paused)return Promise.resolve();const fp={},mp={};for(const k in p){if(FAST.includes(k))fp[k]=p[k];else mp[k]=p[k]}
         const ms=JSON.stringify(mp);if(ms!==lastMeta){lastMeta=ms;mp._t=Date.now();myMeta.set(mp).catch(()=>{})}
         pendingPos=fp;const wait=Math.max(0,220-(Date.now()-lastPosAt));if(!posTimer)posTimer=setTimeout(writePos,wait);return Promise.resolve()},
       peers:()=>list(),
       onPeers(fn){subs.add(fn);setTimeout(()=>fn({peers:list()}),0);return()=>subs.delete(fn)},
       emit(topic,data){const r=evR.child(safeKey(topic)).push();return r.set({d:clean(data),f:PEER,t:firebase.database.ServerValue.TIMESTAMP}).then(()=>{setTimeout(()=>r.remove().catch(()=>{}),20000)})},
       on(topic,fn){const q=evR.child(safeKey(topic)).orderByChild("t").startAt(joinT-2000);const h=s=>{const v=s.val()||{};try{fn({data:v.d,isMe:v.f===PEER,sameTab:v.f===PEER,peer:v.f})}catch(e){}};q.on("child_added",h);return()=>q.off("child_added",h)},
-      leave(){myPos.remove();myMeta.remove()}}}
+      leave(){myPos.remove();myMeta.remove()}};return api}
 
   /* ---------- 사용자 ---------- */
   const USER={id:async()=>UID,me:async()=>({id:UID,name:""}),isOwner:async()=>false,canEdit:async()=>false,can:async()=>true,profiles:async()=>({})};
