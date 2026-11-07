@@ -158,7 +158,7 @@ body.bigtext .pcard p,body.bigtext .wish{font-size:15px}body.bigtext .item b{fon
   <div class="load" id="load">빛의 숲 성당을 짓는 중…</div>
   <div class="hud top">
     <div class="brand"><b>빛의 숲 성당</b><span id="zone">성당 광장</span><span id="wx"></span></div>
-    <div class="right"><button class="chip cnt" id="cnt" type="button" aria-label="함께 있는 사람과 다녀간 분 보기" style="cursor:pointer;font:inherit;font-size:12px;color:inherit">👣 혼자</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🕊️ 묵상</button><button class="btn" id="sndBtn" type="button">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button></div>
+    <div class="right"><button class="chip cnt" id="cnt" type="button" aria-label="함께 있는 사람과 다녀간 분 보기" style="cursor:pointer;font:inherit;font-size:12px;color:inherit">👣 혼자</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🕊️ 묵상</button><button class="btn" id="sndBtn" type="button">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button><button class="btn" id="evBtn" type="button">📅 일정</button></div>
   </div>
   <div class="hud sub hide" id="sub"><small>안내</small><span id="subText"></span></div>
   <div class="hud logw empty" id="logw"><div class="logh"><button class="chipb" id="logFold" type="button">채팅 접기</button><button class="chipb" id="logClear" type="button">내 화면 비우기</button><button class="chipb" id="logWipe" type="button" hidden>모두 지우기</button></div><div class="log" id="log" aria-live="polite"></div></div>
@@ -1055,8 +1055,8 @@ function chime(){if(!AC)return;const t=AC.currentTime;[1320,1980].forEach((fq,i)
 function beadClick(){if(!AC)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(1500,t);o.frequency.exponentialRampToValueAtTime(900,t+.05);o.connect(g).connect(master);env(g,t,.002,.09,.08);o.start(t);o.stop(t+.1)}
 function chirp(v){if(!AC)return;const t=AC.currentTime,n=2+Math.floor(Math.random()*3),b=2400+Math.random()*1500;for(let i=0;i<n;i++){const o=AC.createOscillator(),g=AC.createGain(),s=t+i*.13;o.frequency.setValueAtTime(b,s);o.frequency.exponentialRampToValueAtTime(b*1.45,s+.05);o.connect(g).connect(master);env(g,s,.01,.04*v,.1);o.start(s);o.stop(s+.15)}}
 let birdT=4;
-function audioTick(dt){if(!AC)return;const inn=inside(me.x,me.z),on=ambMode!=="off";const og=on&&ambMode==="all"?(inn?(me.lv===2?.45:.9):(me.lv===1?.04:.12)):0;orgG.gain.setTargetAtTime(og*(npcSpk?.3:1),AC.currentTime,.8);choirG.gain.setTargetAtTime(og*.8*(npcSpk?.3:1),AC.currentTime,.8);
-  if(og>0){chordT-=dt;if(chordT<=0){chordT=7;organChord()}}
+function audioTick(dt){if(!AC)return;const inn=inside(me.x,me.z),on=ambMode!=="off";const og=on&&ambMode==="all"?(inn?(me.lv===2?.45:.9):(me.lv===1?.04:.12)):0;orgG.gain.setTargetAtTime(og*(npcSpk?.3:1)*(evAmbMute?0:1),AC.currentTime,.8);choirG.gain.setTargetAtTime(og*.8*(npcSpk?.3:1)*(evAmbMute?0:1),AC.currentTime,.8);
+  if(og>0&&!evAmbMute){chordT-=dt;if(chordT<=0){chordT=7;organChord()}}
   rainG.gain.setTargetAtTime(on&&WX.kind==="rain"?(inn?.08:.3):0,AC.currentTime,.5);windG.gain.setTargetAtTime(on&&(WX.wind||me.lv===1)&&!inn?(me.lv===1?.24:.18):0,AC.currentTime,.6);murG.gain.setTargetAtTime(on?(inn?.035:.05):0,AC.currentTime,.8);trafG.gain.setTargetAtTime(on&&!inn?Math.max(0,.22-Math.abs(Math.abs(me.x)-62)*.004):0,AC.currentTime,.8);
   if(on&&!inn&&dayLight()>.4&&WX.kind!=="rain"){birdT-=dt;if(birdT<0){birdT=4+Math.random()*7;chirp(.8)}}}
 
@@ -1132,7 +1132,7 @@ NPCS.forEach(n=>{n.av=makeAvatar(n.look,n.name,"npc");n.hist=[];n.until=0;n.busy
   if(n.kind==="priest"){box(.1,.04,.02,lam(0xffffff),0,.5,-.2,n.av.piv)}
   if(n.kind==="nun"){const v=new T.Mesh(new T.SphereGeometry(.2,14,10,0,Math.PI*2,0,Math.PI*.62),lam(0x1d1d22));v.position.set(0,.76,.02);v.scale.set(1,1.15,1.05);n.av.piv.add(v);const bd=new T.Mesh(new T.TorusGeometry(.165,.025,6,20),lam(0xffffff));bd.rotation.x=Math.PI/2;bd.position.set(0,.84,0);n.av.piv.add(bd);
     const tail=box(.34,.42,.05,lam(0x1d1d22),0,.6,.17,n.av.piv)}});
-const CHURCH_INFO="공간 구성: 광장(벤치, 가로등, 방명록), 뼈처럼 기울어진 기둥의 정면 현관과 높은 탑들, 입구 안쪽 양옆 성수대, 숲처럼 가지를 뻗은 기둥이 선 신랑, 서쪽 따뜻한 색·동쪽 푸른 색 스테인드글라스, 오른쪽 통로 봉헌초, 왼쪽 통로 기도 지향 벽, 왼쪽 성모상, 제대 위 천개와 십자가, 뒤쪽 오르간 파이프. 앞쪽 왼쪽 구석에는 종탑으로 올라가는 전용 엘리베이터(안내원 소피아), 종탑 꼭대기에는 탑과 탑을 잇는 철망 아치 다리 전망대(바르셀로나 시내, 바다, 산, 새들, 안내원 클라라), 앞쪽 오른쪽 구석에는 내려오는 엘리베이터가 있다. 왼쪽 통로 뒤편에는 고해소(요셉 신부님), 오른쪽 통로 뒤편 계단으로 내려가면 지하 경당(작은 제대, 감실, 붉은 성체등, 봉헌초)과 성당 박물관(현수선 모형, 석고 탑 모형, 열두 갈래 별 모형, 종, 성작과 성반, 성광, 제의, 연표, 상상 도면)이 있다. 실제 사그라다 파밀리아 사실: 1882년 착공, 1883년 가우디가 맡음, 1926년 6월 10일 가우디 선종, 2010년 11월 7일 교황 베네딕토 16세 축성, 2021년 12월 성모 마리아 탑에 별, 2026년 2월 예수 그리스도의 탑에 십자가가 올라가 높이 172.5m. 이곳은 사그라다 파밀리아에서 영감을 받은 가상 공간이며 실제 성당이나 공식 서비스가 아니다.";
+const CHURCH_INFO="가상 미사 시간(한국 시각, 안드레아 신부님이 제대에서 드리고 성가대가 노래함): 평일(월~금) 오후 7시 30분, 토요 특전 미사 오후 6시, 주일 미사 오전 10시와 오후 6시, 삼종기도 매일 오전 6시·낮 12시·오후 6시. 가상 미사는 실제 미사 참례(주일 미사 의무)를 대신하지 않고, 영성체는 실제 성당에서 하며 여기서는 신령성체 기도를 바친다. 성당 양쪽 벽에 십자가의 길 14처가 있다(왼쪽 벽 1~7처, 오른쪽 벽 8~14처). 화면 위 📅 일정 버튼에 미사 시간표와 성지순례 안내가 있다. 공간 구성: 광장(벤치, 가로등, 방명록), 뼈처럼 기울어진 기둥의 정면 현관과 높은 탑들, 입구 안쪽 양옆 성수대, 숲처럼 가지를 뻗은 기둥이 선 신랑, 서쪽 따뜻한 색·동쪽 푸른 색 스테인드글라스, 오른쪽 통로 봉헌초, 왼쪽 통로 기도 지향 벽, 왼쪽 성모상, 제대 위 천개와 십자가, 뒤쪽 오르간 파이프. 앞쪽 왼쪽 구석에는 종탑으로 올라가는 전용 엘리베이터(안내원 소피아), 종탑 꼭대기에는 탑과 탑을 잇는 철망 아치 다리 전망대(바르셀로나 시내, 바다, 산, 새들, 안내원 클라라), 앞쪽 오른쪽 구석에는 내려오는 엘리베이터가 있다. 왼쪽 통로 뒤편에는 고해소(요셉 신부님), 오른쪽 통로 뒤편 계단으로 내려가면 지하 경당(작은 제대, 감실, 붉은 성체등, 봉헌초)과 성당 박물관(현수선 모형, 석고 탑 모형, 열두 갈래 별 모형, 종, 성작과 성반, 성광, 제의, 연표, 상상 도면)이 있다. 실제 사그라다 파밀리아 사실: 1882년 착공, 1883년 가우디가 맡음, 1926년 6월 10일 가우디 선종, 2010년 11월 7일 교황 베네딕토 16세 축성, 2021년 12월 성모 마리아 탑에 별, 2026년 2월 예수 그리스도의 탑에 십자가가 올라가 높이 172.5m. 이곳은 사그라다 파밀리아에서 영감을 받은 가상 공간이며 실제 성당이나 공식 서비스가 아니다.";
 const NPC_RULES="규칙: 한국어 존댓말로, 맡은 사람다운 따뜻하고 차분한 말투로 2~3문장, 140자 이내로 짧게 답한다. 너는 구글 검색 도구를 쓸 수 있을 때가 있다. 방문객이 날씨, 뉴스, 스포츠 경기 결과, 행사 일정처럼 바깥세상의 최신 소식을 물으면, 검색해서 확인한 내용이나 아래 [실시간 자료]로만 정확히 답하고 언제 어디 소식인지 짧게 밝힌다. 확인한 자료가 없으면 절대 지어내지 말고 그건 지금 확인할 길이 없다고 솔직히 말한다. 오래된 일반 상식은 아는 대로 답하되 확실하지 않으면 모른다고 한다. 날짜와 요일은 아래 적힌 지금 한국 시각을 기준으로 말한다. 가톨릭 신앙과 전례, 기도는 정확하게 말하고 확실하지 않으면 모른다고 한다. 고해성사나 성체 같은 성사는 실제 성당에서 사제를 통해 받는 것이라고 안내하고 여기서 성사를 집전하는 척하지 않는다. 의료, 법률, 투자 같은 전문 문제는 전문가와 상의하라고 권한다. 마음이 많이 힘들거나 위험해 보이는 사람에게는 따뜻하게 대하고 자살예방상담전화 109나 가까운 사람에게 도움을 청하라고 안내한다. 이모지와 목록 기호는 쓰지 않는다.";
 let talkId=null,talkLive=null;
 const npcPos=n=>({x:n.av.g.position.x,z:n.av.g.position.z});
@@ -1166,7 +1166,7 @@ function localReply(n,q){const has=(...w)=>w.some(x=>q.includes(x)),nm=me.name||
   if(has("봉헌","촛불","초 "))return"오른쪽 통로 봉헌초에서 '봉헌초 켜기'를 누르면 초가 밝혀져요.";
   if(has("기도"))return"기도는 거창하지 않아도 돼요. 마음속 이야기를 주님께 드리듯 말씀드리면 됩니다. 왼쪽 통로 기도 지향 벽에 쪽지로 남길 수도 있어요.";
   if(has("성호","성수"))return"성수를 손끝에 찍고 '성부와 성자와 성령의 이름으로. 아멘.' 하며 이마, 가슴, 왼쪽 어깨, 오른쪽 어깨 순서로 십자를 그어요.";
-  if(has("미사"))return"미사는 말씀 전례와 성찬 전례로 이루어져요. 이곳은 가상 공간이라 미사는 없지만, 가까운 성당 미사 시간을 확인해 참례해 보세요.";
+  if(has("미사"))return"미사는 말씀 전례와 성찬 전례로 이루어져요. 이곳에서는 한국 시각으로 평일 저녁 7시 30분, 토요일 오후 6시, 주일 오전 10시와 오후 6시에 제가 제대에서 가상 미사를 드리고 성가대가 노래해요. 위의 📅 일정을 눌러 보세요. 다만 가상 미사는 실제 미사 참례를 대신하지 않으니 가까운 성당 미사에도 꼭 함께하세요.";
   if(has("엘리베이터","전망","탑"))return"앞쪽 왼쪽 구석 엘리베이터는 종탑 전망대로 올라가는 전용이에요. 내려올 때는 다리를 건너 반대편 탑 엘리베이터를 타세요.";
   if(has("박물관","그림","지하","경당"))return"오른쪽 통로 뒤편 계단으로 내려가면 지하 경당과 박물관이 있어요. 그림 앞에 서면 설명을 볼 수 있어요.";
   if(has("가우디","사그라다","건축","기둥","스테인드","유리"))return"이곳은 가우디의 사그라다 파밀리아에서 영감을 받은 가상 성당이에요. 기둥이 나무처럼 갈라져 숲을 이루고, 서쪽 창은 따뜻한 빛, 동쪽 창은 푸른 빛이 들어와요.";
@@ -1182,7 +1182,7 @@ async function askNpc(n,q){if(n.busy)return;n.busy=true;n.face={x:me.x,z:me.z};i
     catch(e){if(e&&e.code==="rate_limited")a="잠시 숨을 고르고 다시 말씀해 주시겠어요?";else{a=localReply(n,q);localTip()}}}
   a=a.replace(/\s+/g," ").slice(0,240)||"……";setNpcSay(n,a);speakNpc(n,a);n.hist.push({who:"방문객",t:q},{who:n.name,t:a});n.busy=false}
 function npcTick(now,t,dt){const tk=talkNpc();if(tk){const p=npcPos(tk);if(Math.hypot(p.x-me.x,p.z-me.z)>7)endTalk()}
-  NPCS.forEach((n,i)=>{if(n.face){const p=npcPos(n),want=Math.atan2(-(n.face.x-p.x),-(n.face.z-p.z));let r=want-n.av.g.rotation.y;r=Math.atan2(Math.sin(r),Math.cos(r));n.av.g.rotation.y+=r*Math.min(1,dt*4);if(now>n.until&&!n.busy&&talkId!==n.id){n.face=null;n.av.g.rotation.y=n.home.ry}}
+  NPCS.forEach((n,i)=>{if(n.ev){evNpc(n,now,t);return}if(n.face){const p=npcPos(n),want=Math.atan2(-(n.face.x-p.x),-(n.face.z-p.z));let r=want-n.av.g.rotation.y;r=Math.atan2(Math.sin(r),Math.cos(r));n.av.g.rotation.y+=r*Math.min(1,dt*4);if(now>n.until&&!n.busy&&talkId!==n.id){n.face=null;n.av.g.rotation.y=n.home.ry}}
     else if(!n.busy&&now%14000<60&&n.kind!=="docent"&&n.kind!=="guide"){n.av.act="hap";n.av.actAt=now}poseAvatar(n.av,now,false,t)})}
 
 function renderLook(){const B=$("lookBody");B.innerHTML="";const L=me.look;
@@ -1320,6 +1320,7 @@ const CTX=[
  {id:"stdn",lab:()=>"⬇️ 지하 경당·박물관으로",when:()=>Math.hypot(me.x-STAIR.x,me.z-STAIR.z)<2.2,fn:()=>stairs(true)},
  {id:"stup",lv:2,lab:()=>"⬆️ 성당으로 올라가기",when:()=>Math.hypot(me.x-STAIR2.x,me.z-STAIR2.z)<2.2,fn:()=>stairs(false)},
  {id:"confg",lab:()=>"📖 고해성사 순서",when:()=>Math.hypot(me.x-CONF.x,me.z-CONF.z)<3.4,fn:()=>openPanel("confess")},
+ {id:"way",lab:()=>{const w=nearStation();return w?`✝️ 제${w.n}처 묵상하기`:""},when:()=>!!nearStation(),fn:()=>{wayCur=nearStation();openPanel("way")}},
  {id:"bell",lv:"*",lab:()=>"종 울리기",when:()=>!inside(me.x,me.z)&&me.z<12,fn:()=>{initAudio();me.bell=Date.now();bellSound(1,3);pushP(true)}}];
 let ctxKey="";function updCtx(){updNear();$("bui").hidden=!!talkId;const av=CTX.filter(c=>(c.lv==="*"||(c.lv||0)===(me.lv||0))&&!riding&&c.when()),key=av.map(c=>c.id+c.lab()).join("|");if(key===ctxKey)return;ctxKey=key;const el=$("ctx");el.innerHTML="";
   av.forEach(c=>{const b=document.createElement("button");b.type="button";b.className="btn act ctx";b.textContent=c.lab();b.onclick=c.fn;el.append(b)})}
@@ -1346,7 +1347,7 @@ let panelKind="";function openPanel(k){panelKind=k;$("panel").hidden=false;rende
 $("panel").addEventListener("click",e=>{if(e.target.id==="panel")$("panel").hidden=true});
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
 function fmtDay(ts){const d=new Date(ts+9*3600e3);return`${d.getUTCMonth()+1}월 ${d.getUTCDate()}일`}
-function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";
+function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;if(panelKind==="ev"){evPanel(c,close);return}if(panelKind==="way"){wayPanel(c,close);return}const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";
   const writer=(col,title,hint,ph,max,after)=>{head.append(el("h2",null,title),close);c.append(head,el("p",null,hint));const row=el("div","row"),inp=el("input");inp.maxLength=max;inp.placeholder=ph;const b=el("button","btn send","남기기");b.type="button";
     b.onclick=async()=>{const t=inp.value.replace(/[\u0000-\u001f​-‏‪-‮⁠-⁤﻿]/g,"").trim().slice(0,max);if(!t||b.disabled)return;b.disabled=true;const st=await sharedAdd(col,{nick:me.name||"손님",text:t,color:me.color,ts:Date.now()});if(st==="ok")toast("남겼어요");after&&after(t);renderPanel()};row.append(inp,b);c.append(row)};
   if(panelKind==="art"&&curArt){const a=curArt;close.onclick=()=>{stopNpcSpeech();$("panel").hidden=true};head.append(el("h2",null,a.t),close);c.append(head);c.append(el("p",null,[a.by,a.yr].filter(Boolean).join(" · ")));
@@ -1460,6 +1461,139 @@ function carTick(now){const s=now/1000;CARS.forEach(c=>{const L=215,u=((s*c.sp+c
 
 /* ================= 매 장면 ================= */
 let last=performance.now(),ctxT=0,lightT=0,angelusH=-1,perfAcc=0,perfN=0,perfDone=0,zoneIn=null;
+/* 빛의 숲 성당 미사·삼종기도 시간표 (한국 시각) · 성가대 · 십자가의 길 */
+const EV_HOMILY=["주님의 평화가 여러분과 함께. 오늘 이 자리에 모인 모든 분을 환영합니다.","사랑은 거창한 일이 아니라 오늘 만나는 한 사람에게 건네는 따뜻한 말 한마디에서 시작됩니다.","우리는 모두 부족하지만 주님께서는 그 부족함까지 품어 주십니다. 너무 자신을 몰아세우지 마십시오.","이번 주에는 서운했던 사람을 위해 짧게라도 기도해 보면 어떨까요. 용서는 나를 먼저 자유롭게 합니다.","감사하는 마음으로 하루를 마무리하는 사람은 내일을 두려워하지 않습니다."];
+const EV_MASS=[[0,"입당 성가","성가대의 노래와 함께 미사를 시작해요",{sing:1,pose:{act:"hap",every:8}}],[.07,"시작 예식","성호경을 긋고 인사와 참회를 해요",{pose:{act:"hap",every:6}}],[.15,"말씀 전례","독서와 화답송, 복음 말씀을 들어요",{}],
+  [.32,"강론","신부님 말씀을 들어요",{lines:EV_HOMILY}],[.52,"보편 지향 기도","세상과 이웃을 위해 함께 기도해요",{pose:{act:"hap",every:5}}],[.59,"예물 준비","봉헌 성가와 함께 빵과 포도주를 준비해요",{sing:1}],
+  [.68,"성찬 전례","감사 기도와 주님의 기도를 바쳐요",{pose:{act:"hap",every:4}}],[.78,"영성체","영성체 성가 · 이곳에서는 마음으로 주님을 모시는 신령성체 기도를 바쳐요",{sing:1,pose:{act:"hap",every:6}}],
+  [.9,"마침 예식","강복과 파견 · 미사가 끝났으니 가서 복음을 전합시다",{pose:{act:"hap",every:3}}],[.95,"퇴장 성가","성가대의 노래로 마쳐요",{sing:1}]];
+const EV_ANGELUS=[[0,"삼종기도","종이 울리면 잠시 멈추고 삼종기도를 바쳐요",{bells:[[0,3],[10,3],[20,3],[30,9]],pose:{act:"hap",every:5}}]];
+const EVC={site:"cathedral",off:"priest",title:"📅 미사 시간",
+  intro:"모든 시간은 한국 시각이에요. 시간이 되면 안드레아 신부님이 제대에서 미사를 드리고 성가대가 노래해요. 그 시간에 들어온 분은 누구나 함께할 수 있어요. 가상 미사는 실제 미사 참례(주일 미사 의무)를 대신하지 않으니, 가까운 성당 미사에도 꼭 함께하세요.",
+  list:[
+   {id:"mass",n:"평일 미사",when:"월~금 오후 7:30 (40분)",at:[[19,30]],dow:[1,2,3,4,5],dur:40,where:"제대",steps:EV_MASS},
+   {id:"sat",n:"토요 특전 미사",when:"토요일 오후 6:00 (45분)",at:[[18,0]],dow:[6],dur:45,where:"제대",steps:EV_MASS},
+   {id:"sun",n:"주일 미사",when:"일요일 오전 10:00 · 오후 6:00 (50분)",at:[[10,0],[18,0]],dow:[0],dur:50,where:"제대",steps:EV_MASS},
+   {id:"angelus",n:"삼종기도",when:"매일 오전 6:00 · 낮 12:00 · 오후 6:00 (2분)",at:[[6,0],[12,0],[18,0]],dur:2,where:"성당",steps:EV_ANGELUS}],
+  spot:{x:0,z:-65.4,ry:Math.PI,act:"",every:6,sit:null},
+  gy:(x,z)=>groundY(x,z,0),
+  inVenue(){return!me.lv&&inside(me.x,me.z)},
+  go(){if(me.lv||!inside(me.x,me.z))goTo("nave");if(me.sit)standUp();let bi=-1,bd=1e9;SEATS.forEach((sv,i)=>{if(sv.lv||seatTaken(sv))return;const d=Math.hypot(sv.x*.6,sv.z+55);if(d<bd){bd=d;bi=i}});if(bi>=0)sitDown(bi,false);else{me.x=0;me.z=-55;me.ry=0}camYaw=0},
+  bell(k){initAudio();if(!AC)return;bellSound(inside(me.x,me.z)?.55:1,k)},
+  onStart(o){if(o.ev.id!=="angelus"){evAmbMute=1;CHOIR.forEach(c=>c.av.g.visible=true)}},
+  onEnd(){CHOIR.forEach(c=>{c.av.g.visible=false;setBubble(c.av,"")});evSing=false},
+  onStep(o,si,opt){evSing=!!opt.sing;evChordT=0},
+  tick(now,dt,o){if(!CHOIR[0].av.g.visible)return;const t=performance.now();CHOIR.forEach((c,i)=>{if(evSing&&now>c.next){c.av.act="hap";c.av.actAt=now;c.next=now+3000+i*400;if(i%3===0)setBubble(c.av,Math.random()<.5?"♪":"♫");else if(c.av.bub)setBubble(c.av,"")}if(!evSing&&c.av.bub)setBubble(c.av,"");poseAvatar(c.av,now,false,t)});
+    if(!AC)return;if(!evG){evG=AC.createGain();evG.gain.value=0;evG.connect(master);if(revIn)evG.connect(revIn)}
+    const want=evSing&&ambMode!=="off"?(me.lv?0:inside(me.x,me.z)?1:Math.max(0,.3-Math.hypot(me.x,me.z-10)*.004)):0;evG.gain.setTargetAtTime(want,AC.currentTime,.6);
+    if(evSing&&want>0){evChordT-=dt;if(evChordT<=0){evChordT=2.6;evChoirChord(EV_HYMN[evChordI++%EV_HYMN.length],3.1)}}},
+  panelExtra(c){wayPanelPart(c)}};
+/* 성가대: 제대 왼쪽 오르간 앞 두 줄 */
+let evSing=false,evG=null,evChordT=0,evChordI=0;
+const EV_HYMN=[[50,57,62,66],[55,59,62,67],[52,59,64,67],[45,57,61,64],[47,54,62,66],[43,55,62,71],[45,57,61,69],[50,57,62,66],[50,57,62,69],[47,55,62,67],[45,54,61,64],[50,57,62,66]];
+function evChoirChord(ch,dur){const t=AC.currentTime;ch.forEach((m,vi)=>{const fq=mtof(m);[-1,1].forEach(dtn=>{const o=AC.createOscillator(),lfo=AC.createOscillator(),lg=AC.createGain(),f1=AC.createBiquadFilter(),f2=AC.createBiquadFilter(),g=AC.createGain();
+    o.type="sawtooth";o.frequency.value=fq*(1+dtn*.003);lfo.frequency.value=4.6+Math.random()*.8;lg.gain.value=fq*.007;lfo.connect(lg).connect(o.frequency);
+    f1.type="bandpass";f1.frequency.value=vi<2?620:780;f1.Q.value=4;f2.type="bandpass";f2.frequency.value=vi<2?1050:1200;f2.Q.value=5;o.connect(f1).connect(g);o.connect(f2).connect(g);g.connect(evG);
+    const pk=(vi===3?.07:.05);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(pk,t+.45);g.gain.setValueAtTime(pk,t+dur-.7);g.gain.linearRampToValueAtTime(0,t+dur);o.start(t);lfo.start(t);o.stop(t+dur+.1);lfo.stop(t+dur+.1)})});
+  ch.forEach(m=>{const o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.value=mtof(m-12);o.connect(g).connect(evG);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.03,t+.3);g.gain.setValueAtTime(.03,t+dur-.6);g.gain.linearRampToValueAtTime(0,t+dur);o.start(t);o.stop(t+dur+.1)})}
+const CHOIR=[];
+(()=>{const xs=[-8.5,-7.5,-6.5,-5.5];[-66.4,-67.5].forEach((z,row)=>xs.forEach((x,i)=>{const k=row*4+i,f=k%2===0;
+  const av=makeAvatar({s:f?"f":"m",h:(k*3)%5,hc:k%3===0?1:0,t:9,tc:"#f3efe4",b:9,bc:"#f3efe4",sh:1,sash:false},k===1?"성가대":"","npc");
+  box(.34,.05,.03,lam(0x2d5f8b),0,.5,-.2,av.piv);if(k!==1&&av.lb)av.lb.visible=false;
+  av.g.position.set(x+(row?.5:0),groundY(x+(row?.5:0),z,0),z);av.g.rotation.y=Math.PI;av.g.visible=false;CHOIR.push({av,next:0})}))})();
+/* 십자가의 길 14처: 성당 양쪽 벽 */
+const WAY_T=["예수님께서 사형 선고를 받으심","예수님께서 십자가를 지심","예수님께서 기력이 떨어져 넘어지심","예수님께서 성모님을 만나심","시몬이 예수님을 도와 십자가를 짐","베로니카, 수건으로 예수님의 얼굴을 닦아 드림","예수님께서 기력이 다하여 두 번째 넘어지심","예수님께서 예루살렘 부인들을 위로하심","예수님께서 세 번째 넘어지심","예수님께서 옷 벗김 당하심","예수님께서 십자가에 못 박히심","예수님께서 십자가 위에서 돌아가심","제자들이 예수님의 시신을 십자가에서 내림","예수님께서 무덤에 묻히심"];
+const WAY_M=["죄 없는 분이 억울한 판결을 받으십니다. 나도 남을 섣불리 판단하지 않았는지 돌아봅니다.","무거운 십자가를 묵묵히 지십니다. 내가 지고 있는 짐도 주님께 맡겨 드립니다.","주님도 넘어지셨습니다. 넘어진 나를 너무 탓하지 말고 다시 일어설 힘을 청합니다.","아들의 고통을 바라보는 어머니의 마음을 생각합니다. 가족의 아픔을 함께 지는 사랑을 청합니다.","낯선 이가 십자가를 함께 졌습니다. 힘든 이웃의 짐을 나누는 손이 되게 하소서.","작은 용기가 큰 위로가 되었습니다. 오늘 누군가의 얼굴을 닦아 주는 사람이 되기를 청합니다.","다시 넘어지셨지만 멈추지 않으셨습니다. 거듭되는 실패 속에서도 포기하지 않게 하소서.","자신의 고통 속에서도 남을 위로하십니다. 나의 아픔에만 갇히지 않게 하소서.","세 번째 넘어지셨어도 다시 일어나십니다. 끝까지 걸어가는 믿음을 청합니다.","모든 것을 빼앗기셨습니다. 내가 붙잡고 있는 것들을 내려놓는 자유를 청합니다.","못 박히는 고통 속에서도 용서를 비셨습니다. 용서하기 어려운 사람을 떠올리며 기도합니다.","주님께서 목숨을 내어 주셨습니다. 잠시 침묵하며 그 사랑 앞에 머뭅니다.","제자들이 슬픔 속에 주님을 품에 안습니다. 떠나보낸 이들을 주님께 맡겨 드립니다.","무덤은 끝이 아니라 부활을 기다리는 자리입니다. 어둠 속에서도 희망을 놓지 않게 하소서."];
+const WAY=[];
+(()=>{const L=[-7.5,-12.5,-21,-29.5,-34.5,-51.5,-56],R=[-56,-51.5,-42,-36,-30,-20,-12.5];
+  const mk=(n)=>{const c=document.createElement("canvas");c.width=256;c.height=320;const g=c.getContext("2d");g.fillStyle="#5a3a22";g.fillRect(0,0,256,320);g.fillStyle="#f3ead6";g.fillRect(12,12,232,296);
+    g.fillStyle="#7a1e2a";g.fillRect(118,34,20,92);g.fillRect(90,56,76,18);g.fillStyle="#2c2418";g.textAlign="center";g.font="bold 40px 'Jua',sans-serif";g.fillText(`제 ${n} 처`,128,176);
+    g.font="22px 'Gowun Dodum',sans-serif";const w=WAY_T[n-1],lines=[];let cur="";for(const ch of w){if(g.measureText(cur+ch).width>200){lines.push(cur);cur=ch}else cur+=ch}lines.push(cur);lines.slice(0,4).forEach((l,i)=>g.fillText(l.trim(),128,216+i*28));
+    const t=new T.CanvasTexture(c);return new T.Mesh(new T.PlaneGeometry(.9,1.12),new T.MeshBasicMaterial({map:t}))};
+  L.forEach((z,i)=>{const n=i+1,m=mk(n);m.position.set(-15.35,2.3,z);m.rotation.y=Math.PI/2;S.add(m);WAY.push({n,x:-13.7,z,ry:Math.PI/2})});
+  R.forEach((z,i)=>{const n=i+8,m=mk(n);m.position.set(15.35,2.3,z);m.rotation.y=-Math.PI/2;S.add(m);WAY.push({n,x:13.7,z,ry:-Math.PI/2})})})();
+let wayCur=null;const wayLS=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+let wayDone=(()=>{try{const a=JSON.parse(wayLS("ct_way")||"[]");return Array.isArray(a)&&a.length===14?a:Array(14).fill(0)}catch(e){return Array(14).fill(0)}})();
+function nearStation(){if(me.lv)return null;return WAY.find(w=>Math.hypot(me.x-w.x,me.z-w.z)<2.1)||null}
+function wayGo(n){const w=WAY[n-1];$("panel").hidden=true;if(me.lv)goTo("nave");if(me.sit)standUp();me.x=w.x;me.z=w.z;me.ry=w.ry;if(typeof meAv!=="undefined")meAv.g.rotation.y=w.ry;camYaw=w.ry;pushP(true)}
+function wayPanel(c,close){const w=wayCur||nearStation();const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";head.append(el("h2",null,`✝️ 십자가의 길 · 제${w.n}처`),close);c.append(head);
+  c.append(el("h3",null,WAY_T[w.n-1]));c.append(el("p",null,WAY_M[w.n-1]));const v=el("p",null,"○ 주 예수 그리스도님, 경배하며 찬송하나이다.\n● 거룩한 십자가로 세상을 구속하셨나이다.");v.style.whiteSpace="pre-line";v.style.opacity=".85";c.append(v);
+  const r=el("div","chips");const b=el("button","btn",wayDone[w.n-1]?"🙏 다시 기도 바치기":"🙏 기도 바치기");b.type="button";
+  b.onclick=()=>{wayDone[w.n-1]=1;initAudio();chime();doAct("hap");const k=wayDone.filter(Boolean).length;
+    if(k>=14){const t=+(wayLS("ct_wayN")||0)+1;wayLS("ct_wayN",String(t));wayDone=Array(14).fill(0);toast(`🎉 십자가의 길 14처를 모두 마쳤어요 (${t}번째 순례)`,true)}else toast(`제${w.n}처 기도를 바쳤어요 · ${k}/14`);
+    wayLS("ct_way",JSON.stringify(wayDone));$("panel").hidden=true};r.append(b);
+  if(w.n<14){const nx=el("button","btn",`제${w.n+1}처로 가기 →`);nx.type="button";nx.onclick=()=>wayGo(w.n+1);r.append(nx)}c.append(r)}
+function wayPanelPart(c){c.append(el("h3",null,"✝️ 성지순례 · 십자가의 길"));const k=wayDone.filter(Boolean).length,t=+(wayLS("ct_wayN")||0);
+  c.append(el("p",null,`성당 양쪽 벽에 걸린 십자가의 길 14처를 차례로 걸으며 묵상해요. 왼쪽 벽 1~7처, 오른쪽 벽 8~14처예요. 지금 ${k}/14${t?` · 모두 마친 순례 ${t}번`:""}`));
+  const nx=wayDone.findIndex(x=>!x)+1||1;const b=el("button","btn",`제${nx}처로 가기`);b.type="button";b.onclick=()=>wayGo(nx);c.append(b);
+  c.append(el("h3",null,"🇰🇷 한국의 천주교 성지"));
+  [["솔뫼성지 (충남 당진)","한국인 첫 사제 성 김대건 안드레아 신부가 1821년에 태어난 곳이에요. 2014년 프란치스코 교황이 다녀갔어요."],
+   ["해미국제성지 (충남 서산)","조선 후기 박해 때 1,000명이 넘는 신자가 순교한 곳이에요. 2020년 교황청이 승인한 우리나라 첫 단일 국제성지예요."],
+   ["천주교 서울 순례길","절두산·서소문·새남터 등 서울의 순교 성지를 잇는 길이에요. 2018년 아시아 최초로 교황청 공식 국제 순례지로 선포됐어요."],
+   ["배론성지 (충북 제천)","두 번째 한국인 사제 최양업 토마스 신부의 묘와 황사영이 백서를 쓴 토굴이 있는 곳이에요."]].forEach(([a,b])=>{const p=el("p");p.append(el("b",null,a),document.createElement("br"),document.createTextNode(b));c.append(p)})}
+/* ================= 시간표 행사: 한국 시각에 맞춰 모든 방문객 화면에서 똑같이 진행 ================= */
+var evAmbMute=0;
+const EV_DAY=864e5,EV_KST=9*3600e3,EV_PREV_STEP=25000;
+function evLunar(ms){try{const p=new Intl.DateTimeFormat("ko-KR-u-ca-chinese",{timeZone:"Asia/Seoul",day:"numeric"}).formatToParts(new Date(ms)).find(x=>x.type==="day");return p?parseInt(p.value,10):0}catch(e){return 0}}
+const evLunCache={};function evLun(d){if(!(d in evLunCache))evLunCache[d]=evLunar(d+12*3600e3);return evLunCache[d]}
+let evPrev=null;
+function evOccs(from,to){const out=[],d0=Math.floor((from+EV_KST)/EV_DAY)*EV_DAY-EV_KST;
+  for(let d=d0;d<to;d+=EV_DAY){const dow=new Date(d+EV_KST).getUTCDay();
+    EVC.list.forEach(ev=>{if(ev.dow&&!ev.dow.includes(dow))return;if(ev.lunar&&evLun(d)!==ev.lunar)return;
+      ev.at.forEach(([h,m])=>{const s=d+(h*60+m)*6e4,e=s+ev.dur*6e4;if(e>from&&s<to&&!out.some(o=>o.s===s))out.push({ev,s,e})})})}
+  out.sort((a,b)=>a.s-b.s);return out}
+function evNow(now){if(evPrev){if(now<evPrev.e)return evPrev;evPrev=null}return evOccs(now-4*3600e3,now+6e4).find(x=>x.s<=now&&now<x.e)||null}
+function evHM(ms){const d=new Date(ms+EV_KST),h=d.getUTCHours(),m=d.getUTCMinutes();return`${h<12?"오전":"오후"} ${h%12||12}:${String(m).padStart(2,"0")}`}
+function evDayName(ms,now){const a=Math.floor((ms+EV_KST)/EV_DAY),b=Math.floor((now+EV_KST)/EV_DAY),d=new Date(ms+EV_KST);return a===b?"오늘":a===b+1?"내일":`${d.getUTCMonth()+1}월 ${d.getUTCDate()}일(${"일월화수목금토"[d.getUTCDay()]})`}
+function evStepAt(o,now){const st=o.ev.steps;if(o.prev)return Math.min(st.length-1,Math.floor((now-o.s)/EV_PREV_STEP));const f=(now-o.s)/(o.e-o.s);let si=0;st.forEach((x,i)=>{if(f>=x[0])si=i});return si}
+function evStepLen(o,si){if(o.prev)return EV_PREV_STEP;const st=o.ev.steps,a=st[si][0],b=si+1<st.length?st[si+1][0]:1;return(b-a)*(o.e-o.s)}
+let evCur=null,evStep=-1,evT=0,evIn=0,evLines=null,evLineI=0,evLineT=0,evBells=[],evStepT0=0,evBarTxt="",evBarGo=false;
+const evGot={};
+function evOff(){return NPCS.find(n=>n.id===EVC.off)}
+function evSay(n,t,now){if(!n)return;n.until=now+12000;setBubble(n.av,t);if(EVC.inVenue()&&talkId!==n.id)toast(`${n.name}: ${t.length>60?t.slice(0,58)+"…":t}`)}
+function evStart(o){const n=evOff();if(n){if(talkId===n.id)endTalk();n.ev=Object.assign({},EVC.spot)}evIn=0;EVC.onStart&&EVC.onStart(o);
+  toast(`🔔 ${o.ev.n}${o.prev?" 미리 보기":""}를 시작해요 · ${o.ev.where}`,true);if(typeof addLog==="function")addLog("알림","#8a6d2f",`${o.ev.n} 시작 · ${o.ev.where} (${evHM(Date.now())})`)}
+function evEnd(){const n=evOff();if(n){n.ev=null;n.nextAct=0;n.av.sit=n.sit||null;const gy=EVC.gy(n.home.x,n.home.z);n.av.g.position.set(n.home.x,gy,n.home.z);n.av.g.rotation.y=n.home.ry;setBubble(n.av,"")}
+  evAmbMute=0;evBells=[];evLines=null;EVC.onEnd&&EVC.onEnd();if(evCur)toast(`🙏 ${evCur.ev.n}를 마쳤어요`)}
+function evStepGo(o,si,now){const st=o.ev.steps[si],opt=st[3]||{},n=evOff();evStepT0=now;
+  if(n)n.ev=Object.assign({},EVC.spot,opt.pose||{});evLines=opt.lines||null;evLineI=0;evLineT=0;
+  evBells=(opt.bells||[]).map(([sec,k])=>({at:now+sec*(o.prev?250:1000),k}));
+  EVC.onStep&&EVC.onStep(o,si,opt);
+  if(n)evSay(n,st[1],now);if(EVC.inVenue()&&st[2])setTimeout(()=>toast(`${o.ev.n} · ${st[2]}`),1800);renderPanelIfOpen&&renderPanelIfOpen()}
+function evNpc(n,now,t){const e=n.ev;n.av.g.position.set(e.x,EVC.gy(e.x,e.z),e.z);if(talkId!==n.id)n.av.g.rotation.y=e.ry;n.av.sit=e.sit||null;if(n.av.broom)n.av.broom.visible=false;
+  if(e.act&&now>(n.nextAct||0)&&!n.busy){n.av.act=e.act;n.av.actAt=now;n.nextAct=now+(e.every||4)*1000}
+  poseAvatar(n.av,now,false,t);if(n.av.bub&&now>n.until&&!n.busy&&talkId!==n.id)setBubble(n.av,"")}
+function evTick(now,dt){EVC.tick&&EVC.tick(now,dt,evCur);evT-=dt;if(evT>0)return;evT=.25;
+  const o=evNow(now);if((o&&o.s)!==(evCur&&evCur.s)||(o&&o.ev)!==(evCur&&evCur.ev)){if(evCur)evEnd();evCur=o;evStep=-1;if(o)evStart(o)}
+  if(evCur){const si=evStepAt(evCur,now);if(si!==evStep){evStep=si;evStepGo(evCur,si,now)}
+    if(evLines&&evLineI<evLines.length){const gap=Math.max(6000,evStepLen(evCur,si)/(evLines.length+.5));if(now-evStepT0>=gap*(evLineI+.3)){evSay(evOff(),evLines[evLineI++],now)}}
+    while(evBells.length&&now>=evBells[0].at){const b=evBells.shift();EVC.bell&&EVC.bell(b.k)}
+    if(EVC.inVenue()){evIn+=.25;if(evIn>=60&&!evGot[evCur.s]){evGot[evCur.s]=1;EVC.attend&&EVC.attend(evCur)}}}
+  evBar(now,evCur)}
+function evBar(now,o){let t="",go=false;const inV=EVC.inVenue();
+  if(o){const st=o.ev.steps[Math.max(0,evStep)];t=`🔔 ${o.ev.n} · ${st[1]}`;go=!inV}
+  else{const nx=evOccs(now,now+20*6e4).find(x=>x.s>now);if(nx){t=`⏰ ${Math.max(1,Math.ceil((nx.s-now)/6e4))}분 뒤 ${nx.ev.n} · ${nx.ev.where}`;go=!inV}}
+  if(t===evBarTxt&&go===evBarGo&&($("evBar").hidden===(!t||!!talkId||!$("panel").hidden)))return;evBarTxt=t;evBarGo=go;const b=$("evBar");if(!b)return;b.hidden=!t||!!talkId||!$("panel").hidden;$("evTxt").textContent=t;$("evGo").hidden=!go}
+function evGoVenue(){$("panel").hidden=true;EVC.go()}
+function evPreview(ev){const now=Date.now();if(evCur){evEnd();evCur=null}evPrev={ev,s:now,e:now+ev.steps.length*EV_PREV_STEP,prev:true};evGoVenue()}
+function evPanel(c,close){const now=Date.now(),head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";head.append(el("h2",null,EVC.title),close);c.append(head);
+  c.append(el("p",null,EVC.intro));
+  const o=evCur;if(o){const box=el("div");box.style.cssText="background:rgba(201,162,74,.16);border-radius:10px;padding:8px 10px;margin:6px 0";
+    box.append(el("b",null,`🔔 지금 ${o.ev.n}${o.prev?" (나만 미리 보기)":""} · ${o.ev.steps[Math.max(0,evStep)][1]}`));const r=el("div","chips");r.style.marginTop="6px";
+    const g=el("button","btn","함께하러 가기");g.type="button";g.onclick=evGoVenue;r.append(g);if(o.prev){const x=el("button","btn","미리 보기 끝내기");x.type="button";x.onclick=()=>{evPrev=null;evT=0;$("panel").hidden=true};r.append(x)}box.append(r);c.append(box)}
+  c.append(el("h3",null,"다가오는 일정 (한국 시각)"));const ul=el("div");ul.style.cssText="display:grid;gap:4px;font-size:14px";
+  evOccs(now,now+8*EV_DAY).filter(x=>x.s>now).slice(0,7).forEach(x=>{const r=el("div");r.textContent=`${evDayName(x.s,now)} ${evHM(x.s)} · ${x.ev.n} (${x.ev.dur}분) · ${x.ev.where}`;ul.append(r)});c.append(ul);
+  c.append(el("h3",null,"정해진 시간표"));const tb=el("div");tb.style.cssText="display:grid;gap:4px;font-size:14px";
+  EVC.list.forEach(ev=>{const r=el("div");r.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:6px";r.append(el("span",null,`${ev.n} · ${ev.when}`));
+    const p=el("button","chipb","▶ 미리 보기");p.type="button";p.onclick=()=>evPreview(ev);r.append(p);tb.append(r)});c.append(tb);
+  c.append(el("p",null,"'미리 보기'는 내 화면에서만 짧게(한 단계 25초) 진행돼요. 정해진 시간의 행사는 접속한 모든 분의 화면에서 똑같이 진행돼요."));
+  EVC.panelExtra&&EVC.panelExtra(c)}
+(()=>{const st=document.createElement("style");st.textContent=".evbar{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 162px);display:flex;align-items:center;gap:6px;max-width:min(64vw,330px);padding:5px 6px 5px 10px;border-radius:999px;background:rgba(40,30,18,.78);color:#fff3d6;font-size:12.5px;line-height:1.3;box-shadow:0 2px 10px #0004;z-index:6}.evbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.evbar .chipb{flex:none;padding:3px 9px}";document.head.append(st);
+  const b=document.createElement("div");b.className="hud evbar";b.id="evBar";b.hidden=true;b.innerHTML='<span id="evTxt"></span><button class="chipb" id="evGo" type="button">가기</button>';$("app").append(b);
+  $("evGo").onclick=evGoVenue;$("evTxt").onclick=()=>openPanel("ev");
+  try{const q=new URLSearchParams(location.search).get("ev");const ev=q&&EVC.list.find(x=>x.id===q);if(ev)setTimeout(()=>evPreview(ev),2500)}catch(e){}})();
+
+$("evBtn").onclick=()=>openPanel("ev");
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();
   if(perfDone<2){perfAcc+=dt;perfN++;if(perfAcc>5){const avg=perfAcc/perfN;perfAcc=0;perfN=0;if(avg>.034){perfDone++;if(perfDone===1){R.setPixelRatio(1);resize()}else{RAYS.forEach(r=>r.visible=false);gfxLow()}}else perfDone=2}}
   let fx=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)+joyV.y,sx=(keys.d?1:0)-(keys.a?1:0)+joyV.x;if(keys.arrowleft)camYaw+=dt*1.8;if(keys.arrowright)camYaw-=dt*1.8;
@@ -1469,7 +1603,7 @@ function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now
   const gy=groundY(me.x,me.z,me.lv);meAv.g.position.set(me.x,gy,me.z);gfxTick(me.x,gy,me.z);let dr=me.ry-meAv.g.rotation.y;dr=Math.atan2(Math.sin(dr),Math.cos(dr));meAv.g.rotation.y+=dr*Math.min(1,dt*10);meAv.sit=me.sit;poseAvatar(meAv,now,moving,t);if(meAv.bub&&now-me.sayAt>6000)setBubble(meAv,"");
   for(const o of others.values()){const dx=o.gx-o.x,dz=o.gz-o.z,d=Math.hypot(dx,dz),mv=d>.05;if(d>25){o.x=o.gx;o.z=o.gz}else if(mv){const st=Math.min(d,Math.max(4.6,d*5)*dt);o.x+=dx/d*st;o.z+=dz/d*st}
     o.av.g.position.set(o.x,groundY(o.x,o.z,o.lv),o.z);let r=o.gry-o.av.g.rotation.y;r=Math.atan2(Math.sin(r),Math.cos(r));o.av.g.rotation.y+=r*Math.min(1,dt*8);poseAvatar(o.av,now,mv,t);if(o.av.bub&&now-o.sayAt>6000)setBubble(o.av,"")}
-  npcTick(now,t,dt);crowdTick(now,t);carTick(now);extTick(t,dt);
+  npcTick(now,t,dt);evTick(now,dt);crowdTick(now,t);carTick(now);extTick(t,dt);
   const inn=inside(me.x,me.z),zk=me.lv===1?"t":me.lv===2?(me.x<0?"c":"m"):inn?"i":"o";if(zk!==zoneIn){const was=zoneIn;zoneIn=zk;$("zone").textContent={t:"종탑 전망대",c:"지하 경당",m:"성당 박물관",i:"성당 안",o:"성당 광장"}[zk];if(zk==="i"&&was==="o"&&$("sheet").hidden&&!quiet)showSub("성당 안","숲처럼 가지를 뻗은 기둥과 색색의 빛이 쏟아져요. 조용히 걸으며, 앉고 싶으면 신자석에서 '신자석에 앉기'를 눌러요.",6000)}
   ctxT-=dt;if(ctxT<0){ctxT=.25;updCtx()}
   lightT-=dt;if(lightT<0){lightT=1;lightTick();$("wx").textContent=wxLine();if(me.lv===2){S.background.setHex(0x17120e);S.fog.color.setHex(0x17120e)}const b=bcnNow();if((b.h===12||b.h===18||b.h===6)&&b.mi===0&&angelusH!==b.h){angelusH=b.h;bellSound(.9,3);toast("🔔 삼종기도 종이 울려요")}}

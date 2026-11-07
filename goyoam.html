@@ -143,7 +143,7 @@ body.bigtext .pcard p,body.bigtext .wish{font-size:15px}body.bigtext .item b{fon
   <div class="load" id="load">산길을 만드는 중…</div>
   <div class="hud top">
     <div class="brand"><b>고요암 가는 길</b><span id="zone">산문 입구</span><span id="wx"></span><span id="clock"></span></div>
-    <div class="right"><span class="chip cnt" id="cnt">👣 혼자</span><button class="stat btn" id="statBtn" type="button" aria-label="공덕과 체험 보기">공덕 <b id="gd">0</b><span class="gi"><i id="gi" style="width:100%"></i></span>기력</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🪷 고요</button><button class="btn" id="sndBtn" type="button" aria-pressed="true">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button></div>
+    <div class="right"><span class="chip cnt" id="cnt">👣 혼자</span><button class="stat btn" id="statBtn" type="button" aria-label="공덕과 체험 보기">공덕 <b id="gd">0</b><span class="gi"><i id="gi" style="width:100%"></i></span>기력</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🪷 고요</button><button class="btn" id="sndBtn" type="button" aria-pressed="true">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button><button class="btn" id="evBtn" type="button">📅 일정</button></div>
   </div>
   <div class="hud sub hide" id="sub"><small>안내 스님</small><span id="subText"></span></div>
   <div class="hud logw empty" id="logw"><div class="logh"><button class="chipb" id="logFold" type="button">채팅 접기</button><button class="chipb" id="logClear" type="button">내 화면 비우기</button><button class="chipb" id="logWipe" type="button" hidden>모두 지우기</button></div><div class="log" id="log" aria-live="polite"></div></div>
@@ -1217,7 +1217,7 @@ function recTick(lv){if(!recBuf||!recG)return false;const prev=performance.now()
   if(want)recStart();recG.gain.setTargetAtTime(want?g:0,AC.currentTime,.6);if(!want&&recSrc&&recG.gain.value<.004)recStop();return want&&!prev||want}
 function ambientTick(dt){if(!AC)return;initRec();const h=tHour(),Ld=dayL(h),r=inRoom(me.x,me.z),inHall=r&&r.id==="hall",outside=!r||r.open;
   const service=h>=4&&h<21;let lv=0;if(inHall)lv=1;else if(me.z<-205&&service){const d=Math.hypot(me.x,me.z+285);lv=Math.max(0,1-(d-9)/50)*.55}
-  if(r&&!r.open&&!inHall)lv=0;if(!ambOn)lv=0;
+  if(r&&!r.open&&!inHall)lv=0;if(!ambOn||evAmbMute)lv=0;
   const recOn=recTick(lv);
   if(lv>0&&!recOn){ambMokT-=dt;if(ambMokT<=0){ambMokT=.62;mokSound(lv*.22);chantSyl(lv)}}else if(chantG)chantG.gain.setTargetAtTime(0,AC.currentTime,.2);
   if(recOn){stopTTS();if(inHall&&!chantNoted){chantNoted=true;toast("법당에서 영인스님의 반야심경 독경이 들려요")}}
@@ -1340,7 +1340,7 @@ function openPanel(kind){panelKind=kind;$("panel").hidden=false;renderPanel()}
 function renderPanelIfOpen(){if(!$("panel").hidden)renderPanel()}
 $("panel").addEventListener("click",e=>{if(e.target.id==="panel")$("panel").hidden=true});
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
-function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;
+function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;if(panelKind==="ev"){evPanel(c,close);return}
   const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";
   if(panelKind==="go"){head.append(el("h2",null,"어디로 갈까요?"),close);c.append(head,el("p",null,"누르면 바로 그곳으로 옮겨 가요."));const g=el("div","chips");
     PLACES.forEach(p=>{const b=el("button","chipb",p[1]);b.type="button";b.style.fontSize="14px";b.style.padding="8px 12px";b.onclick=()=>goTo(p[0]);g.append(b)});c.append(g);return}
@@ -1445,7 +1445,7 @@ function hash(s){let h=0;for(const ch of s)h=(h*31+ch.charCodeAt(0))|0;return h}
 let sample=null;
 /* ================= 절 식구들: 스님과 일 도와주시는 분들 (모두 대화할 수 있어요) ================= */
 const LOOKW={bosal:(tc,h)=>({s:"f",h,hc:0,t:0,tc,b:3,bc:"#6b5a44",sh:2}),geosa:tc=>({s:"m",h:1,hc:3,t:0,tc,b:0,bc:"#5a5148",sh:2})};
-const TEMPLE_INFO="산사 구성: 일주문, 단풍 숲길(연등, 약수터, 돌탑), 계곡 다리와 폭포, 천왕문(사천왕), 절 마당(쌍탑, 석등, 범종각과 법고·운판·목어, 소원 연등 줄, 기와 시주), 마당 오른쪽 공양간과 찻집 다향, 왼쪽 뒤 기념품점, 대웅전(석가모니 부처님, 향과 초, 108배, 참선 방석). 방문객은 공덕을 쌓아 공양, 차, 연등, 향과 초를 구한다.";
+const TEMPLE_INFO="예불·법회 시간(한국 시각, 주지 원각 스님이 대웅전에서 이끔): 매일 새벽예불 오전 4시, 사시예불 오전 10시, 저녁예불 오후 6시, 일요법회 일요일 오전 11시, 초하루법회 음력 1일 오전 11시. 화면 위 📅 일정 버튼에 시간표가 있다. 산사 구성: 일주문, 단풍 숲길(연등, 약수터, 돌탑), 계곡 다리와 폭포, 천왕문(사천왕), 절 마당(쌍탑, 석등, 범종각과 법고·운판·목어, 소원 연등 줄, 기와 시주), 마당 오른쪽 공양간과 찻집 다향, 왼쪽 뒤 기념품점, 대웅전(석가모니 부처님, 향과 초, 108배, 참선 방석). 방문객은 공덕을 쌓아 공양, 차, 연등, 향과 초를 구한다.";
 const NPC_RULES="규칙: 한국어 존댓말로, 맡은 사람다운 따뜻하고 차분한 말투로 2~3문장, 140자 이내로 짧게 답한다. 너는 구글 검색 도구를 쓸 수 있을 때가 있다. 방문객이 날씨, 뉴스, 스포츠 경기 결과, 행사 일정처럼 바깥세상의 최신 소식을 물으면, 검색해서 확인한 내용이나 아래 [실시간 자료]로만 정확히 답하고 언제 어디 소식인지 짧게 밝힌다. 확인한 자료가 없으면 절대 지어내지 말고 그건 지금 확인할 길이 없다고 솔직히 말한다. 오래된 일반 상식은 아는 대로 답하되 확실하지 않으면 모른다고 한다. 날짜와 요일은 아래 적힌 지금 한국 시각을 기준으로 말한다. 불교와 사찰 문화는 정확하게 말하고 확실하지 않으면 모른다고 한다. 고요암은 가상의 절이니 실제 주소나 역사를 지어내지 않는다. 의료, 법률, 투자 같은 전문 문제는 전문가와 상의하라고 권한다. 마음이 많이 힘들거나 위험해 보이는 사람에게는 따뜻하게 대하고 자살예방상담전화 109나 가까운 사람에게 도움을 청하라고 안내한다. 이모지와 목록 기호는 쓰지 않는다.";
 const NPCS=[
  {id:"juji",name:"원각 주지 스님",monk:true,role:"고요암의 주지 스님. 낮에는 요사채 경상 앞에 가부좌로 앉아 경전을 읽고, 밤에는 요사채에서 주무신다. 절 살림 전체를 돌보며 수행, 마음공부, 삶의 고민에 대해 느긋하고 중후하게, 짧지만 깊이 있게 이야기한다",home:{x:-18.9,z:-264,ry:Math.PI/2},sit:"cross"},
@@ -1581,7 +1581,7 @@ function localReply(n,q){const has=(...w)=>w.some(x=>q.includes(x)),nm=me.name||
   if(has("합장"))return"합장은 두 손바닥을 가슴 앞에 모으는 인사예요. 상대를 공경하고 흩어진 마음을 하나로 모은다는 뜻이에요.";
   if(has("108","백팔"))return"108배는 백팔 번뇌를 하나씩 내려놓는 마음으로 해요. 연못가 남쪽 참선방에서 횟수를 세며 할 수 있어요.";
   if(has("삼배","절은","절을","절하","절 하","절 방법"))return"법당에 들어가면 부처님께 세 번 절하는 삼배를 올려요. 가운데 어간문은 피하고 옆문으로 드나들어요.";
-  if(has("예불"))return"예불은 부처님께 올리는 의식이에요. 절에서는 보통 새벽, 오전 사시, 저녁에 예불을 올려요.";
+  if(has("예불"))return"예불은 부처님께 올리는 의식이에요. 절에서는 보통 새벽, 오전 사시, 저녁에 예불을 올려요. 고요암에서는 한국 시각으로 매일 새벽 4시, 오전 10시 사시예불, 오후 6시에 주지 스님이 대웅전에서 예불을 올리고, 일요일과 음력 초하루 오전 11시에는 법회가 있어요. 위의 📅 일정에서 시간표를 볼 수 있어요.";
   if(has("공양","밥","배고"))return"공양간에서 먹을 만큼만 받아 남기지 않고 먹어요. 먹기 전에 음식이 온 곳을 생각하는 오관게를 새겨요.";
   if(has("차 ","차를","차는","녹차","찻집","차가"))return"찻집 다향에서 공덕으로 차를 주문하고, 앉아서 천천히 마셔 보세요.";
   if(has("연등","소원"))return"기념품점에서 연등을 구해 마당 연등 줄에 달 수 있어요. 소원을 적어 달아 보세요.";
@@ -1609,7 +1609,7 @@ async function askNpc(n,q){if(n.busy)return;n.busy=true;n.face={x:me.x,z:me.z};i
 function npcTick(now,t,dt){const sec=now/1000,tk=talkNpc();
   if(tk){const p=npcPos(tk);if(Math.hypot(p.x-me.x,p.z-me.z)>7)endTalk()}
   const night=isNight();
-  NPCS.forEach(n=>{let moving=false;
+  NPCS.forEach(n=>{let moving=false;if(n.ev){evNpc(n,now,t);return}
     const bi=SLEEP[n.id];if(bi!==undefined){if(night){const b=BEDS[bi];if(!n.sleeping){n.sleeping=true;if(talkId===n.id)endTalk();setBubble(n.av,"")}n.av.sit="lie";n.av.act="";n.av.g.position.set(b.x,16,b.z);n.av.g.rotation.y=-Math.PI/2;n.av.broom.visible=false;poseAvatar(n.av,now,false,t);return}
       if(n.sleeping){n.sleeping=false;n.av.sit=n.sit||null;n.av.broom.visible=n.path==="sweep";if(n.home){n.av.g.position.set(n.home.x,groundY(n.home.x,n.home.z),n.home.z);n.av.g.rotation.y=n.home.ry}}}
     if(n.path){const talking=(talkId===n.id)||n.busy||now<n.until;
@@ -2154,6 +2154,92 @@ function dayNight(){const h=tHour(),L=dayL(h),k=WX.kind,dusk=Math.max(0,1-Math.a
     showSub(hr===18?"저녁 예불":"새벽 예불","예불을 알리는 사물이 울립니다. 실제 절에서는 범종을 새벽에 28번, 저녁에 33번 칩니다. 여기서는 세 번으로 줄였습니다.",9000)}
   if(hr!==lastHr){lastHr=hr;const hh=hr%12||12,mm=Math.floor((h%1)*60);$("clock").textContent=`절 시간 ${hr<12?"오전":"오후"} ${hh}시 · ${hourName(h)}`}}
 let last=performance.now(),birdT=3,zoneName="",tgt=new T.Vector3();
+/* 고요암 예불·법회 시간표 (한국 시각). 주지 스님이 대웅전에서 이끕니다 */
+const EV_BEOPMUN=["오늘 이 자리에 함께해 주셔서 고맙습니다. 잠시 숨을 고르고 지금 이 순간에 머물러 봅시다.","부처님께서는 모든 것은 변한다고 하셨습니다. 지금의 괴로움도 영원하지 않습니다.","화가 날 때는 바로 말하지 말고 숨을 세 번 쉬어 보세요. 그 사이에 마음이 조금 넓어집니다.","남에게 베푸는 작은 친절이 결국 내 마음을 가장 먼저 따뜻하게 합니다.","걱정은 내일의 짐을 오늘 미리 지는 일입니다. 오늘은 오늘의 걸음만 걸으면 됩니다.","감사할 일을 하루에 하나씩 찾아보십시오. 마음 밭에 좋은 씨앗을 심는 일입니다.","모두 건강하시고 평안하시길 부처님께 축원드립니다. 성불하십시오."];
+const EV_BELL=n=>Array.from({length:n},(_,i)=>[i*5,1]);
+const EV_BEOPHOE=[[0,"삼귀의","부처님과 가르침과 스님들께 귀의합니다",{pose:{act:"hap",every:6}}],[.06,"반야심경 독송","다 함께 반야심경을 독송합니다",{pose:{act:"mok",every:.7}}],[.16,"입정","눈을 감고 잠시 마음을 고요히 합니다",{pose:{act:"",sit:"cross"}}],
+  [.22,"법문","주지 스님의 법문을 듣습니다",{pose:{ry:Math.PI,act:"",sit:"cross"},lines:EV_BEOPMUN}],[.76,"석가모니불 정근","석가모니불을 부르며 마음을 모읍니다",{pose:{act:"mok",every:.7}}],[.88,"축원","모든 이의 건강과 평안을 빕니다",{pose:{act:"hap",every:6}}],[.95,"사홍서원 · 마침","네 가지 큰 서원을 세우고 마칩니다",{pose:{act:"bow",every:4}}]];
+const EVC={site:"temple",off:"juji",title:"📅 예불·법회 시간",
+  intro:"모든 시간은 한국 시각이에요. 시간이 되면 원각 주지 스님이 대웅전에서 예불과 법회를 이끌어요. 그 시간에 들어온 분은 누구나 함께 볼 수 있고, 대웅전에서 1분 넘게 함께하면 공덕이 쌓여요.",
+  list:[
+   {id:"dawn",n:"새벽예불",when:"매일 오전 4:00 (20분)",at:[[4,0]],dur:20,where:"대웅전",steps:[[0,"범종 28번","새벽 범종이 산사를 깨웁니다",{bells:EV_BELL(28),pose:{act:"hap",every:8}}],[.3,"예불문","삼보께 예를 올립니다",{pose:{act:"bow",every:5}}],[.55,"반야심경 독송","다 함께 반야심경을 독송합니다",{pose:{act:"mok",every:.7}}],[.85,"삼배","세 번 절하고 마칩니다",{pose:{act:"bow",every:4}}]]},
+   {id:"sasi",n:"사시예불",when:"매일 오전 10:00 (30분)",at:[[10,0]],dur:30,where:"대웅전",steps:[[0,"입정","자리에 앉아 마음을 고요히 합니다",{pose:{act:"hap",every:8}}],[.07,"마지 올림","부처님께 공양을 올립니다",{pose:{act:"hap",every:5}}],[.17,"예불문","삼보께 예를 올립니다",{pose:{act:"bow",every:5}}],[.4,"반야심경 독송","다 함께 반야심경을 독송합니다",{pose:{act:"mok",every:.7}}],[.67,"축원","모든 이의 건강과 평안을 빕니다",{pose:{act:"hap",every:6}}],[.9,"삼배","세 번 절하고 마칩니다",{pose:{act:"bow",every:4}}]]},
+   {id:"choharu",n:"초하루법회",when:"매달 음력 1일 오전 11:00 (50분)",at:[[11,0]],lunar:1,dur:50,where:"대웅전",steps:EV_BEOPHOE},
+   {id:"sunday",n:"일요법회",when:"매주 일요일 오전 11:00 (50분)",at:[[11,0]],dow:[0],dur:50,where:"대웅전",steps:EV_BEOPHOE},
+   {id:"eve",n:"저녁예불",when:"매일 오후 6:00 (20분)",at:[[18,0]],dur:20,where:"대웅전",steps:[[0,"범종 33번","저녁 범종이 산과 마을에 울립니다",{bells:EV_BELL(33),pose:{act:"hap",every:8}}],[.35,"예불문","삼보께 예를 올립니다",{pose:{act:"bow",every:5}}],[.6,"반야심경 독송","다 함께 반야심경을 독송합니다",{pose:{act:"mok",every:.7}}],[.88,"삼배","세 번 절하고 마칩니다",{pose:{act:"bow",every:4}}]]}],
+  spot:{x:0,z:-287.1,ry:0,act:"hap",every:6,sit:null},
+  gy:(x,z)=>groundY(x,z),
+  inVenue(){const r=inRoom(me.x,me.z);return!!(r&&r.id==="hall")},
+  go(){if(me.solo)return;goTo("hall");me.x=1.5;me.z=-281.4;me.ry=0;camYaw=0},
+  bell(){initAudio();if(!AC)return;const d=Math.hypot(me.x+12,me.z+221),r=inRoom(me.x,me.z);bellSound(Math.max(.12,1-d/170)*(r&&!r.open?.6:1))},
+  onStep(o,si,opt){evAmbMute=opt.pose&&opt.pose.sit==="cross"?1:0},
+  attend(o){earn(10,`${o.ev.n} 동참`,"ev"+o.s,1e6)},
+  panelExtra(c){c.append(el("h3",null,"🙏 공양과 후원"));c.append(el("p",null,"연등, 향, 초는 마당 왼쪽 뒤 기념품점에서 공덕으로 구해, 연등은 마당 연등 줄에, 향과 초는 대웅전에 올려요."));
+    const u=typeof window!=="undefined"&&window.DONATE_URL;if(u){const b=el("button","btn","💛 고요암 후원하기");b.type="button";b.onclick=()=>{try{window.open(u,"_blank","noopener")}catch(e){}};c.append(b);c.append(el("p",null,window.DONATE_NOTE||"보내 주신 후원은 고요암을 가꾸고 스님 AI 대화를 이어 가는 데 쓰여요."))}
+    else c.append(el("p",null,"실제 후원 안내는 준비 중이에요."))}};
+/* ================= 시간표 행사: 한국 시각에 맞춰 모든 방문객 화면에서 똑같이 진행 ================= */
+var evAmbMute=0;
+const EV_DAY=864e5,EV_KST=9*3600e3,EV_PREV_STEP=25000;
+function evLunar(ms){try{const p=new Intl.DateTimeFormat("ko-KR-u-ca-chinese",{timeZone:"Asia/Seoul",day:"numeric"}).formatToParts(new Date(ms)).find(x=>x.type==="day");return p?parseInt(p.value,10):0}catch(e){return 0}}
+const evLunCache={};function evLun(d){if(!(d in evLunCache))evLunCache[d]=evLunar(d+12*3600e3);return evLunCache[d]}
+let evPrev=null;
+function evOccs(from,to){const out=[],d0=Math.floor((from+EV_KST)/EV_DAY)*EV_DAY-EV_KST;
+  for(let d=d0;d<to;d+=EV_DAY){const dow=new Date(d+EV_KST).getUTCDay();
+    EVC.list.forEach(ev=>{if(ev.dow&&!ev.dow.includes(dow))return;if(ev.lunar&&evLun(d)!==ev.lunar)return;
+      ev.at.forEach(([h,m])=>{const s=d+(h*60+m)*6e4,e=s+ev.dur*6e4;if(e>from&&s<to&&!out.some(o=>o.s===s))out.push({ev,s,e})})})}
+  out.sort((a,b)=>a.s-b.s);return out}
+function evNow(now){if(evPrev){if(now<evPrev.e)return evPrev;evPrev=null}return evOccs(now-4*3600e3,now+6e4).find(x=>x.s<=now&&now<x.e)||null}
+function evHM(ms){const d=new Date(ms+EV_KST),h=d.getUTCHours(),m=d.getUTCMinutes();return`${h<12?"오전":"오후"} ${h%12||12}:${String(m).padStart(2,"0")}`}
+function evDayName(ms,now){const a=Math.floor((ms+EV_KST)/EV_DAY),b=Math.floor((now+EV_KST)/EV_DAY),d=new Date(ms+EV_KST);return a===b?"오늘":a===b+1?"내일":`${d.getUTCMonth()+1}월 ${d.getUTCDate()}일(${"일월화수목금토"[d.getUTCDay()]})`}
+function evStepAt(o,now){const st=o.ev.steps;if(o.prev)return Math.min(st.length-1,Math.floor((now-o.s)/EV_PREV_STEP));const f=(now-o.s)/(o.e-o.s);let si=0;st.forEach((x,i)=>{if(f>=x[0])si=i});return si}
+function evStepLen(o,si){if(o.prev)return EV_PREV_STEP;const st=o.ev.steps,a=st[si][0],b=si+1<st.length?st[si+1][0]:1;return(b-a)*(o.e-o.s)}
+let evCur=null,evStep=-1,evT=0,evIn=0,evLines=null,evLineI=0,evLineT=0,evBells=[],evStepT0=0,evBarTxt="",evBarGo=false;
+const evGot={};
+function evOff(){return NPCS.find(n=>n.id===EVC.off)}
+function evSay(n,t,now){if(!n)return;n.until=now+12000;setBubble(n.av,t);if(EVC.inVenue()&&talkId!==n.id)toast(`${n.name}: ${t.length>60?t.slice(0,58)+"…":t}`)}
+function evStart(o){const n=evOff();if(n){if(talkId===n.id)endTalk();n.ev=Object.assign({},EVC.spot)}evIn=0;EVC.onStart&&EVC.onStart(o);
+  toast(`🔔 ${o.ev.n}${o.prev?" 미리 보기":""}를 시작해요 · ${o.ev.where}`,true);if(typeof addLog==="function")addLog("알림","#8a6d2f",`${o.ev.n} 시작 · ${o.ev.where} (${evHM(Date.now())})`)}
+function evEnd(){const n=evOff();if(n){n.ev=null;n.nextAct=0;n.av.sit=n.sit||null;const gy=EVC.gy(n.home.x,n.home.z);n.av.g.position.set(n.home.x,gy,n.home.z);n.av.g.rotation.y=n.home.ry;setBubble(n.av,"")}
+  evAmbMute=0;evBells=[];evLines=null;EVC.onEnd&&EVC.onEnd();if(evCur)toast(`🙏 ${evCur.ev.n}를 마쳤어요`)}
+function evStepGo(o,si,now){const st=o.ev.steps[si],opt=st[3]||{},n=evOff();evStepT0=now;
+  if(n)n.ev=Object.assign({},EVC.spot,opt.pose||{});evLines=opt.lines||null;evLineI=0;evLineT=0;
+  evBells=(opt.bells||[]).map(([sec,k])=>({at:now+sec*(o.prev?250:1000),k}));
+  EVC.onStep&&EVC.onStep(o,si,opt);
+  if(n)evSay(n,st[1],now);if(EVC.inVenue()&&st[2])setTimeout(()=>toast(`${o.ev.n} · ${st[2]}`),1800);renderPanelIfOpen&&renderPanelIfOpen()}
+function evNpc(n,now,t){const e=n.ev;n.av.g.position.set(e.x,EVC.gy(e.x,e.z),e.z);if(talkId!==n.id)n.av.g.rotation.y=e.ry;n.av.sit=e.sit||null;if(n.av.broom)n.av.broom.visible=false;
+  if(e.act&&now>(n.nextAct||0)&&!n.busy){n.av.act=e.act;n.av.actAt=now;n.nextAct=now+(e.every||4)*1000}
+  poseAvatar(n.av,now,false,t);if(n.av.bub&&now>n.until&&!n.busy&&talkId!==n.id)setBubble(n.av,"")}
+function evTick(now,dt){EVC.tick&&EVC.tick(now,dt,evCur);evT-=dt;if(evT>0)return;evT=.25;
+  const o=evNow(now);if((o&&o.s)!==(evCur&&evCur.s)||(o&&o.ev)!==(evCur&&evCur.ev)){if(evCur)evEnd();evCur=o;evStep=-1;if(o)evStart(o)}
+  if(evCur){const si=evStepAt(evCur,now);if(si!==evStep){evStep=si;evStepGo(evCur,si,now)}
+    if(evLines&&evLineI<evLines.length){const gap=Math.max(6000,evStepLen(evCur,si)/(evLines.length+.5));if(now-evStepT0>=gap*(evLineI+.3)){evSay(evOff(),evLines[evLineI++],now)}}
+    while(evBells.length&&now>=evBells[0].at){const b=evBells.shift();EVC.bell&&EVC.bell(b.k)}
+    if(EVC.inVenue()){evIn+=.25;if(evIn>=60&&!evGot[evCur.s]){evGot[evCur.s]=1;EVC.attend&&EVC.attend(evCur)}}}
+  evBar(now,evCur)}
+function evBar(now,o){let t="",go=false;const inV=EVC.inVenue();
+  if(o){const st=o.ev.steps[Math.max(0,evStep)];t=`🔔 ${o.ev.n} · ${st[1]}`;go=!inV}
+  else{const nx=evOccs(now,now+20*6e4).find(x=>x.s>now);if(nx){t=`⏰ ${Math.max(1,Math.ceil((nx.s-now)/6e4))}분 뒤 ${nx.ev.n} · ${nx.ev.where}`;go=!inV}}
+  if(t===evBarTxt&&go===evBarGo&&($("evBar").hidden===(!t||!!talkId||!$("panel").hidden)))return;evBarTxt=t;evBarGo=go;const b=$("evBar");if(!b)return;b.hidden=!t||!!talkId||!$("panel").hidden;$("evTxt").textContent=t;$("evGo").hidden=!go}
+function evGoVenue(){$("panel").hidden=true;EVC.go()}
+function evPreview(ev){const now=Date.now();if(evCur){evEnd();evCur=null}evPrev={ev,s:now,e:now+ev.steps.length*EV_PREV_STEP,prev:true};evGoVenue()}
+function evPanel(c,close){const now=Date.now(),head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";head.append(el("h2",null,EVC.title),close);c.append(head);
+  c.append(el("p",null,EVC.intro));
+  const o=evCur;if(o){const box=el("div");box.style.cssText="background:rgba(201,162,74,.16);border-radius:10px;padding:8px 10px;margin:6px 0";
+    box.append(el("b",null,`🔔 지금 ${o.ev.n}${o.prev?" (나만 미리 보기)":""} · ${o.ev.steps[Math.max(0,evStep)][1]}`));const r=el("div","chips");r.style.marginTop="6px";
+    const g=el("button","btn","함께하러 가기");g.type="button";g.onclick=evGoVenue;r.append(g);if(o.prev){const x=el("button","btn","미리 보기 끝내기");x.type="button";x.onclick=()=>{evPrev=null;evT=0;$("panel").hidden=true};r.append(x)}box.append(r);c.append(box)}
+  c.append(el("h3",null,"다가오는 일정 (한국 시각)"));const ul=el("div");ul.style.cssText="display:grid;gap:4px;font-size:14px";
+  evOccs(now,now+8*EV_DAY).filter(x=>x.s>now).slice(0,7).forEach(x=>{const r=el("div");r.textContent=`${evDayName(x.s,now)} ${evHM(x.s)} · ${x.ev.n} (${x.ev.dur}분) · ${x.ev.where}`;ul.append(r)});c.append(ul);
+  c.append(el("h3",null,"정해진 시간표"));const tb=el("div");tb.style.cssText="display:grid;gap:4px;font-size:14px";
+  EVC.list.forEach(ev=>{const r=el("div");r.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:6px";r.append(el("span",null,`${ev.n} · ${ev.when}`));
+    const p=el("button","chipb","▶ 미리 보기");p.type="button";p.onclick=()=>evPreview(ev);r.append(p);tb.append(r)});c.append(tb);
+  c.append(el("p",null,"'미리 보기'는 내 화면에서만 짧게(한 단계 25초) 진행돼요. 정해진 시간의 행사는 접속한 모든 분의 화면에서 똑같이 진행돼요."));
+  EVC.panelExtra&&EVC.panelExtra(c)}
+(()=>{const st=document.createElement("style");st.textContent=".evbar{left:10px;bottom:calc(env(safe-area-inset-bottom,0px) + 162px);display:flex;align-items:center;gap:6px;max-width:min(64vw,330px);padding:5px 6px 5px 10px;border-radius:999px;background:rgba(40,30,18,.78);color:#fff3d6;font-size:12.5px;line-height:1.3;box-shadow:0 2px 10px #0004;z-index:6}.evbar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.evbar .chipb{flex:none;padding:3px 9px}";document.head.append(st);
+  const b=document.createElement("div");b.className="hud evbar";b.id="evBar";b.hidden=true;b.innerHTML='<span id="evTxt"></span><button class="chipb" id="evGo" type="button">가기</button>';$("app").append(b);
+  $("evGo").onclick=evGoVenue;$("evTxt").onclick=()=>openPanel("ev");
+  try{const q=new URLSearchParams(location.search).get("ev");const ev=q&&EVC.list.find(x=>x.id===q);if(ev)setTimeout(()=>evPreview(ev),2500)}catch(e){}})();
+
+$("evBtn").onclick=()=>openPanel("ev");
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();perfTick(dt);
   let fx=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)+joyV.y,sx=(keys.d?1:0)-(keys.a?1:0)+joyV.x;
   if(keys.arrowleft)camYaw+=dt*1.8;if(keys.arrowright)camYaw-=dt*1.8;
@@ -2169,7 +2255,7 @@ function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now
     if(d>25){o.x=o.gx;o.z=o.gz}else if(mv){const st=Math.min(d,Math.max(5.2,d*5)*dt);o.x+=dx/d*st;o.z+=dz/d*st}
     o.av.g.position.set(o.x,groundY(o.x,o.z),o.z);let r=o.gry-o.av.g.rotation.y;r=Math.atan2(Math.sin(r),Math.cos(r));o.av.g.rotation.y+=r*Math.min(1,dt*8);
     poseAvatar(o.av,now,mv,t);if(o.av.bub&&now-o.sayAt>6000)setBubble(o.av,"")}
-  npcTick(now,t,dt);
+  npcTick(now,t,dt);evTick(now,dt);
   // broom
   if(me.br){meAv.broom.rotation.y=moving?Math.sin(t*.012)*.55:0;sweepT-=dt;
     if(moving&&sweepT<=0&&me.gi>0){sweepT=.18;const fx2=-Math.sin(me.ry),fz2=-Math.cos(me.ry);const k=sweepAt(me.x,me.z,fx2,fz2);
