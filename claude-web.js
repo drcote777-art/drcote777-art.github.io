@@ -103,7 +103,7 @@
       catch(e){throw{code:"network",message:String(e&&e.message||e)}}finally{clearTimeout(tm)}};
     let code=ls.get("family_code")||"";let {r,j}=await send(code);
     if(r.status===401&&j.error==="code"&&!window.__askedCode){window.__askedCode=true;
-      const c=(window.prompt("스님·신부님과의 AI 대화는 가족만 쓸 수 있어요.\n가족 암호를 입력해 주세요.")||"").trim();
+      const c=(window.prompt("스님·신부님과의 AI 대화는 가족만 쓸 수 있어요.\n가족 암호를 입력해 주세요.\n(암호 문의: drcote777@gmail.com)")||"").trim();
       if(c){ls.set("family_code",c);code=c;({r,j}=await send(code));if(r.status===401){ls.set("family_code","");window.__askedCode=false;try{alert("가족 암호가 맞지 않아요. 다음에 말을 걸 때 다시 입력해 주세요.")}catch(e){}}}}
     if(j.error==="budget")throw{code:"upstream",message:"budget"};
     if(r.status===429)throw{code:"rate_limited",message:"rate"};
