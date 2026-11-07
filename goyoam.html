@@ -2243,7 +2243,7 @@ $("evBtn").onclick=()=>openPanel("ev");
 /* 방문 기록: 기기마다 익명 번호와 기기 종류를 같이 남겨 이름 없는 손님도 구분해요 */
 const VID=(()=>{let v="";try{v=localStorage.getItem("vid")||""}catch(e){}if(!/^[0-9a-f]{4}$/.test(v)){v=Math.random().toString(16).slice(2,6).padEnd(4,"0");try{localStorage.setItem("vid",v)}catch(e){}}return v})();
 const DEV=(()=>{const u=navigator.userAgent||"";return/iPad|Tablet/i.test(u)?"태블릿":/Mobi|Android|iPhone/i.test(u)?"휴대폰":"PC"})();
-const vKey=v=>v.u||v.nick,vTag=v=>[v.dv,v.u?"#"+v.u:""].filter(Boolean).join(" ");
+const vKey=v=>v.u||((visits.find(w=>w.nick===v.nick&&w.u)||{}).u)||v.nick,vTag=v=>[v.dv,v.u?"#"+v.u:""].filter(Boolean).join(" ");
 function visitPanel(c,close){const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";head.append(el("h2",null,"누가 다녀갔나요"),close);c.append(head);
   const fd=ts=>{const d=new Date(ts+9*3600e3);return`${d.getUTCMonth()+1}월 ${d.getUTCDate()}일(${"일월화수목금토"[d.getUTCDay()]})`};
   const here=[me.name||"나",...[...others.values()].map(o=>o.name||"순례자")];c.append(el("h3",null,`지금 함께 있는 사람 ${here.length}명`));
@@ -2251,7 +2251,7 @@ function visitPanel(c,close){const head=el("div");head.style.cssText="display:fl
   const row=v=>{const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)+(vTag(v)?" · "+vTag(v):"")));return w};
   const today=fd(Date.now()),tv=visits.filter(v=>fd(v.ts)===today);c.append(el("h3",null,`오늘 다녀간 분 ${new Set(tv.map(vKey)).size}명 · ${tv.length}번`));
   if(!tv.length)c.append(el("p",null,"오늘은 아직 기록이 없어요."));tv.forEach(v=>c.append(row(v)));
-  const cnt={};visits.forEach(v=>{const n=v.nick+(v.u?" #"+v.u:"");cnt[n]=(cnt[n]||0)+1});const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const cnt={};visits.forEach(v=>{const k=vKey(v),n=v.nick+(k!==v.nick?" #"+k:"");cnt[n]=(cnt[n]||0)+1});const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
   if(top.length){c.append(el("h3",null,"자주 오신 분"));const g=el("div","chips");top.forEach(([n,k])=>{const s=el("span","chipb",`${n} ${k}번`);s.style.cursor="default";g.append(s)});c.append(g)}
   c.append(el("h3",null,"지난 기록"));let last="";const old=visits.filter(v=>fd(v.ts)!==today).slice(0,80);if(!old.length)c.append(el("p",null,"지난 기록이 아직 없어요."));
   old.forEach(v=>{const d=fd(v.ts);if(d!==last){last=d;const h=el("p",null,d);h.style.cssText="margin-top:6px;font-weight:bold";c.append(h)}c.append(row(v))});
