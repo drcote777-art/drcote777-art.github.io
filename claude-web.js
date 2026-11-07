@@ -88,7 +88,7 @@
   const SAMPLE=AI_URL?async function(input,opts){opts=opts||{};
     const prompt=typeof input==="string"?input:(input||[]).map(m=>(m.role==="assistant"?"대답: ":"")+m.content).join("\n");
     const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),30000);
-    let r;try{r=await fetch(AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt}),signal:ac.signal})}
+    let r;try{r=await fetch(AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,search:window.AI_SEARCH!==false,searchModel:window.AI_SEARCH_MODEL||undefined}),signal:ac.signal})}
     catch(e){clearTimeout(tm);throw{code:"network",message:String(e&&e.message||e)}}
     clearTimeout(tm);
     let j={};try{j=await r.json()}catch(e){}

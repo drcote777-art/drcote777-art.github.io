@@ -1446,7 +1446,7 @@ let sample=null;
 /* ================= 절 식구들: 스님과 일 도와주시는 분들 (모두 대화할 수 있어요) ================= */
 const LOOKW={bosal:(tc,h)=>({s:"f",h,hc:0,t:0,tc,b:3,bc:"#6b5a44",sh:2}),geosa:tc=>({s:"m",h:1,hc:3,t:0,tc,b:0,bc:"#5a5148",sh:2})};
 const TEMPLE_INFO="산사 구성: 일주문, 단풍 숲길(연등, 약수터, 돌탑), 계곡 다리와 폭포, 천왕문(사천왕), 절 마당(쌍탑, 석등, 범종각과 법고·운판·목어, 소원 연등 줄, 기와 시주), 마당 오른쪽 공양간과 찻집 다향, 왼쪽 뒤 기념품점, 대웅전(석가모니 부처님, 향과 초, 108배, 참선 방석). 방문객은 공덕을 쌓아 공양, 차, 연등, 향과 초를 구한다.";
-const NPC_RULES="규칙: 한국어 존댓말로, 맡은 사람다운 따뜻하고 차분한 말투로 2~3문장, 110자 이내로 짧게 답한다. 불교와 사찰 문화는 정확하게 말하고 확실하지 않으면 모른다고 한다. 고요암은 가상의 절이니 실제 주소나 역사를 지어내지 않는다. 의료, 법률, 투자 같은 전문 문제는 전문가와 상의하라고 권한다. 마음이 많이 힘들거나 위험해 보이는 사람에게는 따뜻하게 대하고 자살예방상담전화 109나 가까운 사람에게 도움을 청하라고 안내한다. 이모지와 목록 기호는 쓰지 않는다.";
+const NPC_RULES="규칙: 한국어 존댓말로, 맡은 사람다운 따뜻하고 차분한 말투로 2~3문장, 140자 이내로 짧게 답한다. 방문객이 날씨, 뉴스, 스포츠 경기 결과, 행사 일정, 일반 상식처럼 바깥세상의 최신 정보를 물으면 검색으로 확인한 사실만 짧고 정확하게 알려 주고, 확인되지 않으면 모른다고 한다. 날짜와 요일은 아래 적힌 지금 한국 시각을 기준으로 말한다. 불교와 사찰 문화는 정확하게 말하고 확실하지 않으면 모른다고 한다. 고요암은 가상의 절이니 실제 주소나 역사를 지어내지 않는다. 의료, 법률, 투자 같은 전문 문제는 전문가와 상의하라고 권한다. 마음이 많이 힘들거나 위험해 보이는 사람에게는 따뜻하게 대하고 자살예방상담전화 109나 가까운 사람에게 도움을 청하라고 안내한다. 이모지와 목록 기호는 쓰지 않는다.";
 const NPCS=[
  {id:"juji",name:"원각 주지 스님",monk:true,role:"고요암의 주지 스님. 낮에는 요사채 경상 앞에 가부좌로 앉아 경전을 읽고, 밤에는 요사채에서 주무신다. 절 살림 전체를 돌보며 수행, 마음공부, 삶의 고민에 대해 느긋하고 중후하게, 짧지만 깊이 있게 이야기한다",home:{x:-18.9,z:-264,ry:Math.PI/2},sit:"cross"},
  {id:"guide",name:"안내 스님",monk:true,role:"절 마당에서 방문객을 맞고 산사 전체를 안내하는 스님. 고요암의 주지 스님은 원각 스님으로, 낮에는 요사채에서 경전을 읽으신다. 산 아래 입구에는 주차장과 안내초소(덕산 거사님), 템플스테이 안내실(명진 보살님)이 있고, 공양간 옆에 주방(묘덕 보살님)과 야외 부뚜막이 있으며, 기념품점에는 보문 보살님이 계신다. 숲길에는 다람쥐가 살고 뻐꾸기가 운다(실제 뻐꾸기는 5월에 오는 여름 철새지만 고요암에서는 사계절 운다). 천왕문을 지나 마당에 들어서면 오른쪽에 종무소가 있고, 그 안에 방명록과 난로가 있으며 자명행 보살님이 계신다. 마당에는 흰 진돗개 보리와 누렁이 도토리라는 절 강아지 두 마리가 산다",home:{x:4.5,z:-263,ry:Math.PI*.75}},
@@ -1600,7 +1600,7 @@ const SAMPLE_BAD=t=>/^\s*[\(（]/.test(t||"")&&/권한|로그인|허락|sign/i.t
 async function askNpc(n,q){if(n.busy)return;n.busy=true;n.face={x:me.x,z:me.z};if(talkId===n.id){talkLine("나",q,true);talkLive=null}setNpcSay(n,"……",true);let a="";
   if(!sample){a=localReply(n,q);localTip()}
   else{const hist=n.hist.slice(-6).map(h=>`${h.who}: ${h.t}`).join("\n");
-    const input=`너는 '고요암'이라는 가상 3D 산사에 있는 ${n.name}이다. 역할: ${n.role}.\n${TEMPLE_INFO}\n${NPC_RULES}\n오늘 고요암(계룡): ${wxLine()}\n방문객이 지금 있는 곳: ${zoneName||"절 마당"}\n\n지금까지 대화:\n${hist||"(없음)"}\n\n방문객 ${me.name||"순례자"}: ${q}\n\n${n.name}의 대답만 쓰세요.`;
+    const input=`너는 '고요암'이라는 가상 3D 산사에 있는 ${n.name}이다. 역할: ${n.role}.\n${TEMPLE_INFO}\n${NPC_RULES}\n지금 한국 시각: ${new Date().toLocaleString("ko-KR",{timeZone:"Asia/Seoul",year:"numeric",month:"long",day:"numeric",weekday:"long",hour:"numeric",minute:"2-digit"})}\n오늘 고요암(계룡): ${wxLine()}\n방문객이 지금 있는 곳: ${zoneName||"절 마당"}\n\n지금까지 대화:\n${hist||"(없음)"}\n\n방문객 ${me.name||"순례자"}: ${q}\n\n${n.name}의 대답만 쓰세요.`;
     let lastUp=0;
     try{const r=await sample(input,{cache:false,onText:({text})=>{const t=performance.now();if(t-lastUp>300&&text&&!SAMPLE_BAD(text)){lastUp=t;setNpcSay(n,text.trim(),true)}}});a=(r.text||"").trim();if(SAMPLE_BAD(a)){sample=null;a=localReply(n,q);localTip()}}
     catch(e){if(e&&e.code==="rate_limited")a="잠시 숨을 고르고 다시 말씀해 주시겠어요?";else{a=localReply(n,q);localTip()}}}
