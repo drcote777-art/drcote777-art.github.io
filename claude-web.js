@@ -89,7 +89,7 @@
   const HOME={goyoam:["계룡시",36.2746,127.2489],cathedral:["바르셀로나",41.3874,2.1686]}[SITE]||["서울",37.5665,126.978];
   const STOP=new Set("오늘 내일 모레 지금 이번 주말 날씨 기온 어때요 어때 어떤가요 어떻습니까 알려줘 알려주세요 궁금해요 스님 신부님 수녀님 보살님 거기 여기 그쪽 요즘 아침 저녁 낮 밤 비가 눈이 우산 미세먼지 덥나요 춥나요 많이 혹시 좀 정말".split(" "));
   async function liveWeather(q){if(!/날씨|기온|온도|비\s*(가|와|오|올|소식)|눈\s*(이|와|오|올)|덥|춥|우산|미세먼지|일기\s*예보/.test(q))return"";
-    let place=HOME;const words=(q.match(/[가-힣A-Za-z]{2,}/g)||[]).map(w=>w.replace(/(은|는|이|가|에|의|에서|쪽|지역)$/,"")).filter(w=>w.length>=2&&!STOP.has(w));
+    let place=HOME;const words=(q.match(/[\uAC00-\uD7A3A-Za-z]{2,}/g)||[]).map(w=>w.replace(/(은|는|이|가|에|의|에서|쪽|지역)$/,"")).filter(w=>w.length>=2&&!STOP.has(w));
     for(const w of words.slice(0,3)){try{const g=await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=ko&name="+encodeURIComponent(w))).json();const x=(g.results||[])[0];if(x){place=[x.name+(x.country&&x.country!=="대한민국"?" ("+x.country+")":""),x.latitude,x.longitude];break}}catch(e){}}
     try{const u="https://api.open-meteo.com/v1/forecast?latitude="+place[1]+"&longitude="+place[2]+"&current=temperature_2m,weather_code,wind_speed_10m,relative_humidity_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=2";
       const j=await (await fetch(u)).json(),c=j.current||{},d=j.daily||{};const f=n=>n==null?"?":Math.round(n);
@@ -97,11 +97,15 @@
   const SAMPLE=AI_URL?async function(input,opts){opts=opts||{};
     let prompt=typeof input==="string"?input:(input||[]).map(m=>(m.role==="assistant"?"대답: ":"")+m.content).join("\n");
     try{const lines=prompt.split("\n").filter(l=>/^방문객/.test(l));const q=(lines[lines.length-1]||"").replace(/^방문객[^:]*:\s*/,"");const lw=await liveWeather(q);if(lw)prompt+=lw}catch(e){}
-    const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),30000);
-    let r;try{r=await fetch(AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,search:window.AI_SEARCH===true,searchModel:window.AI_SEARCH_MODEL||undefined}),signal:ac.signal})}
-    catch(e){clearTimeout(tm);throw{code:"network",message:String(e&&e.message||e)}}
-    clearTimeout(tm);
-    let j={};try{j=await r.json()}catch(e){}
+    const send=async code=>{const ac=new AbortController(),tm=setTimeout(()=>ac.abort(),30000);
+      try{const r=await fetch(AI_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt,code,search:window.AI_SEARCH!==false}),signal:ac.signal});
+        let j={};try{j=await r.json()}catch(e){}return{r,j}}
+      catch(e){throw{code:"network",message:String(e&&e.message||e)}}finally{clearTimeout(tm)}};
+    let code=ls.get("family_code")||"";let {r,j}=await send(code);
+    if(r.status===401&&j.error==="code"&&!window.__askedCode){window.__askedCode=true;
+      const c=(window.prompt("스님·신부님과의 AI 대화는 가족만 쓸 수 있어요.\n가족 암호를 입력해 주세요.")||"").trim();
+      if(c){ls.set("family_code",c);code=c;({r,j}=await send(code));if(r.status===401){ls.set("family_code","");window.__askedCode=false;try{alert("가족 암호가 맞지 않아요. 다음에 말을 걸 때 다시 입력해 주세요.")}catch(e){}}}}
+    if(j.error==="budget")throw{code:"upstream",message:"budget"};
     if(r.status===429)throw{code:"rate_limited",message:"rate"};
     if(!r.ok||!j.text)throw{code:"upstream",message:String(j.error||r.status)};
     try{opts.onText&&opts.onText({text:j.text,delta:j.text})}catch(e){}
