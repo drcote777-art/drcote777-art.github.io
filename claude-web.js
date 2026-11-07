@@ -49,7 +49,11 @@
   function mkRoom(){const base=root().child("_room"),posR=base.child("pos"),metaR=base.child("meta"),evR=base.child("ev");
     const myPos=posR.child(PEER),myMeta=metaR.child(PEER);myPos.onDisconnect().remove();myMeta.onDisconnect().remove();
     const peers=new Map(),subs=new Set();let lastMeta="",lastPos="",posTimer=0,pendingPos=null,lastPosAt=0;
-    const list=()=>[...peers.entries()].filter(([,v])=>v.m||v.p).map(([id,v])=>({peer:id,isMe:id===PEER,sameTab:id===PEER,kind:"viewer",guest:true,presence:{...(v.m||{}),...(v.p||{})}}));
+    let paused=false,hideT=0,lastP=null;
+    const ghost=(id,v)=>{if(id===PEER)return false;const m=v.m||{};if(m._u&&m._u===UID)return true;if(!m.n)return true;
+      if(lastP&&m.n===lastP.n&&JSON.stringify(m.lk||null)===JSON.stringify(lastP.lk||null)&&m.c===lastP.c)return true;return false};
+    const cleaned=new Set();const sweep=(id)=>{if(cleaned.has(id))return;cleaned.add(id);setTimeout(()=>{metaR.child(id).remove().catch(()=>{});posR.child(id).remove().catch(()=>{})},1500)};
+    const list=()=>[...peers.entries()].filter(([id,v])=>{if(!(v.m||v.p))return false;if(ghost(id,v)){{const m=v.m||{};if(m.n||(m._t&&Date.now()-m._t>60000))sweep(id)};return false}return true}).map(([id,v])=>({peer:id,isMe:id===PEER,sameTab:id===PEER,kind:"viewer",guest:true,presence:{...(v.m||{}),...(v.p||{})}}));
     const emitPeers=()=>{const ch={peers:list()};subs.forEach(f=>{try{f(ch)}catch(e){}})};
     const up=(id,k,v)=>{const o=peers.get(id)||{};o[k]=v;o.t=Date.now();peers.set(id,o);emitPeers()};
     const rm=(id,k)=>{const o=peers.get(id);if(!o)return;delete o[k];if(!o.m&&!o.p)peers.delete(id);emitPeers()};
@@ -57,7 +61,6 @@
     metaR.on("child_added",s=>up(s.key,"m",s.val()));metaR.on("child_changed",s=>up(s.key,"m",s.val()));metaR.on("child_removed",s=>rm(s.key,"m"));
     // 오래 멈춘 접속(창을 그냥 닫은 경우 등) 정리
     // 같은 휴대폰에서 탭을 여러 개 열었거나 화면을 내려 둔 탭이 '또 다른 나'로 남지 않게
-    let paused=false,hideT=0,lastP=null;
     const pause=()=>{if(paused)return;paused=true;myPos.remove().catch(()=>{});myMeta.remove().catch(()=>{})};
     const resume=()=>{if(!paused)return;paused=false;lastMeta="";lastPos="";if(lastP)api.presence(lastP)};
     document.addEventListener("visibilitychange",()=>{clearTimeout(hideT);if(document.hidden)hideT=setTimeout(pause,20000);else resume()});
@@ -71,7 +74,7 @@
     const joinT=Date.now();const evSubs={};
     const api={
       presence(p){p=clean(p||{});lastP=p;if(paused)return Promise.resolve();const fp={},mp={};for(const k in p){if(FAST.includes(k))fp[k]=p[k];else mp[k]=p[k]}
-        const ms=JSON.stringify(mp);if(ms!==lastMeta){lastMeta=ms;mp._t=Date.now();myMeta.set(mp).catch(()=>{})}
+        mp._u=UID;const ms=JSON.stringify(mp);if(ms!==lastMeta){lastMeta=ms;mp._t=Date.now();myMeta.set(mp).catch(()=>{})}
         pendingPos=fp;const wait=Math.max(0,220-(Date.now()-lastPosAt));if(!posTimer)posTimer=setTimeout(writePos,wait);return Promise.resolve()},
       peers:()=>list(),
       onPeers(fn){subs.add(fn);setTimeout(()=>fn({peers:list()}),0);return()=>subs.delete(fn)},
