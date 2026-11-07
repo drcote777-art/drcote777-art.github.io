@@ -1099,7 +1099,7 @@ function helperOnline(){for(const o of others.values())if(o.w)return true;return
 async function sharedAdd(col,data){const id=rid();if(db&&canWrite!==false){try{await db.collection(col).doc(id).set(data);if(canWrite!==true){canWrite=true;pushP(true)}return"ok"}catch(e){canWrite=false;pushP(true)}}
   if(room){pend.push({i:id,c:col,d:data});pend.splice(0,Math.max(0,pend.length-8));savePend();pushP(true);toast(helperOnline()?"기록 도우미를 통해 모두의 기록에 남기는 중이에요":"기록을 맡겨 두었어요. 기록 권한이 있는 사람이 접속하면 모두에게 남아요");return"queued"}return"none"}
 function prunePend(){const n=pend.length;for(let i=pend.length-1;i>=0;i--)if(seenIds.has(pend[i].i))pend.splice(i,1);if(pend.length!==n){savePend();pushP(true)}}
-const RELAY_KEYS={dm:["from","to","text","color","ts"],chat:["text","nick","color","ts"],guestbook:["nick","text","color","ts"],prayers:["nick","text","ts"],candles:["nick","ts"],visits:["nick","ts"]};
+const RELAY_KEYS={dm:["from","to","text","color","ts"],chat:["text","nick","color","ts"],guestbook:["nick","text","color","ts"],prayers:["nick","text","ts"],candles:["nick","ts"],visits:["nick","ts","u","dv"]};
 function relayFrom(o,list){if(canWrite!==true||!db||!Array.isArray(list))return;const now=Date.now();o.rl=(o.rl||[]).filter(t=>now-t<60000);
   list.slice(-8).forEach(it=>{if(!it||typeof it.i!=="string"||!/^[a-z0-9]{8,24}$/.test(it.i)||relayed.has(it.i)||seenIds.has(it.i))return;const keys=RELAY_KEYS[it.c];if(!keys||!it.d||typeof it.d!=="object")return;
     const d={};for(const k of keys){const v=it.d[k];if(typeof v==="string")d[k]=v.slice(0,it.c==="dm"&&k==="text"?200:80);else if(typeof v==="number"&&isFinite(v))d[k]=v}d.ts=Math.min(now,num(d.ts,now));
@@ -1360,12 +1360,12 @@ function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button"
   if(panelKind==="visits"){head.append(el("h2",null,"누가 다녀갔나요"),close);c.append(head);
     const here=[[me.name||"나",zoneOf(me.x,me.z,me.lv)+" · 나"],...[...others.values()].map(o=>[o.name,zoneOf(o.gx,o.gz,o.lv)])];c.append(el("h3",null,`지금 함께 있는 사람 ${here.length}명`));
     here.forEach(([n,z])=>{const w=el("div","wish");w.append(el("b",null,n),document.createTextNode(" · "+z));c.append(w)});
-    const today=fmtDay(Date.now()),tv=visits.filter(v=>fmtDay(v.ts)===today);c.append(el("h3",null,`오늘 다녀간 분 ${new Set(tv.map(v=>v.nick)).size}명`));
-    if(!tv.length)c.append(el("p",null,"오늘은 아직 기록이 없어요."));tv.forEach(v=>{const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)));c.append(w)});
-    const cnt={};visits.forEach(v=>{cnt[v.nick]=(cnt[v.nick]||0)+1});const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const today=fmtDay(Date.now()),tv=visits.filter(v=>fmtDay(v.ts)===today);c.append(el("h3",null,`오늘 다녀간 분 ${new Set(tv.map(vKey)).size}명`));
+    if(!tv.length)c.append(el("p",null,"오늘은 아직 기록이 없어요."));tv.forEach(v=>{const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)+(vTag(v)?" · "+vTag(v):"")));c.append(w)});
+    const cnt={};visits.forEach(v=>{const n=v.nick+(v.u?" #"+v.u:"");cnt[n]=(cnt[n]||0)+1});const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
     if(top.length){c.append(el("h3",null,"자주 오신 분"));const g=el("div","chips");top.forEach(([n,k])=>{const s=el("span","chipb",`${n} ${k}번`);s.style.cursor="default";g.append(s)});c.append(g)}
     c.append(el("h3",null,"지난 기록"));let lastDay="";const old=visits.filter(v=>fmtDay(v.ts)!==today).slice(0,80);if(!old.length)c.append(el("p",null,"지난 기록이 아직 없어요."));
-    old.forEach(v=>{const dd=fmtDay(v.ts);if(dd!==lastDay){lastDay=dd;const h=el("p",null,dd);h.style.cssText="margin-top:6px;font-weight:bold;color:var(--ink)";c.append(h)}const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)));c.append(w)});
+    old.forEach(v=>{const dd=fmtDay(v.ts);if(dd!==lastDay){lastDay=dd;const h=el("p",null,dd);h.style.cssText="margin-top:6px;font-weight:bold;color:var(--ink)";c.append(h)}const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)+(vTag(v)?" · "+vTag(v):"")));c.append(w)});
     c.append(el("p",null,"들어올 때 입력한 이름과 시간이 기록돼요. 같은 사람은 30분에 한 번만 남아요. 기록 권한이 없는 분의 기록은 권한 있는 분이 접속해 있을 때 함께 저장돼요."));return}
   if(panelKind==="go"){head.append(el("h2",null,"어디로 갈까요?"),close);c.append(head);const g=el("div","chips");PLACES.forEach(p=>{const b=el("button","chipb",p[1]);b.type="button";b.style.cssText="font-size:14px;padding:8px 12px";b.onclick=()=>goTo(p[0]);g.append(b)});c.append(g);return}
   if(panelKind==="pray"){writer("prayers","기도 지향","기도하고 싶은 마음을 적으면 기도 지향 벽에 쪽지로 붙어요. 함께 있는 모두가 함께 기도해요.","예: 아픈 어머니의 쾌유를 위하여",40,t=>{prayers.unshift({nick:me.name||"손님",text:t});renderNotes();doAct("hap")});
@@ -1385,7 +1385,7 @@ let curArt=null;function openArt(a){if(!a)return;curArt=a;openPanel("art")}
 const SOLO=makeSolo({theme:"cathedral",title:"고요한 방",parent:$("app"),getAC:()=>{initAudio();return AC},
   onOpen(){me.solo=true;if(me.sit)standUp();if(talkId)endTalk();$("panel").hidden=true;stopNpcSpeech();if(AC&&master)master.gain.setTargetAtTime(0,AC.currentTime,.3);pushP(true)},
   onClose(){me.solo=false;if(AC&&master)master.gain.setTargetAtTime(.8,AC.currentTime,.3);pushP(true)}});
-let visitsReady=false;function updCnt(){const kd=ts=>{const d=new Date(ts+9*3600e3);return d.getUTCMonth()+"-"+d.getUTCDate()},t=kd(Date.now()),n=new Set(visits.filter(v=>kd(v.ts)===t).map(v=>v.nick)).size;$("cnt").textContent=others.size?`👣 ${others.size+1}명 함께`:visitsReady?`👣 오늘 ${n}명 · 누적 ${visits.length>=300?"300+":visits.length}회`:"👣 혼자"}
+let visitsReady=false;function updCnt(){const kd=ts=>{const d=new Date(ts+9*3600e3);return d.getUTCMonth()+"-"+d.getUTCDate()},t=kd(Date.now()),n=new Set(visits.filter(v=>kd(v.ts)===t).map(vKey)).size;$("cnt").textContent=others.size?`👣 ${others.size+1}명 함께`:visitsReady?`👣 오늘 ${n}명 · 누적 ${visits.length>=300?"300+":visits.length}회`:"👣 혼자"}
 const DM=makeDM({key:"ct",parent:$("app"),btn:$("dmBtn"),name:()=>me.name,color:()=>me.color,add:(cl,x)=>sharedAdd(cl,x),db:()=>db,online:()=>[...others.values()].map(o=>o.name),known:()=>visits.map(v=>v.nick),
   notify:t=>{toast(t,true);chime();addLog("쪽지","#b5412e",t)}});
 $("dmBtn").onclick=()=>DM.open();{let dmName="";setInterval(()=>{if(db&&me.name&&$("sheet").hidden&&me.name!==dmName){dmName=me.name;DM.connect(db)}},2000)}
@@ -1401,7 +1401,7 @@ $("nick").value=me.name;buildSw();
 $("setup").addEventListener("submit",e=>{e.preventDefault();const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";me.name=($("nick").value||"").trim().slice(0,10)||"손님";ls.set("ct_name",me.name);me.look.tc=me.color;applyLook();
   $("sheet").hidden=true;initAudio();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(x){}}pushP(true);
   if(mode==="quiet"){goTo("altar");setQuiet(true)}else showSub("빛의 숲 성당","광장에서 정문 현관을 지나 성당 안으로 들어가 보세요. 입구 양옆 성수대에서 성호를 긋고, 숲처럼 뻗은 기둥 사이로 쏟아지는 빛을 걸어 보세요.",8000);
-  {let lv=0;try{lv=+localStorage.getItem("ct_lastvisit")||0}catch(x){}const since=lv;if(since)setTimeout(()=>{const nn=[...new Set(visits.filter(v=>v.ts>since&&v.nick!==me.name).map(v=>v.nick))];if(nn.length){const t=`지난번 이후 다녀간 분: ${nn.slice(0,6).join(", ")}${nn.length>6?` 외 ${nn.length-6}명`:""}`;addLog("알림","#2f7d63",t);toast("👣 "+t)}},4500);if(Date.now()-lv>30*60000){try{localStorage.setItem("ct_lastvisit",String(Date.now()))}catch(x){}setTimeout(()=>sharedAdd("visits",{nick:me.name,ts:Date.now()}),3000)}}});
+  {let lv=0;try{lv=+localStorage.getItem("ct_lastvisit")||0}catch(x){}const since=lv;if(since)setTimeout(()=>{const nn=[...new Set(visits.filter(v=>v.ts>since&&v.nick!==me.name).map(v=>v.nick))];if(nn.length){const t=`지난번 이후 다녀간 분: ${nn.slice(0,6).join(", ")}${nn.length>6?` 외 ${nn.length-6}명`:""}`;addLog("알림","#2f7d63",t);toast("👣 "+t)}},4500);if(Date.now()-lv>10*60000){try{localStorage.setItem("ct_lastvisit",String(Date.now()))}catch(x){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"손님",ts:Date.now(),u:VID,dv:DEV}),3000)}}});
 
 /* ================= 연결 ================= */
 (async()=>{if(!window.claude||!claude.use)return;
@@ -1414,7 +1414,7 @@ $("setup").addEventListener("submit",e=>{e.preventDefault();const mode=(e.submit
     db.collection("candles").orderBy("ts","desc").limit(40).onSnapshot(sn=>{seen(sn);candleTs=sn.docs.map(d=>num((d.data()||{}).ts,0));renderCandles()},()=>{});
     db.collection("prayers").orderBy("ts","desc").limit(30).onSnapshot(sn=>{seen(sn);prayers=sn.docs.map(d=>d.data()||{}).filter(p=>typeof p.text==="string").map(p=>({nick:str(p.nick,10)||"손님",text:str(p.text,40)}));renderNotes();renderPanelIfOpen()},()=>{});
     db.collection("guestbook").orderBy("ts","desc").limit(60).onSnapshot(sn=>{seen(sn);guestbook=sn.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(g=>typeof g.text==="string").map(g=>({id:g.id,text:str(g.text,100),nick:str(g.nick,10)||"손님",color:/^#[0-9a-f]{6}$/i.test(g.color)?g.color:"#8a5a1c",ts:num(g.ts,0)}));renderPanelIfOpen()},()=>{});
-    db.collection("visits").orderBy("ts","desc").limit(300).onSnapshot(sn=>{seen(sn);visits=sn.docs.map(d=>d.data()||{}).filter(v=>typeof v.nick==="string").map(v=>({nick:str(v.nick,10)||"손님",ts:num(v.ts,0)}));renderPanelIfOpen();visitsReady=true;updCnt()},()=>{})}
+    db.collection("visits").orderBy("ts","desc").limit(300).onSnapshot(sn=>{seen(sn);visits=sn.docs.map(d=>d.data()||{}).filter(v=>typeof v.nick==="string").map(v=>({nick:str(v.nick,10)||"손님",ts:num(v.ts,0),u:str(v.u,4),dv:str(v.dv,4)}));renderPanelIfOpen();visitsReady=true;updCnt()},()=>{})}
   updLogw()})();
 
 
@@ -1594,6 +1594,10 @@ function evPanel(c,close){const now=Date.now(),head=el("div");head.style.cssText
   try{const q=new URLSearchParams(location.search).get("ev");const ev=q&&EVC.list.find(x=>x.id===q);if(ev)setTimeout(()=>evPreview(ev),2500)}catch(e){}})();
 
 $("evBtn").onclick=()=>openPanel("ev");
+/* 방문 기록: 기기마다 익명 번호와 기기 종류를 같이 남겨 이름 없는 손님도 구분해요 */
+const VID=(()=>{let v="";try{v=localStorage.getItem("vid")||""}catch(e){}if(!/^[0-9a-f]{4}$/.test(v)){v=Math.random().toString(16).slice(2,6).padEnd(4,"0");try{localStorage.setItem("vid",v)}catch(e){}}return v})();
+const DEV=(()=>{const u=navigator.userAgent||"";return/iPad|Tablet/i.test(u)?"태블릿":/Mobi|Android|iPhone/i.test(u)?"휴대폰":"PC"})();
+const vKey=v=>v.u||v.nick,vTag=v=>[v.dv,v.u?"#"+v.u:""].filter(Boolean).join(" ");
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();
   if(perfDone<2){perfAcc+=dt;perfN++;if(perfAcc>5){const avg=perfAcc/perfN;perfAcc=0;perfN=0;if(avg>.034){perfDone++;if(perfDone===1){R.setPixelRatio(1);resize()}else{RAYS.forEach(r=>r.visible=false);gfxLow()}}else perfDone=2}}
   let fx=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)+joyV.y,sx=(keys.d?1:0)-(keys.a?1:0)+joyV.x;if(keys.arrowleft)camYaw+=dt*1.8;if(keys.arrowright)camYaw-=dt*1.8;

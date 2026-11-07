@@ -143,7 +143,7 @@ body.bigtext .pcard p,body.bigtext .wish{font-size:15px}body.bigtext .item b{fon
   <div class="load" id="load">산길을 만드는 중…</div>
   <div class="hud top">
     <div class="brand"><b>고요암 가는 길</b><span id="zone">산문 입구</span><span id="wx"></span><span id="clock"></span></div>
-    <div class="right"><span class="chip cnt" id="cnt">👣 혼자</span><button class="stat btn" id="statBtn" type="button" aria-label="공덕과 체험 보기">공덕 <b id="gd">0</b><span class="gi"><i id="gi" style="width:100%"></i></span>기력</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🪷 고요</button><button class="btn" id="sndBtn" type="button" aria-pressed="true">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button><button class="btn" id="evBtn" type="button">📅 일정</button></div>
+    <div class="right"><button class="chip cnt" id="cnt" type="button" aria-label="함께 있는 사람과 다녀간 분 보기" style="cursor:pointer;font:inherit;font-size:12px;color:inherit">👣 혼자</button><button class="stat btn" id="statBtn" type="button" aria-label="공덕과 체험 보기">공덕 <b id="gd">0</b><span class="gi"><i id="gi" style="width:100%"></i></span>기력</button><button class="btn" id="dmBtn" type="button">💌 쪽지</button><button class="btn" id="goBtn" type="button">📍 이동</button><button class="btn" id="quietBtn" type="button">🪷 고요</button><button class="btn" id="sndBtn" type="button" aria-pressed="true">🔈 소리</button><button class="btn" id="meBtn" type="button">👤 꾸미기</button><button class="btn" id="evBtn" type="button">📅 일정</button></div>
   </div>
   <div class="hud sub hide" id="sub"><small>안내 스님</small><span id="subText"></span></div>
   <div class="hud logw empty" id="logw"><div class="logh"><button class="chipb" id="logFold" type="button">채팅 접기</button><button class="chipb" id="logClear" type="button">내 화면 비우기</button><button class="chipb" id="logWipe" type="button" hidden>모두 지우기</button></div><div class="log" id="log" aria-live="polite"></div></div>
@@ -1111,7 +1111,7 @@ function buildSw(){const el=$("sws");el.innerHTML="";COLORS.forEach(c=>{const b=
 $("nick").value=me.name;buildSw();
 $("setup").addEventListener("submit",e=>{e.preventDefault();const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";setTimeout(()=>{if(mode==="quiet"){goTo("hall");setQuiet(true)}},60);me.name=($("nick").value||"").trim().slice(0,10)||"순례자";
   ls.set("tp_name",me.name);ls.set("tp_color",me.color);me.look.tc=me.color;applyLook();
-  $("sheet").hidden=true;initAudio();initChant();initRec();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}pushP(true);const Z0=zoneOf(me.z);zoneName=Z0[1];$("zone").textContent=Z0[1];if(!seenZone.size)showZone(Z0);saveMerit();{let lv=0;try{lv=+localStorage.getItem("tp_lastvisit")||0}catch(e){}if(Date.now()-lv>30*60000){try{localStorage.setItem("tp_lastvisit",String(Date.now()))}catch(e){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"순례자",ts:Date.now()}),3000)}}setTimeout(()=>toast(wxGreeting()),2500)});
+  $("sheet").hidden=true;initAudio();initChant();initRec();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(e){}}pushP(true);const Z0=zoneOf(me.z);zoneName=Z0[1];$("zone").textContent=Z0[1];if(!seenZone.size)showZone(Z0);saveMerit();{let lv=0;try{lv=+localStorage.getItem("tp_lastvisit")||0}catch(e){}if(Date.now()-lv>10*60000){try{localStorage.setItem("tp_lastvisit",String(Date.now()))}catch(e){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"순례자",ts:Date.now(),u:VID,dv:DEV}),3000)}}setTimeout(()=>toast(wxGreeting()),2500)});
 $("meBtn").onclick=()=>{renderLook();$("lookP").hidden=false;$("panel").hidden=true};
 $("lookDone").onclick=()=>{const n=($("lookName").value||"").trim().slice(0,10);if(n&&n!==me.name){me.name=n;ls.set("tp_name",n);applyLook()}$("lookP").hidden=true};
 function renderLook(){const B=$("lookBody");B.innerHTML="";const L=me.look;
@@ -1299,7 +1299,7 @@ async function sharedAdd(col,data){const id=rid();
     toast(helperOnline()?"기록 도우미를 통해 모두의 기록에 남기는 중이에요":"기록을 맡겨 두었어요. 기록 권한이 있는 사람이 접속하면 모두에게 남아요");return"queued"}
   return"none"}
 function prunePend(){const n=pend.length;for(let i=pend.length-1;i>=0;i--)if(seenIds.has(pend[i].i))pend.splice(i,1);if(pend.length!==n){savePend();pushP(true)}}
-const RELAY_KEYS={dm:["from","to","text","color","ts"],visits:["nick","ts"],guestbook:["nick","text","color","ts"],wishes:["nick","text","color","ts"],tiles:["nick","text","ts"],stones:["nick","ts"],donations:["nick","ts"],offerings:["t","ts","nick"],chat:["text","nick","color","ts"]};
+const RELAY_KEYS={dm:["from","to","text","color","ts"],visits:["nick","ts","u","dv"],guestbook:["nick","text","color","ts"],wishes:["nick","text","color","ts"],tiles:["nick","text","ts"],stones:["nick","ts"],donations:["nick","ts"],offerings:["t","ts","nick"],chat:["text","nick","color","ts"]};
 function relayFrom(o,list){if(canWrite!==true||!db||!Array.isArray(list))return;const now=Date.now();o.rl=(o.rl||[]).filter(t=>now-t<60000);
   list.slice(-8).forEach(it=>{if(!it||typeof it.i!=="string"||!/^[a-z0-9]{8,24}$/.test(it.i)||relayed.has(it.i)||seenIds.has(it.i))return;const keys=RELAY_KEYS[it.c];if(!keys||!it.d||typeof it.d!=="object")return;
     const d={};for(const k of keys){const v=it.d[k];if(typeof v==="string")d[k]=v.slice(0,it.c==="dm"&&k==="text"?200:60);else if(typeof v==="number"&&isFinite(v))d[k]=v}
@@ -1340,7 +1340,7 @@ function openPanel(kind){panelKind=kind;$("panel").hidden=false;renderPanel()}
 function renderPanelIfOpen(){if(!$("panel").hidden)renderPanel()}
 $("panel").addEventListener("click",e=>{if(e.target.id==="panel")$("panel").hidden=true});
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
-function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;if(panelKind==="ev"){evPanel(c,close);return}
+function renderPanel(){const c=$("pcard");c.innerHTML="";const close=el("button","btn","닫기");close.type="button";close.onclick=()=>$("panel").hidden=true;if(panelKind==="ev"){evPanel(c,close);return}if(panelKind==="visits"){visitPanel(c,close);return}
   const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";
   if(panelKind==="go"){head.append(el("h2",null,"어디로 갈까요?"),close);c.append(head,el("p",null,"누르면 바로 그곳으로 옮겨 가요."));const g=el("div","chips");
     PLACES.forEach(p=>{const b=el("button","chipb",p[1]);b.type="button";b.style.fontSize="14px";b.style.padding="8px 12px";b.onclick=()=>goTo(p[0]);g.append(b)});c.append(g);return}
@@ -1682,7 +1682,7 @@ function onPeers(ch){const seen=new Set(),now=Date.now();
       if(!first)wishes.forEach(w=>{if(!seenW.has(w.id))toast(`${w.nick}님이 소원 연등을 밝혔어요`)});wishes.forEach(w=>seenW.add(w.id));first=false;renderWishes();renderPanelIfOpen()},()=>{});
     db.collection("offerings").orderBy("ts","desc").limit(40).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();const now=Date.now();sn.docs.forEach(d=>{const o=d.data()||{};const ty=o.t==="i"||o.t==="c"?o.t:null,ts=num(o.ts,0);
       if(ty&&ts<=now+60000&&now-ts<(ty==="i"?INC_LIFE:CAN_LIFE))offers.set(ty+ts,{type:ty,ts})});renderOffers()},()=>{});
-    db.collection("visits").orderBy("ts","desc").limit(300).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();visits=sn.docs.map(d=>d.data()||{}).filter(v=>typeof v.nick==="string").map(v=>({nick:str(v.nick,10)||"순례자",ts:num(v.ts,0)}));renderPanelIfOpen();visitsReady=true;updCnt()},()=>{});
+    db.collection("visits").orderBy("ts","desc").limit(300).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();visits=sn.docs.map(d=>d.data()||{}).filter(v=>typeof v.nick==="string").map(v=>({nick:str(v.nick,10)||"순례자",ts:num(v.ts,0),u:str(v.u,4),dv:str(v.dv,4)}));if(panelKind==="visits")renderPanelIfOpen();renderPanelIfOpen();visitsReady=true;updCnt()},()=>{});
     db.collection("guestbook").orderBy("ts","desc").limit(60).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();guestbook=sn.docs.map(d=>({id:d.id,...(d.data()||{})})).filter(g=>typeof g.text==="string").map(g=>({id:g.id,text:str(g.text,100),nick:str(g.nick,10)||"순례자",color:/^#[0-9a-f]{6}$/i.test(g.color)?g.color:"#8a5a1c",ts:num(g.ts,0)}));renderPanelIfOpen()},()=>{});
     db.collection("tiles").limit(1000).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();tileCount=sn.size;renderStacks();renderPanelIfOpen()},()=>{});
     db.collection("stones").limit(1000).onSnapshot(sn=>{sn.docs.forEach(d=>seenIds.add(d.id));prunePend();stoneCount=sn.size;renderStacks()},()=>{});
@@ -1928,7 +1928,7 @@ function makeDM(cfg){const LK="dm_"+cfg.key+"_",MEM={},lg=k=>{let v=null;try{v=l
 
 let quiet=false;
 function setQuiet(on){quiet=on;document.body.classList.toggle("quiet",on);$("quietBtn").textContent=on?"🪷 고요 중":"🪷 고요";if(on){$("panel").hidden=true;if(talkId)endTalk();qStat("고요 모드 · 말없이 마음을 내려놓는 시간")}}
-let visitsReady=false;function updCnt(){const kd=ts=>{const d=new Date(ts+9*3600e3);return d.getUTCMonth()+"-"+d.getUTCDate()},t=kd(Date.now()),n=new Set(visits.filter(v=>kd(v.ts)===t).map(v=>v.nick)).size;$("cnt").textContent=others.size?`👣 ${others.size+1}명 함께`:visitsReady?`👣 오늘 ${n}명 · 누적 ${visits.length>=300?"300+":visits.length}회`:"👣 혼자"}
+let visitsReady=false;function updCnt(){const kd=ts=>{const d=new Date(ts+9*3600e3);return d.getUTCMonth()+"-"+d.getUTCDate()},t=kd(Date.now()),n=new Set(visits.filter(v=>kd(v.ts)===t).map(vKey)).size;$("cnt").textContent=others.size?`👣 ${others.size+1}명 함께`:visitsReady?`👣 오늘 ${n}명 · 누적 ${visits.length>=300?"300+":visits.length}회`:"👣 혼자"}
 const DM=makeDM({key:"tp",parent:$("app"),btn:$("dmBtn"),name:()=>me.name,color:()=>me.color,add:(cl,x)=>sharedAdd(cl,x),db:()=>db,online:()=>[...others.values()].map(o=>o.name),known:()=>visits.map(v=>v.nick),
   notify:t=>{toast(t,true);chime();addLog("쪽지","#b5412e",t)}});
 $("dmBtn").onclick=()=>DM.open();{let dmName="";setInterval(()=>{if(db&&me.name&&$("sheet").hidden&&me.name!==dmName){dmName=me.name;DM.connect(db)}},2000)}
@@ -2240,6 +2240,23 @@ function evPanel(c,close){const now=Date.now(),head=el("div");head.style.cssText
   try{const q=new URLSearchParams(location.search).get("ev");const ev=q&&EVC.list.find(x=>x.id===q);if(ev)setTimeout(()=>evPreview(ev),2500)}catch(e){}})();
 
 $("evBtn").onclick=()=>openPanel("ev");
+/* 방문 기록: 기기마다 익명 번호와 기기 종류를 같이 남겨 이름 없는 손님도 구분해요 */
+const VID=(()=>{let v="";try{v=localStorage.getItem("vid")||""}catch(e){}if(!/^[0-9a-f]{4}$/.test(v)){v=Math.random().toString(16).slice(2,6).padEnd(4,"0");try{localStorage.setItem("vid",v)}catch(e){}}return v})();
+const DEV=(()=>{const u=navigator.userAgent||"";return/iPad|Tablet/i.test(u)?"태블릿":/Mobi|Android|iPhone/i.test(u)?"휴대폰":"PC"})();
+const vKey=v=>v.u||v.nick,vTag=v=>[v.dv,v.u?"#"+v.u:""].filter(Boolean).join(" ");
+function visitPanel(c,close){const head=el("div");head.style.cssText="display:flex;justify-content:space-between;align-items:center;gap:8px";head.append(el("h2",null,"누가 다녀갔나요"),close);c.append(head);
+  const fd=ts=>{const d=new Date(ts+9*3600e3);return`${d.getUTCMonth()+1}월 ${d.getUTCDate()}일(${"일월화수목금토"[d.getUTCDay()]})`};
+  const here=[me.name||"나",...[...others.values()].map(o=>o.name||"순례자")];c.append(el("h3",null,`지금 함께 있는 사람 ${here.length}명`));
+  here.forEach((n,i)=>{const w=el("div","wish");w.append(el("b",null,n),document.createTextNode(i?"":" · 나"));c.append(w)});
+  const row=v=>{const w=el("div","wish");w.append(el("b",null,v.nick),document.createTextNode(" · "+hhmm(v.ts)+(vTag(v)?" · "+vTag(v):"")));return w};
+  const today=fd(Date.now()),tv=visits.filter(v=>fd(v.ts)===today);c.append(el("h3",null,`오늘 다녀간 분 ${new Set(tv.map(vKey)).size}명 · ${tv.length}번`));
+  if(!tv.length)c.append(el("p",null,"오늘은 아직 기록이 없어요."));tv.forEach(v=>c.append(row(v)));
+  const cnt={};visits.forEach(v=>{const n=v.nick+(v.u?" #"+v.u:"");cnt[n]=(cnt[n]||0)+1});const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  if(top.length){c.append(el("h3",null,"자주 오신 분"));const g=el("div","chips");top.forEach(([n,k])=>{const s=el("span","chipb",`${n} ${k}번`);s.style.cursor="default";g.append(s)});c.append(g)}
+  c.append(el("h3",null,"지난 기록"));let last="";const old=visits.filter(v=>fd(v.ts)!==today).slice(0,80);if(!old.length)c.append(el("p",null,"지난 기록이 아직 없어요."));
+  old.forEach(v=>{const d=fd(v.ts);if(d!==last){last=d;const h=el("p",null,d);h.style.cssText="margin-top:6px;font-weight:bold";c.append(h)}c.append(row(v))});
+  c.append(el("p",null,"같은 기기에서 10분 안에 다시 들어오면 한 번으로 세요. 이름을 정하지 않은 분은 기기 종류와 #번호로 구분돼요."))}
+$("cnt").onclick=()=>openPanel("visits");
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();perfTick(dt);
   let fx=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)+joyV.y,sx=(keys.d?1:0)-(keys.a?1:0)+joyV.x;
   if(keys.arrowleft)camYaw+=dt*1.8;if(keys.arrowright)camYaw-=dt*1.8;
