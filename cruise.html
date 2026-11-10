@@ -229,7 +229,8 @@ const SCN={
  nap:{b:'port',o:{city:'nap'},name:'나폴리 구시가'},
  rom:{b:'port',o:{city:'rom'},name:'로마'},
  gen:{b:'port',o:{city:'gen'},name:'제노바'},
- mrs:{b:'port',o:{city:'mrs'},name:'마르세유'}};
+ mrs:{b:'port',o:{city:'mrs'},name:'마르세유'},
+ ride:{b:'ride',name:''}};
 const SHIPMAP=[['deckPool','풀 데크','수영 · 미끄럼틀 · 풀 바'],['buffet','뷔페','아침·점심·간식'],['dining','메인 레스토랑','저녁 정찬'],['cafe','카페','커피 · 디저트'],['bar','피아노 바','라이브 노래 · 노래 부르기'],['theater','대극장','저녁 공연'],['casino','카지노','슬롯 · 룰렛'],['shop','면세점','쇼핑'],['disco','디스코','춤추기'],['cabin','내 객실','쉬기 · 다음 날로'],['deckNight','밤 갑판','별 보기']];
 
 /* 날짜별 할 일 (관광 코스) — at: 그 장면의 길 위치(0~1), a: 해야 할 행동, near: 그 자리에 가면 완료 */
@@ -328,31 +329,31 @@ const CITY={
    {t:.22,side:-1,k:'stall',id:'buy_cag',n:'아케이드 기념품 가게',w:'마리아',items:[['코르크 받침',6],['산호 모양 열쇠고리',7],['사르데냐 과자',5]]}],
   cit:[{t:.3,n:'안토니오',role:'칼리아리에 사는 시민',p:'칼리아리 토박이 할아버지. 바다와 햇볕, 요새 계단 이야기를 좋아한다.'},{t:.8,n:'줄리아',role:'요새 테라스에서 쉬는 대학생',p:'칼리아리 대학생. 테라스 전망과 카스텔로 지구 골목을 추천한다.'}]},
  nap:{spots:[
-   {t:.05,side:1,k:'metro',id:'metro',n:'무니치피오역 · 지하철 1호선',to:.86,msg:'지하철 1호선 Municipio → Duomo (2정거장). 승차권은 역 자판기에서.'},
-   {t:.86,side:-1,k:'metro',id:'metro2',n:'두오모역 · 지하철 1호선',to:.05,msg:'지하철 1호선 Duomo → Municipio (2정거장). 역에서 항구까지 걸어서 5분.'},
+   {t:.05,side:1,k:'metro',id:'metro',n:'무니치피오역 · 지하철 1호선',to:.86,msg:'지하철 1호선 Municipio → Duomo (2정거장). 승차권은 역 자판기에서.',ride:{kind:'metro',scen:'tunnel',title:'나폴리 지하철 1호선',stops:['Municipio','Università','Duomo'],intro:'🚇 승차권은 역 자판기에서 사요. 계단을 내려가 1호선 승강장으로…'}},
+   {t:.86,side:-1,k:'metro',id:'metro2',n:'두오모역 · 지하철 1호선',to:.05,msg:'지하철 1호선 Duomo → Municipio (2정거장). 역에서 항구까지 걸어서 5분.',ride:{kind:'metro',scen:'tunnel',title:'나폴리 지하철 1호선',stops:['Duomo','Università','Municipio']}},
    {t:.64,side:1,k:'stall',id:'buy_presepe',n:'산 그레고리오 아르메노 공방',w:'안나',items:[['프레세페 인형',12],['행운의 뿔 코르니첼로',5],['작은 마구간 모형',22]]},
    {t:.78,side:-1,k:'resto',id:'eat_nap',n:'da Michele',w:'살바토레',menu:{title:"L'Antica Pizzeria da Michele",sub:'피자는 마리나라와 마르게리타 두 가지 · 가상 가격',items:[['피자 마르게리타',6],['피자 마리나라',6],['콜라',3]]}},
    {t:.98,side:1,k:'tour',id:'tour',n:'두오모 가이드 투어',w:'가이드 엘레나'}],
   cit:[{t:.3,n:'주세페',role:'나폴리 시민',p:'수다스러운 나폴리 아저씨. 피자와 축구, 에스프레소를 사랑한다.'},{t:.6,n:'키아라',role:'스파카나폴리에 사는 시민',p:'스파카나폴리 골목에 사는 젊은 엄마. 골목과 공방 거리를 잘 안다.'}]},
  rom:{spots:[
-   {t:.0,side:1,k:'station',id:'train',n:'로마 테르미니역',msg:'치비타베키아역 09:21 FrecciaBianca 8601 → 로마 테르미니 10:03. 이 표는 변경·환불이 안 돼요.'},
+   {t:.0,side:1,k:'station',id:'train',n:'로마 테르미니역',msg:'치비타베키아역 09:21 FrecciaBianca 8601 → 로마 테르미니 10:03. 이 표는 변경·환불이 안 돼요.',ride:{kind:'train',scen:'country',title:'FrecciaBianca 8601',col:'#b3202a',stops:['Civitavecchia','Roma Termini'],gap:900,vmax:42,intro:'🚆 하선 후 치비타베키아역으로. 09:21 FrecciaBianca 8601 1등석 3호차 (변경·환불 불가)',intro2:'치비타베키아 09:21 → 로마 테르미니 10:03. 왼쪽 창밖으로 바다, 오른쪽으로 들판과 소나무가 지나가요.'}},
    {t:.1,side:-1,k:'gelato',id:'gelato1',n:"Gelateria dell'Angeletto",w:'파올로',menu:{title:"Gelateria dell'Angeletto",sub:'몬티 지구 · 가상 가격',items:[['젤라토 컵 두 가지 맛',3.5],['젤라토 콘 세 가지 맛',4.5]]}},
    {t:.3,side:-1,k:'colosseum',id:'colosseum',n:'콜로세움 입구',price:18},
    {t:.4,side:1,k:'gelato',id:'gelato2',n:'Il gelato di Costanza',w:'코스탄차',menu:{title:'Il gelato di Costanza',sub:'콜로세움에서 걸어서 5분 안팎 · 가상 가격',items:[['젤라토 컵',3.5],['그라니타',3]]}},
    {t:.47,side:-1,k:'resto',id:'eat_rom',n:'La Prezzemolina',w:'마르코',menu:{title:'La Prezzemolina',sub:'로마식 피자 · 가상 가격',items:[['로마식 피자 마르게리타',5],['감자 피자',5],['수플리',2.5],['탄산수',2]]}}],
   cit:[{t:.2,n:'루카',role:'몬티 지구에 사는 로마 시민',p:'로마 몬티 지구 청년. 콜로세움 근처 골목과 젤라토 가게를 잘 안다.'},{t:.75,n:'프란체스카',role:'트레비 분수 근처에서 일하는 시민',p:'트레비 근처 가게에서 일한다. 동전 던지기 전통과 사람 많은 시간을 안다.'}]},
  gen:{spots:[
-   {t:.0,side:1,k:'shuttle',id:'shuttle',n:'무료 셔틀 (→ 카리카멘토 광장)',to:.12,msg:'무료 셔틀로 Piazza Caricamento까지. 가리발디 거리까지 걸어서 5분.'},
+   {t:.0,side:1,k:'shuttle',id:'shuttle',n:'무료 셔틀 (→ 카리카멘토 광장)',to:.12,msg:'무료 셔틀로 Piazza Caricamento까지. 가리발디 거리까지 걸어서 5분.',ride:{kind:'bus',scen:'port',title:'무료 셔틀버스',col:'#f0c419',stops:['크루즈 터미널','Piazza Caricamento'],gap:420}},
    {t:.32,side:1,k:'resto',id:'eat_gen',n:'Sà Pesta',w:'로베르토',menu:{title:'Sà Pesta',sub:'예시 메뉴 · 가상 가격',items:[['파리나타 (병아리콩 전)',5],['페스토 트로피에',11],['토르타 파스콸리나',7],['레모네이드',3.5]]}},
    {t:.56,side:-1,k:'museum',id:'museum',n:'롤리 궁전 박물관',price:9}],
   cit:[{t:.2,n:'조르조',role:'제노바 항구 근처 시민',p:'제노바 토박이. 란테르나 등대와 페스토, 카루지 골목 이야기를 좋아한다.'},{t:.62,n:'엘레오노라',role:'가리발디 거리의 시민',p:'음악을 좋아하는 제노바 시민. 파가니니와 롤리 궁전 이야기를 즐긴다.'}]},
  mrs:{spots:[
-   {t:.0,side:1,k:'shuttle',id:'shuttle',n:'유료 셔틀 정류장',to:.0,msg:'코스타 유료 셔틀(선내 예약)로 구항구까지. 크루즈 터미널은 시내에서 약 6km 떨어져 있어요.'},
+   {t:.0,side:1,k:'shuttle',id:'shuttle',n:'유료 셔틀 정류장',to:.0,msg:'코스타 유료 셔틀(선내 예약)로 구항구까지. 크루즈 터미널은 시내에서 약 6km 떨어져 있어요.',ride:{kind:'bus',scen:'port',title:'코스타 유료 셔틀',col:'#f0c419',stops:['크루즈 터미널','Vieux-Port'],gap:600,intro2:'크루즈 터미널은 시내에서 약 6km. 항구의 크레인과 창고를 지나 구항구로 가요.'}},
    {t:.07,side:1,k:'stall',id:'buy_fish',n:'생선 시장',w:'피에르',items:[['정어리 한 봉지',6],['마르세유 비누',5]]},
    {t:.17,side:-1,k:'stall',id:'buy_flower',n:'꽃 시장',w:'소피',items:[['라벤더 다발',8],['해바라기 한 송이',3]]},
    {t:.25,side:-1,k:'resto',id:'eat_mrs',n:'La Cigale',w:'앙투안',menu:{title:'La Cigale Vieux Port',sub:'92 Quai du Port · 1인 €25~40 · 가상 가격',items:[['부야베스 (간소 버전)',29],['홍합 감자튀김',19],['레몬 타르트',8]]}},
-   {t:.38,side:1,k:'bus',id:'bus',n:'60번 버스 정류장',to:.995,msg:'60번 버스로 노트르담 드 라 가르드까지 약 12분.'},
-   {t:.995,side:1,k:'bus',id:'bus2',n:'60번 버스 (구항구 방면)',to:.38,msg:'60번 버스 또는 걸어서 구항구로 내려가요.'}],
+   {t:.38,side:1,k:'bus',id:'bus',n:'60번 버스 정류장',to:.995,msg:'60번 버스로 노트르담 드 라 가르드까지 약 12분.',ride:{kind:'bus',scen:'city',title:'60번 버스',col:'#2e5a86',stops:['Vieux-Port','Notre-Dame de la Garde'],gap:520,intro2:'60번 버스로 노트르담 드 라 가르드까지 약 12분. 언덕길을 올라가요.'}},
+   {t:.995,side:1,k:'bus',id:'bus2',n:'60번 버스 (구항구 방면)',to:.38,msg:'60번 버스 또는 걸어서 구항구로 내려가요.',ride:{kind:'bus',scen:'city',title:'60번 버스',col:'#2e5a86',stops:['Notre-Dame de la Garde','Vieux-Port'],gap:520}}],
   cit:[{t:.12,n:'마르셀',role:'구항구의 어부',p:'마르세유 구항구 어부. 아침 생선 시장과 부야베스 이야기를 좋아한다.'},{t:.6,n:'레아',role:'MuCEM 근처를 산책하는 시민',p:'마르세유 시민. MuCEM과 포르 생장, 바닷바람 이야기를 한다.'}]}};
 
 const CRUISE_INFO="이 게임은 바르셀로나 왕복 지중해 7박 8일 크루즈(배: 코스타 토스카나)를 걷는 가상 3D 세계다. 일정: 10/4(일) 바르셀로나 승선 10:00·출항 18:00 / 10/5(월) 항해일 / 10/6(화) 칼리아리 입항 07:00·출항 16:00, 하선 10:30·승선 14:00 / 10/7(수) 나폴리 입항 08:30·출항 18:30, 하선 10:30·승선 15:10, 두오모 영어 가이드 투어 12:00(11:45까지 도착) / 10/8(목) 치비타베키아(로마) 입항 08:30·출항 19:00, 09:21 기차로 로마 테르미니, 16:12 기차로 복귀 / 10/9(금) 제노바 입항 08:30·출항 17:30경, 하선 10:15·승선 14:15 / 10/10(토) 마르세유 입항 09:00·출항 18:00, 하선 10:15·승선 14:45 / 10/11(일) 바르셀로나 08:00 하선. 그날 선내 프로그램과 최종 승선 시각은 코스타 앱의 'Oggi a Bordo'에서 확인한다. 선내 결제는 승선 카드. 수영장은 무료, 10대 전용 Teen Zone이 있다. 게임 속 돈은 가상 유로다.";
@@ -885,12 +886,77 @@ SC.cafe=()=>{const g=new T.Group(),npcs=[],spots=[],list=[];RND=81;const Y=40,DS
  return {g,path:[new T.Vector3(0,Y,3.2),new T.Vector3(0,Y,-2)],sky:'indoor',seaY:null,notes:[[0,'선내 카페예요. 바리스타에게 커피를 주문하고 자리에 앉아 마셔 보세요.']],acts:[],people:list,npcs,spots,
   walk:{box:[-8.4,8.4,-4.6,7.4],y:Y},camDist:4,camH:2.2,camHmax:3,light:{hemi:1,sun:.4},walkSp:3};};
 
+/* ---------- 대중교통 실제로 타기: 차량 안에서 바깥 풍경이 흘러가요 ---------- */
+let RIDEP=null;
+function startRide(P){RIDEP=P;SCN.ride.name=P.title;if(P.id)markAct(P.id);fadeMsg(P.intro||((P.kind==='metro'?'🚇 ':P.kind==='train'?'🚆 ':'🚌 ')+P.title+' — '+P.stops[0]+' 승강장으로'),()=>go('ride'));}
+SC.ride=()=>{const P=RIDEP;const g=new T.Group(),npcs=[],spots=[],list=[];RND=97;const DS={side:T.DoubleSide};
+ const kind=P.kind,W=kind==='bus'?2.5:2.9,Lc=kind==='bus'?11:kind==='train'?22:18,H=kind==='bus'?2.2:2.3;
+ const wall=M(kind==='train'?'#e9e4da':'#dfe3e6',DS),glass=M('#9fb3c4',{transparent:true,opacity:.12,side:T.DoubleSide});
+ /* 차량 */
+ const car=new T.Group();g.add(car);box(car,W,.12,Lc,M('#4a4f55'),0,-.12,0);box(car,W,.1,Lc,wall,0,H,0);
+ for(const sx of[-1,1]){const x=sx*W/2;box(car,.08,.95,Lc,wall,x,0,0);box(car,.08,.35,Lc,wall,x,H-.35,0);for(let z=-Lc/2+.5;z<=Lc/2;z+=2.4)box(car,.1,1.3,.25,wall,x,.95,z);box(car,.02,1.15,Lc,glass,x,1,0);}
+ box(car,W,H,.1,wall,0,0,-Lc/2);box(car,W,H,.1,wall,0,0,Lc/2);box(car,.02,.12,Lc,M(P.col||'#c8202a'),W/2+.03,.85,0);box(car,.02,.12,Lc,M(P.col||'#c8202a'),-W/2-.03,.85,0);
+ for(let z=-Lc/2+2;z<Lc/2-1;z+=3.5)box(car,.3,.04,2,M('#ffffff',{emissive:'#eeeeee'}),0,H-.06,z);
+ const doors=[];for(const z of(kind==='bus'?[-3.5,2.5]:[-Lc/4,Lc/4])){doors.push(box(car,.07,1.95,1.3,M('#9aa3ab'),W/2+.01,0,z));}
+ const seatM=M(kind==='train'?'#2b3550':kind==='bus'?'#2e5a86':'#c8553d');const seats=[];
+ if(kind==='metro'){for(const sx of[-1,1])for(const z of[-6.5,-2,2.5,6.5]){box(car,.5,.45,3,seatM,sx*(W/2-.3),0,z);for(const dz of[-1,0,1])seats.push({x:sx*(W/2-.4),z:z+dz,ry:-sx*Math.PI/2});}
+  for(const z of[-8,-4.2,0,4.2,8])cyl(car,.03,.03,H,M('#cfd4d8'),.3,0,z,6);}
+ else{const step=kind==='train'?1.9:1.5;for(let z=-Lc/2+1.6;z<Lc/2-1.2;z+=step)for(const sx of[-1,1]){const x=sx*(W/2-.62);box(car,.95,.45,.5,seatM,x,0,z);box(car,.95,.75,.12,seatM,x,.45,z+.22);seats.push({x,z:z-.05,ry:Math.PI});}}
+ /* 승객 */
+ seats.forEach((s,i)=>{if(rnd()<.45){const p=person(g,s.x,0,s.z,CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=s.ry;p.userData.mode='sit';list.push(p);s.taken=1;}});
+ for(let i=0;i<(kind==='bus'?1:3);i++){const p=person(g,-.2+rnd()*.4,0,-Lc/2+3+rnd()*(Lc-6),CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=rnd()*6.28;list.push(p);}
+ const mySeat=seats.filter(s=>!s.taken&&s.x>0).sort((a,b)=>Math.abs(a.z)-Math.abs(b.z))[0];if(mySeat)mySeat.taken=1;
+ seats.forEach(s=>{if(!s.taken)spots.push({x:s.x,z:s.z,r:.7,b:'💺 앉기',s:'빈자리',fn:()=>sitAt(s.x,0,s.z,s.ry,'sit')});});
+ /* 바깥 풍경 */
+ const out=new T.Group();g.add(out);const rep=[];const LOOP=480;
+ const add=(o,bz)=>{o.userData.bz=bz;out.add(o);rep.push(o);return o;};
+ const stop=new T.Group();g.add(stop);let signs=[];
+ const sgnMat=(name)=>TM('st_'+name+(P.col||''),512,96,(c,w,h)=>{c.fillStyle='#f4f2ec';c.fillRect(0,0,w,h);c.fillStyle=P.col||'#c8202a';c.fillRect(0,0,w,12);c.fillRect(0,h-12,w,12);c.fillStyle='#1d1d1d';c.font='bold 46px sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillText(name,w/2,h/2+2);});
+ let sky='day',seaY=null,dark=false;
+ if(P.scen==='tunnel'){dark=true;const tw=M('#2a2622',DS);box(g,.2,6,600,tw,-3.4,-1.2,0);box(g,.2,6,600,tw,3.4,-1.2,0);box(g,7,.2,600,tw,0,4.6,0);box(g,7,.2,600,M('#1d1a17'),0,-1.25,0);
+  for(let k=0;k<32;k++){const gg=new T.Group();box(gg,.12,.18,.6,M('#fff2c8',{emissive:'#ffe0a0'}),-3.25,2.4,0);box(gg,.12,.18,.6,M('#fff2c8',{emissive:'#ffe0a0'}),3.25,2.4,0);box(gg,.25,5.6,.3,M('#3a3632'),-3.25,-1.1,0);box(gg,.25,5.6,.3,M('#3a3632'),3.25,-1.1,0);add(gg,k*15);}
+  const pc=['#e9d8a6','#9ad0e8','#e8b0c8'];box(stop,4.6,1,90,M('#b8b2a6'),3.85,-1,0);box(stop,.1,.05,90,M('#f2c14e'),1.62,0,0);box(stop,.2,5,90,M(pc[(rnd()*3)|0],DS),6.3,0,0);box(stop,5.5,.2,90,M('#d8d4cc',DS),3.6,4.5,0);
+  for(let z=-36;z<=36;z+=18){const s=new T.Mesh(new T.PlaneGeometry(4.6,.86),sgnMat(P.stops[0]));s.position.set(6.18,2.6,z);s.rotation.y=-Math.PI/2;stop.add(s);signs.push(s);}
+  for(let z=-40;z<=40;z+=8)box(stop,.4,.08,3,M('#ffffff',{emissive:'#ffffff'}),3.6,4.4,z);for(let i=0;i<7;i++){const p=person(stop,2.6+rnd()*2.6,0,-34+i*10,CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=-Math.PI/2;list.push(p);}}
+ else{seaY=-1.2;const gr=P.scen==='country'?'#8aa05a':'#8a837a';
+  if(P.scen==='country'){for(let k=0;k<16;k++){const gg=new T.Group();box(gg,60,.4,30,M(['#9ab35e','#c9b36a','#7f9a4e','#b8a35a'][k%4]),35,-1.4,0);box(gg,3,.3,30,M('#7a6a55'),4,-1.3,0);
+     if(k%3===0){box(gg,7,5,9,facade('farm'+(k%2),'#e2c9a0',{rows:2,cols:3,shut:'#7a5a3a'}),26+rnd()*20,-1.2,0);}for(let t=0;t<3;t++){if(rnd()<.5)pine(gg,12+rnd()*40,-14+rnd()*28,.6).position.y=-1.2;else cypress(gg,12+rnd()*40,-14+rnd()*28,.8);}
+     cyl(gg,.08,.08,7,M('#5a4a3a'),3.2,-1.2,0,5);box(gg,3,.12,.12,M('#3a3a3a'),3.2,5.6,0);add(gg,k*30);}
+   for(let k=0;k<6;k++){const h=new T.Mesh(new T.SphereGeometry(140,16,8,0,Math.PI*2,0,Math.PI/2),M('#6f8a52'));h.scale.y=.35;h.position.set(260+rnd()*200,-2,-600+k*240);g.add(h);}
+   box(g,8,.4,1200,M('#d9c79a'),-8,-1.5,0);sky='day';}
+  else{/* port 또는 city */const cityCols=P.scen==='city'?['#efe3c8','#e6d2a8','#d9a05b','#f2ead8']:['#cfc6b4','#b9b0a0'];
+   for(let k=0;k<16;k++){const gg=new T.Group();box(gg,40,.5,30,M(gr),22,-1.5,0);box(gg,4,.3,30,M('#3c3f44'),3.2,-1.2,0);
+     if(P.scen==='city'){for(const sx of[1,-1]){const h=12+rnd()*12;bld(gg,sx*13+sx*4,(rnd()*10-5),11,h,12,0,facade('rc'+(k%4),cityCols[k%4],{rows:5,cols:4,shut:'#7b8fa3'}));}box(gg,40,.5,30,M(gr),-22,-1.5,0);}
+     else{if(k%2===0){const c=new T.Group();box(c,1.2,30,1.2,M('#c8553d'),0,-1,0);box(c,1.2,1.2,26,M('#c8553d'),0,28,-6);c.position.set(24,0,0);gg.add(c);}else{box(gg,16,8,22,M('#b9b0a0'),26,-1,0);box(gg,6,2.6,2.4,M(['#c8553d','#2e5a86','#5a8a5c'][k%3]),12,-1,5);}}
+     cyl(gg,.08,.1,6,M('#55595e'),5.2,-1.2,6,6);if(k%2)pine(gg,7,-8,.5).position.y=-1.2;add(gg,k*30);}
+   if(P.scen==='port'){const sh=makeShip();sh.position.set(-120,-1,-260);sh.rotation.y=Math.PI/2;g.add(sh);}
+   sky='day';}
+  box(stop,4,.3,30,M('#cfc6b4'),3.6,-1.05,0);for(let z=-12;z<=12;z+=12){const s=new T.Mesh(new T.PlaneGeometry(3.2,.7),sgnMat(P.stops[0]));s.position.set(4.6,2.6,z);s.rotation.y=-Math.PI/2;stop.add(s);signs.push(s);cyl(stop,.05,.05,2.6,M('#666'),4.7,-1,z,5);}
+  if(kind==='train'){box(stop,6,.2,40,M('#d8d4cc'),4,4.5,0);for(const z of[-15,0,15])cyl(stop,.15,.15,5.6,M('#888'),6.4,-1,z,6);}
+  for(let i=0;i<5;i++){const p=person(stop,2.8+rnd()*1.5,-.9,-12+i*6,CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=-Math.PI/2;list.push(p);}}
+ /* 운행: 정차 → 출발 → 다음 정류장 */
+ const gap=P.gap||220,vmax=P.vmax||(kind==='bus'?13:16);let si=0,s=0,v=0,phase='dwell',dwell=3.5,doorK=1,done=false;
+ const setSigns=n=>signs.forEach(x=>x.material=sgnMat(n));
+ const rideTick=dt=>{if(done)return;
+  if(phase==='dwell'){dwell-=dt;doorK=Math.min(1,doorK+dt*2);if(dwell<1.2)doorK=Math.max(0,dwell/1.2);
+   if(dwell<=0){if(si>=P.stops.length-1){done=true;say(P.stops[si]+' 도착! 내려요.');fadeMsg('🚶 '+P.stops[si]+'에서 내려요.',()=>{if(P.after)P.after();else go(P.dest.sc,P.dest.at);});return;}
+    phase='run';v=0;blip(880,.2,'sine',.15);setTimeout(()=>blip(660,.3,'sine',.15),220);say('다음 정류장: '+P.stops[si+1]+(P.lines&&P.lines[si]?' — '+P.lines[si]:''),P.title);}}
+  else{const left=gap-s;if(left<v*v/(2*(kind==='train'?1.4:2.2))+.5)v=Math.max(.6,v-(kind==='train'?1.4:2.2)*dt);else v=Math.min(vmax,v+(kind==='train'?1.2:2.4)*dt);s+=v*dt;
+   if(s>=gap){s=0;si++;phase='dwell';dwell=si>=P.stops.length-1?3:4;doorK=0;v=0;setSigns(P.stops[si]);say(P.stops[si]+(si>=P.stops.length-1?' — 내릴 곳이에요.':' — 정차해요.'),P.title);blip(660,.2,'sine',.15);setTimeout(()=>blip(880,.3,'sine',.15),220);}}
+  const run=phase==='run'?s:0;rep.forEach(o=>{o.position.z=(((o.userData.bz+run+si*gap)%LOOP)+LOOP)%LOOP-LOOP/2;});
+  stop.visible=phase!=='run'||s<80||s>gap-80;stop.position.z=phase!=='run'?0:(s<80?s:s-gap);
+  doors.forEach(d=>d.position.y=doorK*2.05);car.position.y=phase==='run'?Math.sin(clock*25)*.01:0;
+  if(phase==='run'&&AC&&Math.random()<dt*.5)blip(60+v*2,1,'sawtooth',.02);};
+ const notes=[[0,P.intro2||(P.title+' — '+P.stops[0]+'에서 '+P.stops[P.stops.length-1]+'까지. 차 안을 걸어 다니거나 빈자리에 앉아도 돼요.')]];
+ return {g,path:[new T.Vector3(0,0,Lc/2-2.5),new T.Vector3(0,0,-Lc/2+2.5)],sky:dark?'indoor':sky,seaY:dark?null:seaY,dark,notes,acts:[{id:'skipride',b:'⏭ 건너뛰기',s:'바로 도착'}],people:list,npcs,spots,
+  walk:{box:[-W/2+.35,W/2-.35,-Lc/2+.6,Lc/2-.6],y:0},camDist:2.6,camH:1.7,camHmax:2,walkSp:2,rideTick,rideSkip:()=>{phase='dwell';si=P.stops.length-1;dwell=.1;},mySeat,rideW:W,light:dark?{hemi:.9,sun:.2}:null,rock:true};};
+
 /* ---------- 기존 장면에 사람·장소 더하기 ---------- */
 const ENH={};
 ENH.terminal=(c,o)=>{c.npcs=c.npcs||[];c.spots=c.spots||[];
  mkNpc(c.g,c.npcs,{id:'checkin',name:'체크인 직원 마리아',role:'바르셀로나 크루즈 터미널 체크인 직원',p:'친절한 체크인 직원. 승선 카드와 여권, 짐 태그를 안내한다.',x:.9,y:0,z:-30,ry:Math.PI/2,cloth:'#1f2f4a',longHair:1,quick:['체크인 어떻게 해요?','짐은 어디에 맡겨요?'],lines:['여권과 승선권 보여 주세요. 승선 카드를 만들어 드릴게요.','짐은 태그를 붙여 맡기시면 객실 앞까지 배달돼요.']});
  if(!o.off)c.spots.push({x:14,z:9.5,y:9.5,r:3,b:'🚢 승선하기',s:'배 안으로',fn:()=>doAct({id:'board'})});
- else c.spots.push({x:6,z:-48,r:4,b:'🧳 짐 찾기',s:'수하물 구역',fn:()=>doAct({id:'bags'})});};
+ else{c.spots.push({x:6,z:-48,r:4,b:'🧳 짐 찾기',s:'수하물 구역',fn:()=>doAct({id:'bags'})});c.spots.push({x:-4,z:-76,r:6,b:'🏙 바르셀로나 시내로',s:'람블라스·성당 쪽',fn:()=>{fadeMsg('터미널 밖으로 나가요. 택시·셔틀버스 승차장이 바로 앞이에요.',()=>{location.href='cathedral.html#port';});}});}};
 ENH.deck=(c,o)=>{c.npcs=c.npcs||[];c.spots=c.spots||[];
  mkNpc(c.g,c.npcs,{id:'poolbar',name:'풀 바 바텐더 케빈',role:'풀 데크 바텐더',p:'유쾌한 풀 바 바텐더. 스무디와 시원한 음료를 권한다.',x:0,y:46,z:32.4,ry:0,cloth:'#3d9a9b',quick:['시원한 거 추천해 주세요'],lines:['더운 날엔 과일 스무디가 최고예요!','수영하고 오셨어요? 레모네이드 어때요?']});
  if(o.time!=='night')mkNpc(c.g,c.npcs,{id:'lifeguard',name:'안전요원 사라',role:'수영장 안전요원',p:'수영장 안전요원. 안전 수칙을 상냥하게 알려 준다.',x:8.5,y:46,z:23.5,ry:Math.PI,cloth:'#d8433a',pants:'#d8433a',longHair:1,lines:['수영장은 무료예요. 뛰지 말고 걸어 주세요!','미끄럼틀은 키 제한이 있으니 안내판을 확인하세요.']});
@@ -903,7 +969,8 @@ ENH.cabin=(c)=>{c.acts.push({id:'sleep',b:'잠자기',s:'다음 날 아침으로
 ENH.port=(c,o)=>{const city=o.city,D=CITY[city];c.npcs=c.npcs||[];c.spots=c.spots||[];const g=c.g;
  const at=(t,side,off)=>{const p=curve.getPointAt(Math.min(1,Math.max(0,t))),tg=curve.getTangentAt(Math.min(1,Math.max(0,t)));const nx=-tg.z,nz=tg.x,l=Math.hypot(nx,nz)||1;return {x:p.x+nx/l*side*off,y:p.y,z:p.z+nz/l*side*off,tx:tg.x,tz:tg.z,nx:nx/l*side,nz:nz/l*side,face:Math.atan2(-nx/l*side,-nz/l*side)};};
  const BOARD={cag:'걸어서 항구로 돌아가 14:00까지 승선해요.',nap:'항구로 걸어가 15:10까지 승선해요.',rom:'16:12 Regionale Veloce 4136 → 치비타베키아 17:13. 역 앞 Port Link 셔틀로 터미널까지 가서 19:00 출항 전에 승선해요.',gen:'Piazza Caricamento에서 셔틀로 돌아가 14:15까지 승선해요.',mrs:'셔틀 승차 위치는 선내 신문에서 확인. 14:45까지 승선해요.'};
- const b=at(0,1,4);c.spots.push({x:b.x,z:b.z,y:b.y,r:5,b:'🚢 승선 복귀',s:'배로 돌아가기',fn:()=>{fadeMsg(BOARD[city],()=>doAct({id:'board'}));}});
+ const BR={rom:{kind:'train',scen:'country',title:'Regionale Veloce 4136',col:'#2e5a86',stops:['Roma Termini','Civitavecchia'],gap:900,vmax:36,intro:'🚆 16:12 Regionale Veloce 4136 → 치비타베키아 17:13'},gen:{kind:'bus',scen:'port',title:'무료 셔틀버스',col:'#f0c419',stops:['Piazza Caricamento','크루즈 터미널'],gap:420},mrs:{kind:'bus',scen:'port',title:'코스타 유료 셔틀',col:'#f0c419',stops:['Vieux-Port','크루즈 터미널'],gap:600}};
+ const b=at(0,1,4);c.spots.push({x:b.x,z:b.z,y:b.y,r:5,b:'🚢 승선 복귀',s:'배로 돌아가기',fn:()=>{if(BR[city])startRide(Object.assign({after:()=>{say(BOARD[city]);doAct({id:'board'});}},BR[city]));else fadeMsg(BOARD[city],()=>doAct({id:'board'}));}});
  D.spots.forEach(s=>{const p=at(s.t,s.side,s.k==='resto'?6:5.5);
   if(s.k==='resto'){const f=at(s.t,s.side,10.5);bld(g,f.x,f.z,9,6,4,Math.atan2(f.nx,f.nz),facade('rs_'+s.id,'#c96d4f',{rows:2,cols:3,arches:true}));label(g,s.n,f.x-f.nx*2.05,f.y+5.2,f.z-f.nz*2.05,Math.atan2(-f.nx,-f.nz),6,'#fff','#7a2f22');
     const awn=box(g,8,.12,2,M('#b0243f'),f.x-f.nx*3,f.y+3.2,f.z-f.nz*3);awn.rotation.y=Math.atan2(f.nx,f.nz);
@@ -951,6 +1018,7 @@ function go(id,atT){const sc=SCN[id];if(!sc)return;if(cur){scene.remove(cur.g);d
  guide=null;if(cur.guide){guide=mkNpc(cur.g,cur.npcs,Object.assign({id:'crew',name:'크루 지아',role:'이 크루즈의 한국어 안내 크루',p:'손님을 따라다니며 일정과 선내 시설, 기항지 관광을 안내하는 밝은 크루. 일정표 자료를 정확히 알고 있다.',x:0,z:0,quick:['오늘 일정 알려 주세요','지금 뭐 하면 좋아요?','승선 시간이 언제예요?'],lines:['무엇이든 물어보세요!','오늘 할 일은 위쪽 일정 버튼에서 볼 수 있어요.']},CREW));guide.follow=1;}
  meAv=rigPerson({cloth:'#e3b860',pants:'#2b3550',hat:'#2e5a86',hatBrim:'#2e5a86'});cur.g.add(meAv);
  placeAt(atT!==undefined?Math.round(atT*(SN-1)):0,true);
+ if(cur.mySeat){const q=cur.mySeat;sitAt(q.x,0,q.z,q.ry,'sit');camYaw=-Math.PI/2;camH=1.45;}
  updHead();ctxKey='';updCtx();say('');ambient();bgm(cur.bgm||null);if(auto)setAuto(false);}
 function updHead(){const d=DAYS[dayI];$('dayTag').textContent=d.tag+' · '+d.title;$('placeName').textContent=SCN[curId].name;const n=nextQ();$('placeSub').textContent=n?('다음: '+(n.q.t?n.q.t+' ':'')+n.q.n):'오늘 코스 완료! 일정에서 다음 날로';$('wallet').textContent='€'+G.eur.toFixed(0)+(G.chips?' · 칩 '+G.chips:'');}
 function qKey(d,i){return d+':'+i;}
@@ -1014,7 +1082,7 @@ function serve(nm,ctx,actId,stand){const w=cur.npcs.find(n=>/웨이터|바텐더
  else{setMode(me.sit?'drink':'standEat',8);say(nm+' 받았어요!',w?w.name:'직원');setTimeout(()=>{if(me.mode==='standEat')setMode('idle');if(me.mode==='drink')setMode('sit');if(actId)markAct(actId);},8000);}}
 function openShop(items,actId,title){openPanel(title,(b)=>{const p=document.createElement('p');p.className='lead';p.textContent='게임 속 가상 가격 · 지갑 €'+G.eur.toFixed(2);b.append(p);
   items.forEach(([nm,pr])=>{const r=document.createElement('button');r.type='button';r.className='row';const have=G.bag.filter(x=>x===nm).length;r.innerHTML='<span>'+nm+(have?' <small>· 가방에 '+have+'개</small>':'')+'</span><b>€'+pr+'</b>';r.onclick=()=>{if(!charge(pr))return;G.bag.push(nm);saveG();blip(1046,.12,'triangle',.18);toast('🛍 '+nm+' 샀어요');markAct(actId);openShop(items,actId,title);};b.append(r);});});}
-function transit(s){markAct(s.id);fadeMsg(s.msg,()=>{if(s.to!==undefined&&s.to!==0)placeAt(Math.round(s.to*(SN-1)),true);});}
+function transit(s){if(s.ride){startRide(Object.assign({id:s.id,dest:{sc:curId,at:s.to}},s.ride));return;}markAct(s.id);fadeMsg(s.msg,()=>{if(s.to!==undefined&&s.to!==0)placeAt(Math.round(s.to*(SN-1)),true);});}
 function museum(s){if(!charge(s.price))return;markAct(s.id);fadeMsg('롤리 궁전 박물관 관람 — 붉은 궁전·하얀 궁전·투르시 궁 통합권. 투르시 궁에는 파가니니의 바이올린 \'일 카노네\'가 있고, 10/2~11/8 파가니니 축제 기간이에요.');}
 function tourNap(){markAct('tour');fadeMsg('두오모 디 나폴리 영어 가이드 투어 (12:00 시작). 나폴리 수호성인 산 젠나로를 모신 대성당이에요. 여권 지참, 입구는 성당 안뜰 왼쪽 통로.',()=>{});}
 function enterArena(s){if(!charge(s.price))return;markAct('colosseum');fadeMsg('콜로세움 입장 (Intero €18). 같은 표로 24시간 안에 포로 로마노·팔라티노도 들어가요.',()=>{const z=cur.zones[0];me.zone=0;me.x=z.x+8;me.z=z.z;me.y=z.y;me.ry=Math.PI/2;camYaw=me.ry;});}
@@ -1043,7 +1111,8 @@ function doAct(x,btn){if(AC&&AC.state==='suspended')AC.resume();switch(x.id){
  case 'bags':say('짐 찾기 완료. 이제 시내 호텔로 이동해요.');blip(660,.12);markAct('bags');break;
  case 'trip':markAct('trip');openPass(true);break;
  case 'sleep':fadeMsg('푹 잤어요. 다음 날 아침이에요.',()=>{if(dayI<DAYS.length-1){dayI++;G.day=dayI;saveG();goNext();}});break;
- case 'exit':exitArena();break;}}
+ case 'exit':exitArena();break;
+ case 'skipride':if(cur.rideSkip)cur.rideSkip();break;}}
 function stampSilent(){}
 
 /* ---------- 미니게임 ---------- */
@@ -1184,6 +1253,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
   let cx=me.x+Math.sin(camYaw)*dist,cz=me.z+Math.cos(camYaw)*dist;
   if(cur.walk&&cur.walk.box){const b=cur.walk.box;cx=Math.max(b[0],Math.min(b[1],cx));cz=Math.max(b[2]-(cur.door?2.4:0),Math.min(b[3],cz));}
   cam.position.set(cx,me.y+ch,cz);cam.lookAt(me.x,me.y+(lie?.6:(cur.camDist&&cur.camDist<3?1.5:2)),me.z);
+  if(cur.rideW&&me.sit){const a=camYaw+Math.PI,px=-cur.rideW/2+.45,pz=me.z+1.7;cam.position.set(px,1.55,pz);cam.lookAt(px+Math.sin(a)*12,1.2,pz+Math.cos(a)*12-1.5);}
   if(cur.rock){cam.rotation.z+=Math.sin(clock*.6)*.006;}
   /* 크루와 사람들 */
   if(guide&&talkN!==guide){const gi=cur.closed?(me.ni+8)%SN:Math.min(SN-1,me.ni+7);const g=S[gi],h=S[cur.closed?(gi+2)%SN:Math.min(SN-1,gi+2)],k=S[cur.closed?(gi-2+SN)%SN:Math.max(0,gi-2)];
@@ -1200,6 +1270,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
    cur.dancers.forEach((d,i)=>{d.position.y=-4.4;d.userData.mode=showOn?'dance'+(i%3):'idle';});}
   if(cur.tiles){cur.tiles.forEach((t,i)=>{const k=Math.floor(clock*2.07)+i*7;t.material.color.setHSL(((k*37)%360)/360,.8,(Math.sin(clock*4+i)*.5+.5)*.35+.15);});cur.ball.rotation.y+=dt*.8;cur.beams.forEach((b,i)=>{b.rotation.z=Math.sin(clock*1.6+i)*.6;b.rotation.x=Math.cos(clock*1.2+i)*.4;});}
   if(cur.wheel&&cur.wheelSpin>0){cur.wheelSpin-=dt;cur.wheel.rotation.z+=dt*cur.wheelSpin*4;}
+  if(cur.rideTick)cur.rideTick(dt);
   if(cur.door){cur.door.position.x+=((doorOpen?-.85:.85)-cur.door.position.x)*dt*4;}
   coins=coins.filter(c=>{c.t+=dt;const k=Math.min(1,c.t/1.1);c.m.position.lerpVectors(c.a,c.b,k);c.m.position.y+=Math.sin(k*Math.PI)*4;c.m.rotation.x+=dt*14;if(k>=1){splashSnd();cur.g.remove(c.m);return false;}return true;});
   if(cur.seaY!==null&&!cur.dark&&cur.sky!=='indoor'){gullT-=dt;if(gullT<0){gullT=6+Math.random()*10;if(cur.city||cur.shore)gull();}}
@@ -1211,7 +1282,8 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
  R.render(scene,cam);requestAnimationFrame(frame);}
 
 /* 시작 */
-updStamps();go(nextQ()?nextQ().q.sc:'terminal',nextQ()?nextQ().q.at:0);requestAnimationFrame(frame);
+const FROMCITY=location.hash==='#board';if(FROMCITY){dayI=0;G.day=0;saveG();const st=document.querySelector('#start p');if(st)st.textContent='바르셀로나 크루즈 터미널 D에 도착했어요. 짐을 맡기고 체크인한 뒤 탑승교를 건너 배에 올라요.';$('enter').textContent='체크인하러 가기';}
+updStamps();if(FROMCITY)go('terminal',0.02);else go(nextQ()?nextQ().q.sc:'terminal',nextQ()?nextQ().q.at:0);requestAnimationFrame(frame);
 $('enter').disabled=false;loadingEl.textContent='';
 $('enter').onclick=()=>{setTimeout(()=>{$('hint').hidden=true;},9000);initAudio();ambient();bgm(cur.bgm||null);$('start').hidden=true;if(cur.notes[0]){say(cur.notes[0][1]);firedN.add(0);}};
 $('rail').addEventListener('pointerdown',e=>{const r=e.currentTarget.getBoundingClientRect();const k=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width));placeAt(Math.round(k*(SN-1)),true);if(auto)aIdx=me.ni;});

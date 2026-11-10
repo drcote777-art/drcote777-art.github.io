@@ -1400,7 +1400,7 @@ function buildSw(){const e=$("sws");e.innerHTML="";COLORS.forEach(c=>{const b=do
 $("nick").value=me.name;buildSw();
 $("setup").addEventListener("submit",e=>{e.preventDefault();{const v=($("nick").value||"").trim();if(!v||v==="순례자"||v==="손님"){$("nick").value="";$("nick").placeholder="이름을 꼭 적어 주세요 (예: 표주인)";$("nick").style.outline="2px solid #c0392b";$("nick").focus();try{toast("이름을 적어야 들어갈 수 있어요. 가족이 누가 왔는지 알아볼 수 있어요",true)}catch(x){}return}}const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";me.name=($("nick").value||"").trim().slice(0,10)||"손님";ls.set("ct_name",me.name);me.look.tc=me.color;applyLook();
   $("sheet").hidden=true;initAudio();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(x){}}pushP(true);
-  if(mode==="quiet"){goTo("altar");setQuiet(true)}else showSub("빛의 숲 성당","광장에서 정문 현관을 지나 성당 안으로 들어가 보세요. 입구 양옆 성수대에서 성호를 긋고, 숲처럼 뻗은 기둥 사이로 쏟아지는 빛을 걸어 보세요.",8000);
+  if(location.hash==="#port"&&typeof portArrive==="function"){portArrive()}else if(mode==="quiet"){goTo("altar");setQuiet(true)}else showSub("빛의 숲 성당","광장에서 정문 현관을 지나 성당 안으로 들어가 보세요. 입구 양옆 성수대에서 성호를 긋고, 숲처럼 뻗은 기둥 사이로 쏟아지는 빛을 걸어 보세요.",8000);
   {let lv=0;try{lv=+localStorage.getItem("ct_lastvisit")||0}catch(x){}const since=lv;if(since)setTimeout(()=>{const nn=[...new Set(visits.filter(v=>v.ts>since&&v.nick!==me.name).map(v=>v.nick))];if(nn.length){const t=`지난번 이후 다녀간 분: ${nn.slice(0,6).join(", ")}${nn.length>6?` 외 ${nn.length-6}명`:""}`;addLog("알림","#2f7d63",t);toast("👣 "+t)}},4500);if(Date.now()-lv>10*60000){try{localStorage.setItem("ct_lastvisit",String(Date.now()))}catch(x){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"손님",ts:Date.now(),u:VID,dv:DEV}),3000)}}});
 
 /* ================= 연결 ================= */
@@ -1893,12 +1893,12 @@ const RGLOW=(()=>{const g=new T.BufferGeometry(),a=new Float32Array(LAMPS.length
 
 /* ---------- 매 프레임 ---------- */
 let ramVis=false,ramNight=-1;
-function ramTick(now,t,dt){const on=me.lv>=3;if(on!==ramVis){ramVis=on;RAM.visible=on}meAv.g.visible=me.lv!==4;if(!on)return;const s=now/1000;
+function ramTick(now,t,dt){const on=me.lv>=3&&me.lv!==6;if(on!==ramVis){ramVis=on;RAM.visible=on}meAv.g.visible=me.lv!==4&&!(RIDE&&RIDE.hideMe);if(!on)return;const s=now/1000;if(typeof portTick==="function")portTick(s);
   if(me.lv===4){me.x=RX-Math.sin(camYaw)*2.1;me.z=COLZ-Math.cos(camYaw)*2.1;me.ry=camYaw+Math.PI}
   rcrowdTick(now);pigeonTick(s);SEA.offset.x=s*.004;SEA.offset.y=s*.007;
   TAXI.forEach(tx=>{const L=800,u=((s*7+tx.ph)%L),z=tx.lane>0?-4-u:-804+u;tx.g.position.set(RX+tx.lane,0,z);tx.g.rotation.y=tx.lane>0?0:Math.PI});
   const nt=dayLight()<.35;if(nt!==ramNight){ramNight=nt;RGLOW.visible=nt;const h=RAM.userData.lampHead;if(h){h.material.emissive.setHex(nt?0x8a6a30:0)}}}
-function ramZone(x,z){const lx=x-RX;if(me.lv===4)return"콜럼버스 전망대";if(lx>1400){const s=SHOPR.find(s=>Math.abs(lx-s.rx)<12);return s?s.ko:"가게 안"}if(z>0)return"카탈루냐 광장";if(lx>16.5&&z<-299&&z>-346)return"보케리아 시장";if(lx<-17&&z<-500&&z>-570)return"레이알 광장";
+function ramZone(x,z){const lx=x-RX;if(me.lv===6)return"지하철 안";if(me.lv===4)return"콜럼버스 전망대";if(lx>40&&lx<900&&z<-860)return portZone(lx,z);if(lx>1400){const s=SHOPR.find(s=>Math.abs(lx-s.rx)<12);return s?s.ko:"가게 안"}if(z>0)return"카탈루냐 광장";if(lx>16.5&&z<-299&&z>-346)return"보케리아 시장";if(lx<-17&&z<-500&&z>-570)return"레이알 광장";
   if(z<QUAYZ)return"람블라 데 마르 (항구)";if(z<-805)return lx<-60?"콜롬 산책로 (바닷가)":"콜럼버스 동상";if(z>-120)return"람블라 데 카날레테스";if(z>-250)return"람블라 데 엘스 에스투디스";if(z>-430)return"람블라 데 산트 조셉 (꽃의 람블라)";if(z>-620)return"람블라 데 엘스 카푸친스";return"람블라 데 산타 모니카"}
 function ramCam(cx,cz){const lz=me.z;if(me.lv===4){camDist=Math.min(camDist,1.1);return[cx,cz]}const sh=shopIn();if(sh){return[Math.max(RX+sh.rx-8.6,Math.min(RX+sh.rx+8.6,cx)),Math.max(-6.7,Math.min(6.7,cz))]}if(lz<0&&lz>-806&&Math.abs(me.x-RX)<16.5){cx=Math.max(RX-16,Math.min(RX+16,cx))}
   if(me.x-RX>17&&me.z<-299&&me.z>-346){cx=Math.max(RX+17.4,Math.min(RX+52,cx));cz=Math.max(-344.5,Math.min(-300.5,cz))}
@@ -1944,8 +1944,8 @@ INFO.push({n:"지하철 입구",x:METRO0.x,z:METRO0.z+2,r:4,d:"사그라다 파�
 PLACES.push(["ramcat","🚇 카탈루냐 광장",RX,28,0,3],["canal","💧 카날레테스 샘",RX+4,-14,Math.PI/2,3],["flor","🌹 꽃의 람블라",RX,-300,0,3],["boq","🍓 보케리아 시장",RX+21,-322,-Math.PI/2,3],
  ["liceu","🎭 리세우 극장 앞",RX+12,-464,-Math.PI/2,3],["reial","🌴 레이알 광장",RX-40,-532,Math.PI/2,3],["artist","🎨 거리 화가",RX,-692,0,3],["colom","🗽 콜럼버스 동상",RX,-812,0,3],["port","⛵ 항구 · 람블라 데 마르",RX,-905,0,3],["colomtop","🔭 콜럼버스 전망대",RX,COLZ+2.2,0,4]);
 CTX.splice(CTX.length-1,0,
- {id:"metro0",lab:()=>"🚇 지하철 타고 람블라스로",when:()=>Math.hypot(me.x-METRO0.x,me.z-(METRO0.z+2.6))<3.2,fn:()=>ramMetro(true)},
- {id:"metro3",lv:3,lab:()=>"🚇 지하철 타고 성당으로",when:()=>RMETRO.some(([x,z])=>Math.hypot(me.x-RX-x,me.z-(z+2.4))<3),fn:()=>ramMetro(false)},
+ {id:"metro0",lab:()=>"🚇 지하철 타고 람블라스로",when:()=>Math.hypot(me.x-METRO0.x,me.z-(METRO0.z+2.6))<3.2,fn:()=>metroRide(true)},
+ {id:"metro3",lv:3,lab:()=>"🚇 지하철 타고 성당으로",when:()=>RMETRO.some(([x,z])=>Math.hypot(me.x-RX-x,me.z-(z+2.4))<3),fn:()=>{const r=RMETRO.find(([x,z])=>Math.hypot(me.x-RX-x,me.z-(z+2.4))<3);metroRide(false,r?r[2]:"Catalunya")}},
  {id:"canal",lv:3,lab:()=>"💧 카날레테스 샘물 마시기",when:()=>Math.hypot(me.x-RX-2,me.z+14)<2.4,fn:()=>{initAudio();beadClick();doAct("hap");toast("시원한 샘물을 마셨어요. 바르셀로나에 다시 오게 될 거래요 😊")}},
  {id:"flower",lv:3,lab:()=>"🌹 꽃 한 송이 사기",when:()=>(RAM.userData.flowers||[]).some(([x,z])=>Math.hypot(me.x-RX-x,me.z-z)<3.4),fn:()=>{initAudio();chime();toast("빨간 장미 한 송이를 샀어요 🌹")}},
  {id:"statue",lv:3,lab:()=>"🪙 조각상에게 동전 넣기",when:()=>Math.hypot(me.x-RX+2.6,me.z+575)<2.6,fn:()=>{initAudio();beadClick();toast("은빛 조각상이 천천히 고개 숙여 인사해요 🙇")}},
@@ -2038,6 +2038,169 @@ CTX.splice(CTX.length-1,0,
  {id:"wear",lv:3,lab:()=>"👕 옷 고르기",when:()=>{const s=shopIn();return!!s&&s.kind==="wear"},fn:()=>openPanel("shop:"+shopIn().id)});
 PLACES.push(["shops","🛍️ 카탈루냐 광장 가게들",RX,62,0,3]);
 INFO.push({n:"광장 북쪽 가게들",x:RX,z:66,r:30,lv:3,d:"카페 델 솔, 옷 가게 모다 BCN, 알뜰 옷 가게 본 프레우, 람블라 버거가 있어요. 문 앞에서 '들어가기'를 누르세요. 가상 유로로 사 먹고, 옷을 사 입을 수 있어요(실제 결제 없음)."});
+/* ================= 크루즈 터미널 가는 길 · 실제로 타는 지하철·택시·셔틀버스 =================
+   콜럼버스 동상 앞(z -866)에서 항구 도로를 따라 몬주익 언덕 아래를 지나 크루즈 터미널 D(팔라크루세로스)까지.
+   실제로는 약 2~3km인 길을 걷기 편하게 줄였어요. */
+const PORTP=[[45,-872],[168,-874],[166,-1000],[166,-1300],[176,-1512],[400,-1517],[628,-1517]];
+const TERM={x:630,z:-1542};
+let RIDE=null;
+WALKS[3].push({x0:RX+40,x1:RX+182,z0:-881,z1:-863},{x0:RX+150,x1:RX+182,z0:-1532,z1:-863},{x0:RX+150,x1:RX+760,z0:-1532,z1:-1503},{x0:RX+560,x1:RX+700,z0:-1541,z1:-1503});
+(()=>{const asph=rmat(0x3c3f44),walk=rmat(0xb8b0a2),line=rmat(0xf2f2ee),rail=rmat(0xd0d4d8);
+  rbox(146,2,20,walk,111,-1,-872);rbox(30,2,668,walk,166,-1,-1197);rbox(612,2,30,walk,455,-1,-1517);rbox(140,2,40,walk,630,-1,-1522);
+  rbox(140,.04,10,asph,111,.02,-874);rbox(14,.04,660,asph,170,.02,-1197);rbox(600,.04,14,asph,460,.02,-1520);
+  for(let z=-880;z>-1500;z-=9)rbox(.25,.05,4,line,170,.05,z);for(let x=170;x<760;x+=9)rbox(4,.05,.25,line,x,.05,-1520);
+  rbox(140,1.1,.12,rail,111,.55,-881.5);rbox(.12,1.1,640,rail,150.5,.55,-1200);rbox(600,1.1,.12,rail,460,.55,-1532.5);
+  // 가로수(야자수)와 가로등
+  const tr=rmat(0x8a6a48),lf=new T.MeshLambertMaterial({color:0x3f6b34,side:T.DoubleSide});const palm=(x,z)=>{rcyl(.25,.35,9,tr,x,4.5,z,6);for(let k=0;k<7;k++){const l=new T.Mesh(new T.PlaneGeometry(.9,4.2),lf);l.position.set(RX+x,9,z);l.rotation.set(-1.0,k/7*6.283,0);l.translateY(1.8);RAM.add(l)}};
+  for(let x=60;x<170;x+=22)palm(x,-865);for(let z=-890;z>-1500;z-=26)palm(180,z);for(let x=200;x<560;x+=26)palm(x,-1505);
+  const pole=rmat(0x55595e),bulb=new T.MeshLambertMaterial({color:0xfff2c8,emissive:0x6a5a30});for(let z=-890;z>-1500;z-=40){rcyl(.1,.12,8,pole,152,4,z,6);rbox(1.4,.1,.2,pole,152.7,8,z);rbox(.5,.15,.3,bulb,153.3,7.9,z)}
+  // 세계무역센터(WTC)와 모이 데 바르셀로나 부두
+  rbox(88,2,270,walk,104,-1,-1015);const gls=new T.MeshPhongMaterial({color:0x8fa9bb,specular:0xffffff,shininess:80});
+  [[90,-930,24],[118,-975,30],[90,-1020,24]].forEach(([x,z,h])=>{rbox(26,h,36,gls,x,h/2,z);rbox(27,.8,37,rmat(0xe8e8e8),x,h+.4,z)});
+  const wsg=new T.Mesh(new T.PlaneGeometry(22,2.4),signMat("WORLD TRADE CENTER","세계무역센터","#23466b"));wsg.position.set(RX+131.1,20,-975);wsg.rotation.y=Math.PI/2;RAM.add(wsg);
+  // 하이메 1세 탑 (포트 케이블카, 약 107m)과 몬주익까지 이어지는 줄
+  const stl=rmat(0x8c3a2a);[[-3,-3],[3,-3],[-3,3],[3,3]].forEach(([a,b])=>rbox(.8,100,.8,stl,110+a,50,-1080+b));for(let y=10;y<100;y+=10)rbox(7,.4,7,stl,110,y,-1080);
+  rbox(12,6,12,rmat(0x6b2f22),110,103,-1080);const cab=new T.Mesh(new T.CylinderGeometry(.06,.06,1,4),rmat(0x222222));const a=new T.Vector3(RX+110,104,-1080),b=new T.Vector3(RX+420,128,-1060),mid=a.clone().add(b).multiplyScalar(.5);
+  cab.scale.y=a.distanceTo(b);cab.position.copy(mid);cab.lookAt(b);cab.rotateX(Math.PI/2);RAM.add(cab);
+  const gon=rbox(2.2,2,2.2,rmat(0xc8202a),0,0,0);RAM.userData.gondola={m:gon,a,b};
+  // 페리 두 척
+  [[118,-1270],[118,-1420]].forEach(([x,z])=>{rbox(26,9,120,rmat(0xf4f2ec),x,1.5,z);rbox(26.2,1.4,120,rmat(0x23466b),x,-2,z);rbox(22,6,80,rmat(0xf4f2ec),x,9,z+6);for(let k=0;k<12;k++)rbox(22.3,1,4,rmat(0x2a3640),x,9.5,z-30+k*6.5);rcyl(2,2.5,7,rmat(0x23466b),x,15,z+30,10)});
+  // 크루즈 배 (터미널 D 앞, 그 옆 다른 배)
+  const ship=(cx,cz,fun,L)=>{const w=rmat(0xf6f7f8),nv=rmat(0x1f2f4a);rbox(L,9,38,nv,cx,-2,cz);rbox(L,12,38,w,cx,8.5,cz);
+    const [c,g]=cvs(128,64);g.fillStyle="#f6f7f8";g.fillRect(0,0,128,64);g.fillStyle="#2f4b66";for(let i=0;i<8;i++)g.fillRect(4+i*16,10,12,30);g.fillStyle="rgba(170,210,230,.6)";g.fillRect(0,40,128,6);const bm=new T.MeshLambertMaterial({map:ctex(c,L/14,8)});
+    const up=new T.Mesh(new T.BoxGeometry(L*.86,30,34),[bm,bm,rmat(0xb98b5e),w,bm,bm]);up.position.set(RX+cx-L*.04,29.5,cz);RAM.add(up);
+    rbox(16,15,10,rmat(fun),cx-L*.33,52,cz);rbox(16.2,2,10.2,nv,cx-L*.33,60,cz);for(let k=0;k<10;k++)rcyl(1.6,1.6,7,rmat(0xff8a1f),cx-L*.4+k*L*.08,18,cz+19.5,8)};
+  ship(620,-1600,0xf0c419,300);ship(260,-1600,0x2c5a8a,260);
+  // 크루즈 터미널 D
+  const tg=new T.MeshPhongMaterial({color:0x9fc0d2,specular:0xffffff,shininess:70});rbox(140,14,38,tg,TERM.x,7,-1561);rbox(144,1.2,42,rmat(0xf2f2f2),TERM.x,14.6,-1561);
+  for(let x=-60;x<=60;x+=12)rbox(.6,14,.6,rmat(0xdedede),TERM.x+x,7,-1541.8);
+  const ts=new T.Mesh(new T.PlaneGeometry(40,4),signMat("CRUISE TERMINAL D","크루즈 터미널 D · 팔라크루세로스","#1f2f4a"));ts.position.set(RX+TERM.x,17.5,-1541.6);RAM.add(ts);
+  rbox(6,4,.3,rmat(0x2a3640),TERM.x,2,-1541.7);rbox(4,3,40,rmat(0xdfe5ea),TERM.x+30,10,-1582);ROB(TERM.x-70,TERM.x+70,-1580,-1542);
+  // 콜럼버스 쪽 승강장: 택시 승차장, 셔틀버스 정류장 / 터미널 앞 승차장
+  const stand=(x,z,txt,ko,col)=>{rcyl(.07,.07,3,rmat(0x666666),x,1.5,z,6);const s=new T.Mesh(new T.PlaneGeometry(1.8,.8),signMat(txt,ko,col));s.position.set(RX+x,3.2,z+.06);RAM.add(s);const s2=s.clone();s2.rotation.y=Math.PI;s2.position.z-=.12;RAM.add(s2)};
+  stand(52,-866,"TAXI","택시 승차장","#c9a21a");stand(62,-866,"BUS","크루즈 셔틀버스","#2e5a86");stand(TERM.x-20,-1506,"TAXI","택시 승차장","#c9a21a");stand(TERM.x-30,-1506,"BUS","셔틀버스 (콜럼버스 동상 방면)","#2e5a86");
+  // 도로 위 차들
+  const cars=[];for(let i=0;i<10;i++){const g=new T.Group();RAM.add(g);const col=[0x161616,0xd8d8d8,0x2c5a8a,0x8c2f3a,0x3a3f44][i%5];const bd=new T.Mesh(new T.BoxGeometry(1.8,.8,4.3),rmat(col));bd.position.y=.65;g.add(bd);const cb=new T.Mesh(new T.BoxGeometry(1.6,.6,2.2),rmat(0x2a3640));cb.position.set(0,1.3,.2);g.add(cb);
+    if(i%5===0){[-1,1].forEach(s=>{const d=new T.Mesh(new T.BoxGeometry(.04,.55,2.2),rmat(0xf2c21a));d.position.set(s*.92,.7,.1);g.add(d)})}cars.push({g,u:i*.1,dir:i%2?1:-1})}RAM.userData.pcars=cars})();
+const PCURVE=new T.CatmullRomCurve3(PORTP.map(([x,z])=>new T.Vector3(RX+x,0,z)),false,"centripetal"),PLEN=PCURVE.getLength();
+function portTick(s){const cs=RAM.userData.pcars;if(cs)cs.forEach(c=>{const u=((c.u+s*.012*(c.dir))%1+1)%1,p=PCURVE.getPointAt(u),t=PCURVE.getTangentAt(u);const nx=-t.z,nz=t.x;c.g.position.set(p.x+nx*(c.dir>0?-2.4:2.4),0,p.z+nz*(c.dir>0?-2.4:2.4));c.g.rotation.y=Math.atan2(t.x*c.dir,t.z*c.dir)});
+  const gd=RAM.userData.gondola;if(gd){const k=(Math.sin(s*.05)+1)/2;gd.m.position.lerpVectors(gd.a,gd.b,k);gd.m.position.y-=2.5}}
+function portZone(lx,z){if(z<-1500&&lx>540)return"크루즈 터미널 D";if(lx>140&&z<-1490)return"항구 도로 (터미널 방면)";if(lx>140)return"항구 도로 · 몬주익 언덕 아래";return"콜롬 부두 (택시·셔틀버스)"}
+INFO.push({n:"택시·셔틀버스 승차장",x:RX+57,z:-864,r:6,lv:3,d:"여기서 택시나 크루즈 셔틀버스를 타고 크루즈 터미널로 갈 수 있어요. 걸어서 가도 돼요. 실제로는 2~3km 거리라 짐이 있으면 택시가 편해요."},
+ {n:"세계무역센터",x:RX+136,z:-975,r:14,lv:3,d:"모이 데 바르셀로나 부두에 있는 배 모양의 건물 단지예요. 호텔과 사무실, 크루즈 터미널 일부가 있어요."},
+ {n:"하이메 1세 탑",x:RX+152,z:-1080,r:16,lv:3,d:"항구를 가로질러 몬주익 언덕까지 가는 포트 케이블카의 중간 탑이에요. 높이가 100m가 넘어요."},
+ {n:"크루즈 터미널 D",x:RX+TERM.x,z:-1530,r:18,lv:3,d:"코스타 크루즈는 보통 터미널 D(팔라크루세로스)나 E(헬릭스)를 써요. 실제 승선 터미널은 승선권 표기를 확인하세요. 문 앞에서 체크인하고 배에 올라요."});
+PLACES.push(["portstop","🚕 택시·셔틀 승차장",RX+57,-868,Math.PI,3],["cruiseT","🚢 크루즈 터미널 D",RX+TERM.x,-1512,0,3]);
+
+/* 이정표: 콜럼버스 동상 → 택시·셔틀 승차장 → 크루즈 터미널 D (표지판 + 바닥 화살표) */
+(()=>{const wayMat=(l1,l2,arrow)=>{const [c,g]=cvs(512,176);g.fillStyle="#1d4f91";g.fillRect(0,0,512,176);g.strokeStyle="#ffffff";g.lineWidth=6;g.strokeRect(6,6,500,164);
+    g.fillStyle="#ffffff";g.textAlign="left";g.textBaseline="middle";const tx=arrow==="→"?22:arrow?130:22;g.font="bold 50px 'Jua','Gowun Dodum',sans-serif";g.fillText(l1,tx,62,360);g.font="30px 'Gowun Dodum',sans-serif";g.fillStyle="#ffe9a8";g.fillText(l2,tx,124,360);
+    if(arrow){const ax=arrow==="→"?440:66,ay=88,r={"→":0,"↓":Math.PI/2,"←":Math.PI,"↑":-Math.PI/2}[arrow];g.save();g.translate(ax,ay);g.rotate(r);g.fillStyle="#ffd23f";g.beginPath();g.moveTo(52,0);g.lineTo(4,-44);g.lineTo(4,-17);g.lineTo(-50,-17);g.lineTo(-50,17);g.lineTo(4,17);g.lineTo(4,44);g.closePath();g.fill();g.restore()}
+    return new T.MeshBasicMaterial({map:new T.CanvasTexture(c)})};
+  const post=(x,z,ry,l1,l2,af,ab)=>{const pm=rmat(0x4a4f55);[-1.9,1.9].forEach(d=>rcyl(.09,.09,4.6,pm,x+Math.cos(ry)*d,2.3,z-Math.sin(ry)*d,6));
+    const a=new T.Mesh(new T.PlaneGeometry(4.6,1.58),wayMat(l1,l2,af));a.position.set(RX+x+Math.sin(ry)*.06,3.75,z+Math.cos(ry)*.06);a.rotation.y=ry;RAM.add(a);
+    const b=new T.Mesh(new T.PlaneGeometry(4.6,1.58),wayMat(l1,l2,ab));b.position.set(RX+x-Math.sin(ry)*.06,3.75,z-Math.cos(ry)*.06);b.rotation.y=ry+Math.PI;RAM.add(b)};
+  post(10.5,-800,0,"크루즈 터미널","택시·셔틀 승차장 70m","→","←");
+  post(27,-838,0,"크루즈 터미널","택시·셔틀 승차장 30m","↑","↓");
+  post(57,-861.6,0,"택시·셔틀버스","여기서 타요 · 크루즈 터미널행","↓","↑");
+  post(146,-864,-Math.PI/2,"크루즈 터미널","걸어서 가는 길 · 왼쪽으로","←","→");
+  post(158,-1180,0,"크루즈 터미널","이 길로 쭉 · 몬주익 아래","↑","↓");
+  post(158,-1496,0,"크루즈 터미널","오른쪽으로 · 거의 다 왔어요","→","←");
+  post(600,-1504,-Math.PI/2,"크루즈 터미널 D","체크인 · 승선 오른쪽 입구","→","←");
+  const [c,g]=cvs(64,64);g.clearRect(0,0,64,64);g.fillStyle="#1d6fd0";g.beginPath();g.moveTo(32,4);g.lineTo(60,36);g.lineTo(46,36);g.lineTo(32,20);g.lineTo(18,36);g.lineTo(4,36);g.closePath();g.fill();g.beginPath();g.moveTo(32,30);g.lineTo(60,62);g.lineTo(46,62);g.lineTo(32,46);g.lineTo(18,62);g.lineTo(4,62);g.closePath();g.fill();
+  const cm=new T.MeshBasicMaterial({map:new T.CanvasTexture(c),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}),cg=new T.PlaneGeometry(1.5,1.5);
+  const R=[[9,-806],[26,-824],[26,-856],[44,-865.5],[157,-865.5],[157,-1507],[628,-1507],[630,-1536]];
+  for(let i=0;i<R.length-1;i++){const [x0,z0]=R[i],[x1,z1]=R[i+1],L=Math.hypot(x1-x0,z1-z0),n=Math.max(2,Math.round(L/(L>200?12:5))),th=Math.atan2(-(x1-x0),-(z1-z0));
+    for(let k=0;k<n;k++){const m=new T.Mesh(cg,cm);m.position.set(RX+x0+(x1-x0)*k/n,.09,z0+(z1-z0)*k/n);m.rotation.set(-Math.PI/2,0,th);RAM.add(m)}}})();
+INFO.push({n:"크루즈 터미널 가는 길",x:RX+10,z:-803,r:7,lv:3,d:"바닥의 파란 화살표를 따라가면 택시·셔틀버스 승차장(약 70m)이 나와요. 거기서 타거나, 화살표를 계속 따라 항구 도로를 걸으면 크루즈 터미널 D예요."});
+CTX.splice(CTX.length-1,0,{id:"toStand",lv:3,lab:()=>"🚢 크루즈 터미널 가는 길 (승차장으로)",when:()=>me.z<-790&&me.z>-860&&Math.abs(me.x-RX)<40&&Math.hypot(me.x-RX-57,me.z+866)>12,fn:()=>{placeMe(3,RX+57,-869.5,Math.PI);showSub("택시·셔틀버스 승차장","표지판 앞에 서면 🚕 택시 / 🚌 셔틀버스 버튼이 나와요. 걸어가려면 바닥의 파란 화살표를 따라가세요.",9000)}});
+
+/* 탈것 모양 */
+function mkTaxiG(){const g=new T.Group(),bk=rmat(0x161616),ye=rmat(0xf2c21a);const b=new T.Mesh(new T.BoxGeometry(1.8,.8,4.3),bk);b.position.y=.65;g.add(b);[-1,1].forEach(s=>{const d=new T.Mesh(new T.BoxGeometry(.04,.55,2.2),ye);d.position.set(s*.92,.7,.1);g.add(d)});
+  const cab=new T.Mesh(new T.BoxGeometry(1.6,.6,2.2),new T.MeshLambertMaterial({color:0x2a3640,transparent:true,opacity:.55}));cab.position.set(0,1.3,.2);g.add(cab);const sg=new T.Mesh(new T.BoxGeometry(.5,.14,.2),new T.MeshLambertMaterial({color:0xd03030,emissive:0x8a1a1a}));sg.position.set(0,1.68,.4);g.add(sg);
+  const pa=makeAvatar(me.look,"");pa.g.scale.setScalar(.8);pa.sit={};pa.g.position.set(.4,.15,.6);g.add(pa.g);if(pa.lb)pa.lb.visible=false;g.userData.av=pa;return g}
+function mkBusG(){const g=new T.Group(),bl=rmat(0x2e5a86);const b=new T.Mesh(new T.BoxGeometry(2.55,2.6,11.5),bl);b.position.y=1.8;g.add(b);
+  const w=new T.Mesh(new T.BoxGeometry(2.6,.9,10),new T.MeshLambertMaterial({color:0x22303c,transparent:true,opacity:.6}));w.position.y=2.4;g.add(w);const sg=new T.Mesh(new T.PlaneGeometry(2.2,.4),signMat("CRUISE BUS","크루즈 셔틀","#2e5a86"));sg.position.set(0,3.2,-5.76);sg.rotation.y=Math.PI;g.add(sg);
+  for(let i=0;i<6;i++){const pa=makeAvatar(defLook(i%2?"f":"m",["#c8553d","#2e5a86","#f2c14e","#5a8a5c","#7a4f8a"][i%5]),"");pa.sit={};pa.g.scale.setScalar(.85);pa.g.position.set(i%2?.7:-.7,.5,-3.5+i*1.5);if(pa.lb)pa.lb.visible=false;g.add(pa.g);if(i===2){g.userData.av=pa}}
+  return g}
+/* 탈 때 화면 아래 안내 */
+const RUI=document.createElement("div");RUI.id="rideUi";RUI.hidden=true;RUI.innerHTML='<b id="rideT"></b><span id="rideS"></span><button type="button" id="rideSkip">건너뛰기 ⏭</button>';document.body.appendChild(RUI);
+const rst=document.createElement("style");rst.textContent="#rideUi{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:30;background:rgba(20,24,30,.82);color:#f3e6c8;border:1px solid rgba(243,230,200,.3);border-radius:16px;padding:10px 14px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;max-width:92vw;font-family:'Gowun Dodum',sans-serif}#rideUi b{font-family:'Jua',sans-serif;font-weight:400;font-size:17px}#rideUi span{font-size:13.5px;opacity:.85;flex:1 1 100%}#rideUi button{font:15px 'Jua',sans-serif;padding:6px 12px;border-radius:999px;border:0;background:#f3e6c8;color:#1d1915;margin-left:auto}";document.head.appendChild(rst);
+function rideUi(t,s){RUI.hidden=!t;if(t){$("rideT").textContent=t;$("rideS").textContent=s||""}}
+$("rideSkip").onclick=()=>{if(RIDE&&RIDE.skip)RIDE.skip()};
+
+/* 택시·셔틀버스: 항구 도로를 실제로 달려요 */
+function roadRide(kind,toTerm){if(riding||RIDE)return;riding=true;if(me.sit)standUp();if(talkId)endTalk();$("panel").hidden=true;initAudio();
+  const pts=PORTP.map(([x,z])=>new T.Vector3(RX+x,0,z));if(!toTerm)pts.reverse();const cv=new T.CatmullRomCurve3(pts,false,"centripetal"),L=cv.getLength();
+  const car=kind==="bus"?mkBusG():mkTaxiG();RAM.add(car);let s=0,v=0;const vmax=kind==="bus"?19:24,lane=2.4,yaw0=camYaw;const said=new Set();
+  const lines=toTerm?[[0,kind==="bus"?"크루즈 셔틀버스":"택시 기사님",kind==="bus"?"콜럼버스 동상 앞에서 크루즈 터미널로 출발해요.":"크루즈 터미널 D 맞으시죠? 10분쯤 걸려요. 짐은 트렁크에 실었어요."],[.18,"창밖","왼쪽 바다 위 배 모양 건물이 세계무역센터, 붉은 철탑은 몬주익으로 가는 포트 케이블카의 하이메 1세 탑이에요."],[.45,"창밖","오른쪽은 몬주익 언덕, 왼쪽 부두에는 섬으로 가는 큰 페리들이 서 있어요."],[.78,"창밖","저기 노란 굴뚝의 크루즈 배와 터미널 D가 보여요!"]]
+     :[[0,kind==="bus"?"크루즈 셔틀버스":"택시 기사님","콜럼버스 동상 쪽으로 갈게요. 람블라스 거리 바로 앞에 내려 드려요."],[.5,"창밖","몬주익 언덕과 항구를 지나요."],[.85,"창밖","콜럼버스 동상이 보여요."]];
+  const end=()=>{RAM.remove(car);car.traverse(o=>{if(o.geometry)o.geometry.dispose()});RIDE=null;riding=false;rideUi(null);
+    if(toTerm){placeMe(3,RX+TERM.x-24,-1510,Math.PI);showSub("크루즈 터미널 D","도착했어요! 문 앞에서 '체크인하고 승선'을 누르면 터미널 안으로 들어가요.",9000)}else{placeMe(3,RX+50,-860,0);showSub("콜롬 부두","콜럼버스 동상 앞이에요. 북쪽으로 걸으면 람블라스 거리예요.",7000)}};
+  RIDE={hideMe:true,skip:()=>{s=L-1},tick:dt=>{const left=L-s;if(left<v*v/(2*4)+1)v=Math.max(2,v-6*dt);else v=Math.min(vmax,v+4*dt);s=Math.min(L,s+v*dt);const u=s/L,p=cv.getPointAt(u),t=cv.getTangentAt(u);
+      car.position.set(p.x-t.z*lane,0,p.z+t.x*lane);car.rotation.y=Math.atan2(t.x,t.z)+Math.PI;me.x=car.position.x;me.z=car.position.z;
+      lines.forEach((l,i)=>{if(!said.has(i)&&u>=l[0]){said.add(i);showSub(l[1],l[2],7000)}});rideUi(kind==="bus"?"🚌 크루즈 셔틀버스":"🚕 택시",(toTerm?"→ 크루즈 터미널 D":"→ 콜럼버스 동상")+" · "+Math.round((1-u)*100)+"% 남음");
+      if(s>=L){end();return}if(AC&&Math.random()<dt*.6&&typeof liftHum==="function")liftHum(1.2);if(car.userData.av)poseAvatar(car.userData.av,Date.now(),false,performance.now())},
+    cam:(C,dt)=>{const t=car.rotation.y-Math.PI,off=camYaw-yaw0;const a=t+off,d=kind==="bus"?13:9,h=kind==="bus"?6:4.2;const tx=car.position.x-Math.sin(a)*d,tz=car.position.z-Math.cos(a)*d;
+      C.position.lerp(new T.Vector3(tx,h,tz),Math.min(1,dt*4));C.lookAt(car.position.x,1.4,car.position.z)}};}
+
+/* 지하철: 승강장 → 터널 → 다음 역 → 환승 → 도착 */
+const MX=-9000;let MET=null;
+function stationMat(name,col){const [c,g]=cvs(512,96);g.fillStyle="#f4f2ec";g.fillRect(0,0,512,96);g.fillStyle=col;g.fillRect(0,0,512,14);g.fillRect(0,82,512,14);g.fillStyle="#1d1d1d";g.font="bold 44px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(name,256,50);return new T.MeshLambertMaterial({map:ctex(c)})}
+function buildMetro(){if(MET)return MET;const G=new T.Group();S.add(G);G.visible=false;const mb=(w,h,d,m,x,y,z,p)=>{const o=new T.Mesh(new T.BoxGeometry(w,h,d),m);o.position.set(MX+x,y,z);(p||G).add(o);return o};
+  const DS={side:T.DoubleSide};const wall=new T.MeshLambertMaterial({color:0xdfe3e6,side:T.DoubleSide}),seat=new T.MeshLambertMaterial({color:0x2c5a8a}),steel=new T.MeshPhongMaterial({color:0xcfd4d8,shininess:90,specular:0xffffff});
+  const car=new T.Group();G.add(car);
+  mb(2.9,.12,20,new T.MeshLambertMaterial({color:0x4a4f55}),0,-.06,0,car);mb(2.9,.1,20,wall,0,2.3,0,car);
+  [-1.45,1.45].forEach(x=>{mb(.08,.95,20,wall,x,.47,0,car);mb(.08,.35,20,wall,x,2.12,0,car);for(let z=-9.5;z<=9.5;z+=2.5)mb(.1,1.4,.25,wall,x,1.25,z,car);mb(.02,1.15,20,new T.MeshLambertMaterial({color:0x99aabb,transparent:true,opacity:.12,side:T.DoubleSide}),x,1.45,0,car)});
+  mb(2.9,2.4,.1,wall,0,1.15,-10,car);mb(2.9,2.4,.1,wall,0,1.15,10,car);
+  const stripe=new T.MeshLambertMaterial({color:0x2c6ab3});[-1.46,1.46].forEach(x=>mb(.02,.12,20,stripe,x,.9,0,car));
+  [-1,1].forEach(s=>{for(const z of[-6.5,-2,2.5,7])mb(.5,.45,3,seat,s*1.15,.23,z,car)});for(const z of[-8.5,-4.2,0,4.2,8.5]){const p=new T.Mesh(new T.CylinderGeometry(.03,.03,2.3,6),steel);p.position.set(MX+(z===0?.3:0),1.15,z);car.add(p)}
+  for(let z=-8;z<=8;z+=4)mb(.25,.04,2.5,new T.MeshLambertMaterial({color:0xffffff,emissive:0xeeeeee}),0,2.24,z,car);
+  const doors=[];for(const z of[-5,0,5]){const d=mb(.06,1.95,1.3,new T.MeshLambertMaterial({color:0x9aa3ab}),1.46,1,z,car);doors.push(d)}
+  const scr=mb(.02,.3,1.2,new T.MeshLambertMaterial({color:0x111111,emissive:0x1a3a1a}),-1.4,2.0,0,car);
+  // 승객
+  const pax=[];for(let i=0;i<7;i++){const a=makeAvatar(defLook(i%3?"f":"m",["#c8553d","#2e5a86","#f2c14e","#5a8a5c","#7a4f8a","#e8e1d4","#33384a"][i]),"");if(a.lb)a.lb.visible=false;S.remove(a.g);G.add(a.g);
+    if(i<5){a.sit={};a.g.position.set(MX+(i%2?1.05:-1.05),0,[-7,-6,-2.6,-1.4,-8][i]);a.g.rotation.y=i%2?-Math.PI/2:Math.PI/2}else{a.g.position.set(MX-.1,0,i===5?-3.6:-6.4);a.g.rotation.y=Math.PI*.7}pax.push(a)}
+  // 터널 (움직이는 조명과 벽 이음매)
+  const tun=new T.Group();G.add(tun);const tw=new T.MeshLambertMaterial({color:0x2a2622,side:T.DoubleSide});mb(.2,6,600,tw,-3.4,1.5,0,tun);mb(7,.2,600,tw,0,4.4,0,tun);mb(7,.2,600,new T.MeshLambertMaterial({color:0x1d1a17}),0,-1.1,0,tun);
+  for(const x of[-.75,.75])mb(.12,.15,600,new T.MeshPhongMaterial({color:0x888888,shininess:80}),x,-.95,0,tun);
+  const tl=[];const lm=new T.MeshLambertMaterial({color:0xfff2c8,emissive:0xffe0a0});const jm=new T.MeshLambertMaterial({color:0x3a3632});for(let k=0;k<40;k++){const a=mb(.12,.18,.6,lm,-3.25,2.6,0,tun),b=mb(.12,.18,.6,lm,3.25,2.6,0,tun),j=mb(.25,6,.3,jm,-3.25,1.5,0,tun),j2=mb(.25,6,.3,jm,3.25,1.5,0,tun);tl.push([a,b,j,j2])}
+  // 승강장 (역마다 이름이 바뀜)
+  const plat=new T.Group();G.add(plat);const tile=new T.MeshLambertMaterial({color:0xe8e4da,side:T.DoubleSide});mb(4.6,1.1,90,new T.MeshLambertMaterial({color:0xb8b2a6}),3.85,-.55,0,plat);mb(.1,.06,90,new T.MeshLambertMaterial({color:0xf2c21a}),1.62,.02,0,plat);
+  mb(.2,5,90,tile,6.3,2.5,0,plat);mb(5.5,.2,90,new T.MeshLambertMaterial({color:0xd8d4cc}),3.6,4.6,0,plat);const signs=[];for(let z=-36;z<=36;z+=18){const s=new T.Mesh(new T.PlaneGeometry(4.6,.86),stationMat("Sagrada Família","#2c6ab3"));s.position.set(MX+6.18,2.6,z);s.rotation.y=-Math.PI/2;plat.add(s);signs.push(s)}
+  for(let z=-40;z<=40;z+=8)mb(.4,.08,3,new T.MeshLambertMaterial({color:0xffffff,emissive:0xffffff}),3.6,4.48,z,plat);for(const z of[-24,0,24])mb(2,.5,.6,new T.MeshLambertMaterial({color:0x8a6a48}),5.4,.25,z,plat);
+  const ppl=[];for(let i=0;i<8;i++){const a=makeAvatar(defLook(i%2?"f":"m",["#c8553d","#2e5a86","#f2c14e","#5a8a5c","#7a4f8a","#e8e1d4","#33384a","#e07a5f"][i]),"");if(a.lb)a.lb.visible=false;S.remove(a.g);plat.add(a.g);a.g.position.set(MX+2.6+Math.random()*2.6,0,-36+i*9);a.g.rotation.y=-Math.PI/2;ppl.push(a)}
+  MET={G,car,tun,tl,plat,signs,doors,stripe,pax,ppl,scr};return MET}
+const L5=["Sagrada Família","Verdaguer","Diagonal"],L3=["Diagonal","Passeig de Gràcia","Catalunya","Liceu","Drassanes"];
+function metroRide(toRam,from){if(riding||RIDE)return;riding=true;if(me.sit)standUp();if(talkId)endTalk();$("panel").hidden=true;initAudio();const m=buildMetro();
+  let legs;if(toRam)legs=[{line:"L5",col:"#2c6ab3",dir:"Cornellà Centre",st:L5},{line:"L3",col:"#2f9e44",dir:"Zona Universitària",st:L3.slice(0,3)}];
+  else{const i=L3.indexOf(from||"Catalunya");legs=[{line:"L3",col:"#2f9e44",dir:"Trinitat Nova",st:L3.slice(0,i+1).reverse()},{line:"L5",col:"#2c6ab3",dir:"Vall d'Hebron",st:L5.slice().reverse()}]}
+  let li=0,si=0,s=0,v=0,dwell=3.2,phase="dwell",doorK=1,gap=200,said={},yaw0;const prevLv=me.lv;
+  const setLeg=()=>{const L=legs[li];m.stripe.color.set(L.col);m.signs.forEach(x=>x.material=stationMat(L.st[0],L.col));s=0;si=0;v=0;dwell=3.2;phase="dwell";doorK=1};
+  const F=$("fade");const fade=(txt,cb)=>{F.textContent=txt;F.hidden=false;requestAnimationFrame(()=>F.classList.add("on"));setTimeout(()=>{cb&&cb();F.classList.remove("on");setTimeout(()=>F.hidden=true,700)},1500)};
+  fade(toRam?"🚇 계단을 내려가 사그라다 파밀리아역 L5 승강장으로…":"🚇 계단을 내려가 "+(from||"Catalunya")+"역 L3 승강장으로…",()=>{m.G.visible=true;setLeg();setLv(6);me.x=MX+.35;me.z=1.2;me.ry=-Math.PI/2;camYaw=0;yaw0=0;S.background=new T.Color(0x0b0b0d);
+    showSub(legs[0].line+" · "+legs[0].dir+" 방면",legs[0].st[0]+"역이에요. 문이 닫히면 출발해요.",6000);chime()});
+  const finish=()=>{m.G.visible=false;RIDE=null;riding=false;rideUi(null);fade("🚶 계단을 올라 밖으로 나가요…",()=>{if(toRam){placeMe(3,RX-36,10,Math.PI/4);showSub("카탈루냐 광장","지하철에서 나왔어요. 여기서 람블라스 거리가 시작돼요. 남쪽으로 쭉 걸으면 콜럼버스 동상과 바다, 크루즈 터미널 가는 승차장이 나와요.",9000)}else{placeMe(0,METRO0.x-1.6,METRO0.z,Math.PI/2);showSub("사그라다 파밀리아역","밖으로 나오니 성당이 바로 앞이에요.",6000)}})};
+  RIDE={sky:false,skip:()=>{finish()},tick:dt=>{if(me.lv!==6)return;const L=legs[li];S.background.setHex(0x0b0b0d);S.fog.color.setHex(0x0b0b0d);
+      if(phase==="dwell"){dwell-=dt;doorK=Math.min(1,doorK+dt*2);if(dwell<1.2)doorK=Math.max(0,dwell/1.2);if(dwell<=0){if(si>=L.st.length-1){if(li<legs.length-1){li++;phase="xfer";fade("🚶 환승 통로를 걸어 "+legs[li].line+" 승강장으로 ("+legs[li].dir+" 방면)",()=>{setLeg();showSub(legs[li].line+" · "+legs[li].dir+" 방면",legs[li].st[0]+"역에서 갈아탔어요.",6000)});return}finish();phase="end";return}
+          phase="run";v=0;chime();showSub("다음 역 · Propera estació",L.st[si+1]+(si+1===L.st.length-1&&li<legs.length-1?" — "+legs[li+1].line+" 환승":""),6000)}}
+      else if(phase==="run"){const left=gap-s;if(left<v*v/(2*2.2)+.5)v=Math.max(.6,v-2.2*dt);else v=Math.min(16,v+2.5*dt);s+=v*dt;if(s>=gap){s=0;si++;phase="dwell";dwell=4;doorK=0;v=0;m.signs.forEach(x=>x.material=stationMat(L.st[si],L.col));showSub(L.st[si],(si===L.st.length-1?(li<legs.length-1?"여기서 "+legs[li+1].line+"으로 갈아타요.":"내릴 역이에요. 문이 열리면 내려요."):"문이 열려요."),5000);chime()}
+        if(Math.random()<dt*.8&&typeof liftHum==="function")liftHum(1.4)}
+      // 승강장과 터널 움직임 (앞으로 갈수록 바깥이 뒤로 흘러가요)
+      const runS=phase==="run"?s:0;m.plat.position.z=phase==="run"?runS:0;m.plat.visible=phase!=="run"||runS<70||runS>gap-70;if(phase==="run"&&runS>gap-70)m.plat.position.z=runS-gap;
+      m.tl.forEach((q,k)=>{const z=(((k*15+(phase==="run"?s:0))%600)+600)%600-300;q.forEach(o=>o.position.z=z)});
+      m.doors.forEach(d=>d.position.y=1+doorK*2.1);m.car.position.y=phase==="run"?Math.sin(performance.now()*.03)*.008:0;
+      const now=Date.now(),tt=performance.now();m.pax.forEach(a=>poseAvatar(a,now,false,tt));m.ppl.forEach(a=>poseAvatar(a,now,false,tt));
+      rideUi("🚇 "+L.line+" · "+L.dir+" 방면",phase==="run"?"다음 역: "+L.st[si+1]:(L.st[si]+"역 정차 중"))},
+    cam:(C,dt)=>{const off=camYaw-yaw0;const a=Math.PI*.56+off;const px=MX-1.2,pz=me.z+2.1;C.position.set(px,1.8,pz);C.lookAt(px+Math.sin(a)*10,1.2,pz+Math.cos(a)*10)}};}
+function portArrive(){placeMe(3,RX+TERM.x-10,-1512,0);showSub("크루즈 터미널 D","배에서 내렸어요. 택시나 셔틀버스를 타거나 걸어서 콜럼버스 동상과 람블라스 거리로 갈 수 있어요.",9000)}
+CTX.splice(CTX.length-1,0,
+ {id:"taxiT",lv:3,lab:()=>"🚕 택시 타고 크루즈 터미널",when:()=>Math.hypot(me.x-RX-52,me.z+866)<5,fn:()=>roadRide("taxi",true)},
+ {id:"busT",lv:3,lab:()=>"🚌 셔틀버스 타고 크루즈 터미널",when:()=>Math.hypot(me.x-RX-62,me.z+866)<5,fn:()=>roadRide("bus",true)},
+ {id:"taxiB",lv:3,lab:()=>"🚕 택시 타고 콜럼버스 동상",when:()=>Math.hypot(me.x-RX-TERM.x+20,me.z+1506)<5,fn:()=>roadRide("taxi",false)},
+ {id:"busB",lv:3,lab:()=>"🚌 셔틀버스 타고 콜럼버스 동상",when:()=>Math.hypot(me.x-RX-TERM.x+30,me.z+1506)<5,fn:()=>roadRide("bus",false)},
+ {id:"board",lv:3,lab:()=>"🛂 체크인하고 크루즈 승선",when:()=>Math.hypot(me.x-RX-TERM.x,me.z+1540)<7,fn:()=>{initAudio();chime();const F=$("fade");F.textContent="🧳 터미널 안으로 들어가 체크인해요…";F.hidden=false;requestAnimationFrame(()=>F.classList.add("on"));setTimeout(()=>{location.href="cruise.html#board"},1300)}});
+
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();
   if(perfDone<2){perfAcc+=dt;perfN++;if(perfAcc>5){const avg=perfAcc/perfN;perfAcc=0;perfN=0;if(avg>.034){perfDone++;if(perfDone===1){R.setPixelRatio(1);resize()}else{RAYS.forEach(r=>r.visible=false);gfxLow()}}else perfDone=2}}
   let fx=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)+joyV.y,sx=(keys.d?1:0)-(keys.a?1:0)+joyV.x;if(keys.arrowleft)camYaw+=dt*1.8;if(keys.arrowright)camYaw-=dt*1.8;
@@ -2054,6 +2217,7 @@ function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now
   FLAMES.forEach((f,i)=>{f.scale.y=1+Math.sin(t*.02+i*2)*.15});CANDLES.forEach((f,i)=>{if(f.visible)f.scale.y=1+Math.sin(t*.018+i)*.18});
   if(WX.kind==="rain"&&!inn){RAIN.visible=true;const a=RAIN.geometry.attributes.position.array;for(let i=0;i<a.length;i+=6){let y=a[i+1]-dt*18;if(y<-2)y+=22;a[i+1]=y;a[i+4]=y-.7}RAIN.geometry.attributes.position.needsUpdate=true;RAIN.position.set(me.x,gy,me.z)}else RAIN.visible=false;
   audioTick(dt);
+  if(RIDE){RIDE.tick(dt);if(RIDE){RIDE.cam(C,dt);if(RIDE.sky!==false)gxSkyTick(C,gxDay());else if(GX.sky)GX.sky.visible=false;if(!me.solo)R.render(S,C);requestAnimationFrame(frame);return}}
   // 카메라: 성당 안에서는 벽과 천장 안쪽에 머물러요
   const dist=inn?Math.min(camDist,5):camDist;let cx=me.x+Math.sin(camYaw)*dist,cz=me.z+Math.cos(camYaw)*dist,cy=gy+camH-camTilt*1.2;
   S.fog.far=me.lv===1||me.lv===4?1700:me.lv===3?1300:1000;S.fog.near=me.lv===1||me.lv===4?260:me.lv===3?200:140;
