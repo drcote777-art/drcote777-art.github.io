@@ -2113,7 +2113,7 @@ PLACES.push(["portstop","🚕 택시·셔틀 승차장",RX+57,-868,Math.PI,3],["
   for(let i=0;i<R.length-1;i++){const [x0,z0]=R[i],[x1,z1]=R[i+1],L=Math.hypot(x1-x0,z1-z0),n=Math.max(2,Math.round(L/(L>200?12:5))),th=Math.atan2(-(x1-x0),-(z1-z0));
     for(let k=0;k<n;k++){const m=new T.Mesh(cg,cm);m.position.set(RX+x0+(x1-x0)*k/n,.09,z0+(z1-z0)*k/n);m.rotation.set(-Math.PI/2,0,th);RAM.add(m)}}})();
 INFO.push({n:"크루즈 터미널 가는 길",x:RX+10,z:-803,r:7,lv:3,d:"바닥의 파란 화살표를 따라가면 택시·셔틀버스 승차장(약 70m)이 나와요. 거기서 타거나, 화살표를 계속 따라 항구 도로를 걸으면 크루즈 터미널 D예요."});
-CTX.splice(CTX.length-1,0,{id:"toStand",lv:3,lab:()=>"🚢 크루즈 터미널 가는 길 (승차장으로)",when:()=>me.z<-790&&me.z>-860&&Math.abs(me.x-RX)<40&&Math.hypot(me.x-RX-57,me.z+866)>12,fn:()=>{placeMe(3,RX+57,-869.5,Math.PI);showSub("택시·셔틀버스 승차장","표지판 앞에 서면 🚕 택시 / 🚌 셔틀버스 버튼이 나와요. 걸어가려면 바닥의 파란 화살표를 따라가세요.",9000)}});
+CTX.splice(CTX.length-1,0,{id:"toStand",lv:3,lab:()=>"🚢 크루즈 터미널 가는 길 (승차장으로)",when:()=>me.z<-790&&me.z>-860&&Math.abs(me.x-RX)<40&&Math.hypot(me.x-RX-57,me.z+866)>12,fn:()=>{placeMe(3,RX+55.5,-869,Math.PI);showSub("택시·셔틀버스 승차장","아래 🚕 택시 버튼을 누르면 타요. 오른쪽 BUS 표지판 쪽으로 몇 걸음 가면 🚌 셔틀버스 버튼이 나와요. 걸어가려면 바닥의 파란 화살표를 따라가세요.",9000)}});
 
 /* 탈것 모양 */
 function mkTaxiG(){const g=new T.Group(),bk=rmat(0x161616),ye=rmat(0xf2c21a);const b=new T.Mesh(new T.BoxGeometry(1.8,.8,4.3),bk);b.position.y=.65;g.add(b);[-1,1].forEach(s=>{const d=new T.Mesh(new T.BoxGeometry(.04,.55,2.2),ye);d.position.set(s*.92,.7,.1);g.add(d)});
@@ -2136,7 +2136,7 @@ function roadRide(kind,toTerm){if(riding||RIDE)return;riding=true;if(me.sit)stan
   const lines=toTerm?[[0,kind==="bus"?"크루즈 셔틀버스":"택시 기사님",kind==="bus"?"콜럼버스 동상 앞에서 크루즈 터미널로 출발해요.":"크루즈 터미널 D 맞으시죠? 10분쯤 걸려요. 짐은 트렁크에 실었어요."],[.18,"창밖","왼쪽 바다 위 배 모양 건물이 세계무역센터, 붉은 철탑은 몬주익으로 가는 포트 케이블카의 하이메 1세 탑이에요."],[.45,"창밖","오른쪽은 몬주익 언덕, 왼쪽 부두에는 섬으로 가는 큰 페리들이 서 있어요."],[.78,"창밖","저기 노란 굴뚝의 크루즈 배와 터미널 D가 보여요!"]]
      :[[0,kind==="bus"?"크루즈 셔틀버스":"택시 기사님","콜럼버스 동상 쪽으로 갈게요. 람블라스 거리 바로 앞에 내려 드려요."],[.5,"창밖","몬주익 언덕과 항구를 지나요."],[.85,"창밖","콜럼버스 동상이 보여요."]];
   const end=()=>{RAM.remove(car);car.traverse(o=>{if(o.geometry)o.geometry.dispose()});RIDE=null;riding=false;rideUi(null);
-    if(toTerm){placeMe(3,RX+TERM.x-24,-1510,Math.PI);showSub("크루즈 터미널 D","도착했어요! 문 앞에서 '체크인하고 승선'을 누르면 터미널 안으로 들어가요.",9000)}else{placeMe(3,RX+50,-860,0);showSub("콜롬 부두","콜럼버스 동상 앞이에요. 북쪽으로 걸으면 람블라스 거리예요.",7000)}};
+    if(toTerm){placeMe(3,RX+TERM.x-3,-1529,0);showSub("크루즈 터미널 D","도착했어요! 아래 '체크인하고 크루즈 승선'을 누르면 터미널 안으로 들어가요.",9000)}else{placeMe(3,RX+50,-860,0);showSub("콜롬 부두","콜럼버스 동상 앞이에요. 북쪽으로 걸으면 람블라스 거리예요.",7000)}};
   RIDE={hideMe:true,skip:()=>{s=L-1},tick:dt=>{const left=L-s;if(left<v*v/(2*4)+1)v=Math.max(2,v-6*dt);else v=Math.min(vmax,v+4*dt);s=Math.min(L,s+v*dt);const u=s/L,p=cv.getPointAt(u),t=cv.getTangentAt(u);
       car.position.set(p.x-t.z*lane,0,p.z+t.x*lane);car.rotation.y=Math.atan2(t.x,t.z)+Math.PI;me.x=car.position.x;me.z=car.position.z;
       lines.forEach((l,i)=>{if(!said.has(i)&&u>=l[0]){said.add(i);showSub(l[1],l[2],7000)}});rideUi(kind==="bus"?"🚌 크루즈 셔틀버스":"🚕 택시",(toTerm?"→ 크루즈 터미널 D":"→ 콜럼버스 동상")+" · "+Math.round((1-u)*100)+"% 남음");
@@ -2195,11 +2195,11 @@ function metroRide(toRam,from){if(riding||RIDE)return;riding=true;if(me.sit)stan
     cam:(C,dt)=>{const off=camYaw-yaw0;const a=Math.PI*.56+off;const px=MX-1.2,pz=me.z+2.1;C.position.set(px,1.8,pz);C.lookAt(px+Math.sin(a)*10,1.2,pz+Math.cos(a)*10)}};}
 function portArrive(){placeMe(3,RX+TERM.x-10,-1512,0);showSub("크루즈 터미널 D","배에서 내렸어요. 택시나 셔틀버스를 타거나 걸어서 콜럼버스 동상과 람블라스 거리로 갈 수 있어요.",9000)}
 CTX.splice(CTX.length-1,0,
- {id:"taxiT",lv:3,lab:()=>"🚕 택시 타고 크루즈 터미널",when:()=>Math.hypot(me.x-RX-52,me.z+866)<5,fn:()=>roadRide("taxi",true)},
- {id:"busT",lv:3,lab:()=>"🚌 셔틀버스 타고 크루즈 터미널",when:()=>Math.hypot(me.x-RX-62,me.z+866)<5,fn:()=>roadRide("bus",true)},
+ {id:"taxiT",lv:3,lab:()=>"🚕 택시 타고 크루즈 터미널",when:()=>me.x-RX<57&&Math.hypot(me.x-RX-52,me.z+866)<7,fn:()=>roadRide("taxi",true)},
+ {id:"busT",lv:3,lab:()=>"🚌 셔틀버스 타고 크루즈 터미널",when:()=>me.x-RX>=57&&Math.hypot(me.x-RX-62,me.z+866)<7,fn:()=>roadRide("bus",true)},
  {id:"taxiB",lv:3,lab:()=>"🚕 택시 타고 콜럼버스 동상",when:()=>Math.hypot(me.x-RX-TERM.x+20,me.z+1506)<5,fn:()=>roadRide("taxi",false)},
  {id:"busB",lv:3,lab:()=>"🚌 셔틀버스 타고 콜럼버스 동상",when:()=>Math.hypot(me.x-RX-TERM.x+30,me.z+1506)<5,fn:()=>roadRide("bus",false)},
- {id:"board",lv:3,lab:()=>"🛂 체크인하고 크루즈 승선",when:()=>Math.hypot(me.x-RX-TERM.x,me.z+1540)<7,fn:()=>{initAudio();chime();const F=$("fade");F.textContent="🧳 터미널 안으로 들어가 체크인해요…";F.hidden=false;requestAnimationFrame(()=>F.classList.add("on"));setTimeout(()=>{location.href="cruise.html#board"},1300)}});
+ {id:"board",lv:3,lab:()=>"🛂 체크인하고 크루즈 승선",when:()=>me.z<-1516&&Math.abs(me.x-RX-TERM.x)<32,fn:()=>{initAudio();chime();const F=$("fade");F.textContent="🧳 터미널 안으로 들어가 체크인해요…";F.hidden=false;requestAnimationFrame(()=>F.classList.add("on"));setTimeout(()=>{location.href="cruise.html#board"},1300)}});
 
 function frame(t){const dt=Math.min(.05,(t-last)/1000);last=t;const now=Date.now();
   if(perfDone<2){perfAcc+=dt;perfN++;if(perfAcc>5){const avg=perfAcc/perfN;perfAcc=0;perfN=0;if(avg>.034){perfDone++;if(perfDone===1){R.setPixelRatio(1);resize()}else{RAYS.forEach(r=>r.visible=false);gfxLow()}}else perfDone=2}}
