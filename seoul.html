@@ -189,6 +189,8 @@ button small{display:block;font-size:11.5px;color:var(--sub)}
 <script src="config.js"></script>
 <script src="claude-web.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="assets3d/gltf-loader.js"></script>
+<script src="assets3d/outline-effect.js"></script>
 <script>
 (function(){
 const loadingEl=document.getElementById('loading');
@@ -340,8 +342,11 @@ function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspe
 addEventListener('resize',resize);resize();
 
 /* ---------- 재질·텍스처 도우미 ---------- */
-const MC={},TC={};
-function M(c,o){const k=c+JSON.stringify(o||{});if(!MC[k]){MC[k]=new T.MeshStandardMaterial(Object.assign({color:c,roughness:.8,metalness:.02},o||{}));}return MC[k];}
+const MC={},TC={};const GRAD=new T.DataTexture(new Uint8Array([105,175,255]),3,1,T.LuminanceFormat);GRAD.minFilter=GRAD.magFilter=T.NearestFilter;GRAD.needsUpdate=true;
+let FX=null;try{if(T.OutlineEffect)FX=new T.OutlineEffect(R,{defaultThickness:.0032,defaultColor:[.16,.12,.1],defaultAlpha:.9});}catch(e){FX=null;}
+const KN={},KNQ=[];function knLoad(){if(!T.GLTFLoader)return;const ld=new T.GLTFLoader();[['cloud','p/cloud.glb'],['tree','c/grass-trees.glb'],['tree2','c/grass-trees-tall.glb'],['fountain','c/pavement-fountain.glb']].forEach(([k,u])=>ld.load('assets3d/'+u,g=>{KN[k]=g.scene;KNQ.filter(q=>q.k===k).forEach(q=>q.f());},undefined,()=>{}));}
+function deco(g,k,x,y,z,size,ry){const put=()=>{if(!g.parent&&g!==cur.g)return;const m=KN[k].clone(true);m.scale.setScalar(size);m.position.set(x,y,z);m.rotation.y=ry||0;m.traverse(o=>{if(o.isMesh){o.castShadow=k!=='cloud';o.receiveShadow=k!=='cloud';if(k==='cloud')o.material.userData.outlineParameters={visible:false};}});g.add(m);if(k==='cloud'){g.userData.clouds=g.userData.clouds||[];g.userData.clouds.push(m);}};if(KN[k])put();else KNQ.push({k,f:put});}
+function M(c,o){const k=c+JSON.stringify(o||{});if(!MC[k]){MC[k]=new T.MeshToonMaterial(Object.assign({color:c,gradientMap:GRAD},o||{}));}return MC[k];}
 function tex(key,w,h,draw,rep){if(TC[key])return TC[key];const cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');draw(g,w,h);const t=new T.CanvasTexture(cv);t.anisotropy=4;if(rep){t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rep[0],rep[1]);}TC[key]=t;return t;}
 function TM(key,w,h,draw,o){const k='tm_'+key;if(!MC[k]){MC[k]=new T.MeshLambertMaterial(Object.assign({map:tex(key,w,h,draw)},o||{}));}return MC[k];}
 let RND=1;function rnd(){RND=(RND*16807)%2147483647;return RND/2147483647;}
@@ -381,7 +386,7 @@ function rigPerson(o){o=o||{};const R=new T.Group(),hip=new T.Group();hip.positi
  const torso=new T.Mesh(new T.CylinderGeometry(.19,.23,.62,10),cl);torso.position.y=.31;hip.add(torso);
  const sh=new T.Mesh(new T.SphereGeometry(.21,10,6,0,Math.PI*2,0,Math.PI/2),cl);sh.position.y=.6;sh.scale.y=.45;hip.add(sh);
  const head=new T.Group();head.position.y=.8;hip.add(head);
- const hd=new T.Mesh(new T.SphereGeometry(.14,14,10),sk);hd.position.y=.08;head.add(hd);
+ const hd=new T.Mesh(new T.SphereGeometry(.14,14,10),sk);hd.position.y=.08;head.add(hd);head.scale.setScalar(1.32);for(const ex of[-.052,.052]){const w=new T.Mesh(new T.SphereGeometry(.03,8,6),M('#ffffff'));w.position.set(ex,.095,.118);w.scale.z=.5;head.add(w);const pu=new T.Mesh(new T.SphereGeometry(.016,8,6),M('#1a1410'));pu.position.set(ex,.095,.134);pu.scale.z=.5;head.add(pu);}{const mo=new T.Mesh(new T.BoxGeometry(.05,.012,.01),M('#a8473a'));mo.position.set(0,.03,.136);head.add(mo);}
  const hr=new T.Mesh(new T.SphereGeometry(.148,12,8,0,Math.PI*2,0,Math.PI*.55),ha);hr.position.y=.1;hr.rotation.x=-.25;head.add(hr);
  if(o.longHair){const lh=new T.Mesh(new T.BoxGeometry(.26,.28,.1),ha);lh.position.set(0,-.02,.1);head.add(lh);}
  if(o.hat){const c=new T.Mesh(new T.CylinderGeometry(.16,.16,.09,14),M(o.hat));c.position.y=.22;head.add(c);const b=new T.Mesh(new T.CylinderGeometry(.19,.19,.015,14),M(o.hatBrim||'#f4f6f7'));b.position.y=.18;head.add(b);}
@@ -1243,7 +1248,7 @@ function seoulNow(){const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Seou
 function liveSky(){if(G.skyMode==='day')return 'day';if(G.skyMode==='night')return 'night';const n=seoulNow(),ss=[17.4,18,18.6,19.1,19.6,19.9,19.8,19.3,18.5,17.8,17.3,17.2][n.m-1],sr=[7.7,7.3,6.6,5.9,5.3,5.2,5.4,5.8,6.2,6.7,7.2,7.6][n.m-1];return n.h<sr-.6?'night':n.h<sr+.6?'dawn':n.h<ss-.7?'day':n.h<ss+.5?'sunset':'night';}
 function wxText(){const n=seoulNow();let s=L('Seoul now ','지금 서울 ')+n.txt;if(WX){const c=WX.weather_code,ic=c>=95?'⛈':c>=71&&c<=77||c===85||c===86?'❄':c>=51?'🌧':c>=45?'🌫':c>=2?'☁':'☀';s+=' · '+Math.round(WX.temperature_2m)+'°C '+ic;}return s;}
 function wxLoad(){fetch('https://api.open-meteo.com/v1/forecast?latitude=37.5665&longitude=126.978&current=temperature_2m,weather_code&timezone=Asia%2FSeoul').then(r=>r.json()).then(j=>{WX=j.current||null;}).catch(()=>{});}
-wxLoad();setInterval(wxLoad,600000);
+wxLoad();setInterval(wxLoad,600000);knLoad();
 function liveTick(dt){const e=$('wx');if(e&&(clock%2)<dt)e.textContent=wxText();const c=WX?WX.weather_code:0,wet=cur&&cur.sky!=='indoor'&&!cur.dark&&G.skyMode!=='day'&&c>=51,snow=c>=71&&c<=77||c===85||c===86;
  if(!RAIN){const n=700,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=(Math.random()-.5)*60;a[i*3+1]=Math.random()*30;a[i*3+2]=(Math.random()-.5)*60;}const ge=new T.BufferGeometry();ge.setAttribute('position',new T.BufferAttribute(a,3));RAIN=new T.Points(ge,new T.PointsMaterial({color:'#cfe0f0',size:.16,transparent:true,opacity:.7}));RAIN.frustumCulled=false;scene.add(RAIN);}
  RAIN.visible=!!wet;if(wet){RAIN.material.size=snow?.3:.14;const a=RAIN.geometry.attributes.position,v=snow?4:26;for(let i=0;i<a.count;i++){let y=a.getY(i)-v*dt;if(y<0)y+=30;a.setY(i,y);}a.needsUpdate=true;RAIN.position.set(cam.position.x,cam.position.y-12,cam.position.z);}}
@@ -1277,7 +1282,7 @@ function openTrip(){openPanel(L('🧾 My trip sheet','🧾 내 여행표'),(b)=>
   DAYS.forEach((d,di)=>{const n=d.q.filter((q,i)=>G.done[qKey(di,i)]).length;row(d.tag+' · '+d.title,n+' / '+d.q.length);});
   h(L('What I spent (virtual won, real prices for transport and tickets)','쓴 돈 (가상 원화 · 교통과 입장권은 실제 요금)'));if(!sp.length)row(L('Nothing yet','아직 없음'),'₩0');
   [0,1,2].forEach(di=>{const xs=sp.filter(x=>x[2]===di);if(!xs.length)return;row('— DAY '+(di+1),'₩'+xs.reduce((a,x)=>a+x[1],0).toLocaleString());xs.forEach(x=>row('   '+x[0],'₩'+x[1].toLocaleString()));});row(L('Total','합계'),'₩'+tot.toLocaleString());
-  h(L('Remember','꼭 기억할 것'));[L('AREX Express ₩13,000 / 43 min · all-stop about ₩4,750 / 59 min','공항철도 직통 13,000원·43분 / 일반 약 4,750원·59분'),L('Subway base fare ₩1,550 with a card · tap in and out · transfer within 30 min','지하철 기본 1,550원 · 탈 때와 내릴 때 찍기 · 30분 안 환승'),L('Gyeongbokgung closed Tuesdays · guard ceremony 10:00 and 14:00','경복궁 화요일 휴궁 · 수문장 교대 10:00·14:00'),L('Bukchon red zone 10:00–17:00 only','북촌 레드존은 10:00~17:00만'),L('Namsan Cable Car 10:00–23:00 · Hangang Bus card only','남산 케이블카 10:00~23:00 · 한강버스는 카드만'),L('Meal and shop prices in this app are examples. Check opening hours before you go.','이 앱의 식사·가게 가격은 예시예요. 운영 시간은 가기 전에 확인하세요.')].forEach(t=>{const li=document.createElement('p');li.style.cssText='margin:0 0 6px;line-height:1.5;font-size:14px';li.textContent='• '+t;b.append(li);});
+  h(L('Remember','꼭 기억할 것'));[L('AREX Express ₩13,000 / 43 min · all-stop about ₩4,750 / 59 min','공항철도 직통 13,000원·43분 / 일반 약 4,750원·59분'),L('Subway base fare ₩1,550 with a card · tap in and out · transfer within 30 min','지하철 기본 1,550원 · 탈 때와 내릴 때 찍기 · 30분 안 환승'),L('Gyeongbokgung closed Tuesdays · guard ceremony 10:00 and 14:00','경복궁 화요일 휴궁 · 수문장 교대 10:00·14:00'),L('Bukchon red zone 10:00–17:00 only','북촌 레드존은 10:00~17:00만'),L('Namsan Cable Car 10:00–23:00 · Hangang Bus card only','남산 케이블카 10:00~23:00 · 한강버스는 카드만'),L('Meal and shop prices in this app are examples. Check opening hours before you go.','이 앱의 식사·가게 가격은 예시예요. 운영 시간은 가기 전에 확인하세요.'),L('3D trees, clouds and fountain models: Kenney (kenney.nl). Photos: Wikimedia Commons.','3D 나무·구름·분수 모델: Kenney (kenney.nl). 사진: 위키미디어 공용.')].forEach(t=>{const li=document.createElement('p');li.style.cssText='margin:0 0 6px;line-height:1.5;font-size:14px';li.textContent='• '+t;b.append(li);});
   const pr=document.createElement('button');pr.type='button';pr.className='row noprint';pr.style.cssText='justify-content:center;background:var(--brass);color:var(--navy);margin-top:10px';pr.textContent=L('🖨 Print / save as PDF','🖨 인쇄 / PDF로 저장');pr.onclick=()=>window.print();b.append(pr);});}
 /* 360도 사진 */
 let PV=null;
@@ -1511,7 +1516,7 @@ function constrain(ox,oz,dt){const w=cur.walk;
 /* 그림자: 해를 따라 사람과 건물 그림자가 생겨요 */
 let fpsT=0,fpsN=0;
 const AMB=new T.AmbientLight(0xffffff,.1);scene.add(AMB);
-function dressScene(){const out=cur.sky!=='indoor'&&!cur.dark;AMB.intensity=cur.sky==='indoor'?.5:cur.sky==='night'?.3:.1;sun.castShadow=!!(G.hd!==false&&out);cur.g.traverse(o=>{if(!o.isMesh)return;const m=o.material,tr=m&&!Array.isArray(m)&&m.transparent;if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const big=o.geometry.boundingSphere.radius*Math.max(o.scale.x,o.scale.z)>260;o.castShadow=!tr&&!big&&!/Plane/.test(o.geometry.type);o.receiveShadow=!tr;});fpsT=0;fpsN=0;}
+function dressScene(){[skyMesh,sea,stars].forEach(o=>{if(o&&o.material)o.material.userData.outlineParameters={visible:false};});if(RAIN)RAIN.material.userData.outlineParameters={visible:false};if(cur.sky!=='indoor'&&!cur.dark&&cur.sky!=='night'){RND=5;for(let i=0;i<12;i++)deco(cur.g,'cloud',me.x-500+rnd()*1000,70+rnd()*60,me.z-400+rnd()*800,22+rnd()*26,rnd()*6.28);}const TR={hgr:[[-40,34],[-90,38],[-150,34],[-210,38],[-20,-2],[-130,-3]],nam:[[-20,18],[-50,22],[-80,-22],[-40,-24]],gbk:[[40,-20],[-50,-30],[60,-90],[40,-140],[-60,60],[60,60]],gng:[[-150,-16],[-170,-16],[-30,16]],bkc:[[-230,12],[-290,-14]]}[cur.city]||[];TR.forEach(([x,z],i)=>deco(cur.g,i%2?'tree2':'tree',x,0,z,i%2?13:11,i*1.3));const FT={hgr:[-100,22],gng:[-110,-16],myd:[-60,-18]}[cur.city];if(FT)deco(cur.g,'fountain',FT[0],0,FT[1],7,0);const out=cur.sky!=='indoor'&&!cur.dark;AMB.intensity=cur.sky==='indoor'?.5:cur.sky==='night'?.3:.1;sun.castShadow=!!(G.hd!==false&&out);cur.g.traverse(o=>{if(!o.isMesh)return;const m=o.material,tr=m&&!Array.isArray(m)&&m.transparent;if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const big=o.geometry.boundingSphere.radius*Math.max(o.scale.x,o.scale.z)>260;o.castShadow=!tr&&!big&&!/Plane/.test(o.geometry.type);o.receiveShadow=!tr;if(m&&!Array.isArray(m)&&(tr||m.isMeshBasicMaterial||/Plane/.test(o.geometry.type)||big))m.userData.outlineParameters={visible:false};});fpsT=0;fpsN=0;}
 function sunFollow(dt){sun.target.position.set(me.x,me.y,me.z);sun.position.set(me.x+SUND.x*160,me.y+Math.max(.25,SUND.y)*160,me.z+SUND.z*160);if(sun.castShadow&&fpsN>=0){fpsT+=dt;fpsN++;if(fpsT>5){if(fpsN/fpsT<20){G.hd=false;saveG();sun.castShadow=false;toast(L('Shadows turned off to keep it smooth','부드럽게 움직이도록 그림자를 껐어요'));}fpsN=-1;}}}
 /* 건물·사물에 막히기 */
 let SOL=[];const _cv=new T.Vector3(),_cb=new T.Box3();
@@ -1580,8 +1585,8 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;if
   nearT-=dt;if(nearT<0){nearT=.5;DAYS[dayI].q.forEach((q,i)=>{if(q.near&&!G.done[qKey(dayI,i)]&&q.sc===curId){const s=S[Math.round(q.at*(SN-1))];if(Math.hypot(s.x-me.x,s.z-me.z)<14&&Math.abs(s.y-me.y)<6)doneQ(i);}});}
   $('fill').style.width=(tPos*100)+'%';$('me').style.left=(tPos*100)+'%';
  }
- skyMesh.position.copy(cam.position);stars.position.copy(cam.position);sea.position.x=Math.round(cam.position.x/50)*50;sea.position.z=Math.round(cam.position.z/50)*50;seaU.uT.value=clock;
- R.render(scene,cam);requestAnimationFrame(frame);}
+ if(cur&&cur.g.userData.clouds)cur.g.userData.clouds.forEach((c,i)=>{c.position.x+=dt*(1.2+i%3*.5);if(c.position.x>me.x+500)c.position.x=me.x-500;});skyMesh.position.copy(cam.position);stars.position.copy(cam.position);sea.position.x=Math.round(cam.position.x/50)*50;sea.position.z=Math.round(cam.position.z/50)*50;seaU.uT.value=clock;
+ (FX&&G.hd!==false?FX:R).render(scene,cam);requestAnimationFrame(frame);}
 
 /* 시작 */
 const FROMCITY=false;{const sw=()=>{try{localStorage.setItem('seoul_lang',LANG==='ko'?'en':'ko');}catch(e){}location.reload();};$('stLang').onclick=sw;$('langBtn').onclick=sw;
