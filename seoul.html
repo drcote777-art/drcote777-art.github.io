@@ -1162,12 +1162,12 @@ ENH.terminal0=ENH.terminal;ENH.terminalX=(c,o)=>{ENH.terminal0(c,o);const s=S[Ma
 const KHAN=M('#3a3f45'),KRED=M('#9a3324'),KGRN=M('#2f6b5a');
 function hanokRoof(g,w,d,x,y,z,ry){const r=box(g,w+1.6,.5,d+1.6,KHAN,x,y,z,ry);box(g,w*.7,.5,d*.5,KHAN,x,y+.45,z,ry);return r;}
 function hanok(g,x,y,z,w,d,ry){box(g,w,3,d,M('#efe9dc'),x,y,z,ry);box(g,w+.1,.9,d+.1,M('#8a8478'),x,y,z,ry);hanokRoof(g,w,d,x,y+3,z,ry);}
-function mkGate(){const g=new T.Group(),st=M('#cfc8b8');box(g,40,8,12,st,0,0,0);for(const x of[-9,0,9]){box(g,5,5.5,12.2,M('#2a2018'),x,0,0);}
+function mkGate(){const g=new T.Group();g.userData.pass=1;const st=M('#cfc8b8');box(g,40,8,12,st,0,0,0);for(const x of[-9,0,9]){box(g,5,5.5,12.2,M('#2a2018'),x,0,0);}
  for(let i=0;i<2;i++){const y=8+i*5;for(let x=-15;x<=15;x+=5)cyl(g,.35,.35,4,KRED,x,y,i?0:3.5,8);box(g,34-i*6,3.6,8-i*2,KGRN,0,y+.2,0).visible=false;hanokRoof(g,36-i*6,10-i*2,0,y+4,0);box(g,30-i*6,3.4,5-i,M('#7a2a1e'),0,y+.3,0);}return g;}
 function mkHall(w,d,tiers){const g=new T.Group();for(let i=0;i<2;i++)box(g,w+14-i*5,1.2,d+14-i*5,M('#d9d2c2'),0,i*1.2,0);
  for(let t=0;t<(tiers||2);t++){const y=2.4+t*6,ww=w-t*5,dd=d-t*4;for(let x=-ww/2;x<=ww/2+.1;x+=ww/6)for(const z of[-dd/2,dd/2])cyl(g,.4,.4,5.4,KRED,x,y,z,8);box(g,ww-.6,5.2,dd-.6,M('#7a2a1e'),0,y,0);box(g,ww-.4,.8,dd-.4,KGRN,0,y+4.6,0);hanokRoof(g,ww+2,dd+2,0,y+5.4,0);}return g;}
 function mkNTower(){const g=new T.Group(),c=M('#d9dde2',{emissive:'#20242a'});cyl(g,2.2,3.4,62,c,0,0,0,14);cyl(g,7,5,5,M('#bfc6ce',{emissive:'#2a3a55'}),0,40,0,20);cyl(g,7.4,7.4,1.2,M('#8fd0ff',{emissive:'#2f7fd0'}),0,45,0,20);cyl(g,5,6.6,4,c,0,46.2,0,20);cyl(g,.5,1.4,34,M('#e8eef4',{emissive:'#4a5a7a'}),0,62,0,8);return g;}
-function mkLotte(){const g=new T.Group(),gl=new T.MeshPhongMaterial({color:'#9fb8cc',specular:'#ffffff',shininess:90,emissive:'#0d1a2a'});const b=new T.Mesh(new T.CylinderGeometry(5,15,170,4),gl);b.position.y=85;b.rotation.y=Math.PI/4;g.add(b);box(g,1.2,16,5,gl,-2.4,168,0);box(g,1.2,16,5,gl,2.4,168,0);box(g,46,12,40,M('#cfd4d8'),0,0,0);return g;}
+function mkLotte(){const g=new T.Group();g.userData.pass=1;const gl=new T.MeshPhongMaterial({color:'#9fb8cc',specular:'#ffffff',shininess:90,emissive:'#0d1a2a'});const b=new T.Mesh(new T.CylinderGeometry(5,15,170,4),gl);b.position.y=85;b.rotation.y=Math.PI/4;g.add(b);box(g,1.2,16,5,gl,-2.4,168,0);box(g,1.2,16,5,gl,2.4,168,0);box(g,46,12,40,M('#cfd4d8'),0,0,0);return g;}
 function shopSigns(g,curve,words,n){for(let i=0;i<n;i++){const t=.06+rnd()*.88,p=curve.getPointAt(t),tg=curve.getTangentAt(t);if(p.y>1)continue;const l=Math.hypot(tg.x,tg.z)||1,s=rnd()<.5?-1:1,x=p.x-tg.z/l*s*7.4,z=p.z+tg.x/l*s*7.4,w=words[(rnd()*words.length)|0],cols=['#e83a5a','#2e8fd0','#f0a020','#2fae6a','#8a4fd0'];
   label(g,w,x,3.6+rnd()*5,z,Math.atan2(-(-tg.z/l*s),-(tg.x/l*s)),3+w.length*.5,'#fff',cols[(rnd()*5)|0]);}}
 function cityLights(g,y,R){const m=[M('#ffe9a8',{emissive:'#ffcf6a'}),M('#bfe0ff',{emissive:'#7fb8ff'}),M('#8a8f96')];for(let i=0;i<220;i++){const a=rnd()*6.28,r=120+rnd()*R;box(g,6+rnd()*10,8+rnd()*40,6+rnd()*10,m[2],Math.cos(a)*r,y,Math.sin(a)*r);if(i%2)box(g,1.5,1.5,1.5,m[i%4?0:1],Math.cos(a)*r+rnd()*8,y+10+rnd()*30,Math.sin(a)*r+rnd()*8);}}
@@ -1266,7 +1266,7 @@ function go(id,atT){const sc=SCN[id];if(!sc)return;if(cur){scene.remove(cur.g);d
  if(cur.sky==='indoor'){hemi.intensity=1;}if(cur.light){hemi.intensity=cur.light.hemi;sun.intensity=cur.light.sun;}
  guide=null;if(cur.guide){guide=mkNpc(cur.g,cur.npcs,Object.assign({id:'crew',name:L('Guide Jia','가이드 지아'),role:L('Your Seoul tour guide','서울 여행 가이드'),p:'여행자를 따라다니며 서울 2박 3일 코스와 교통, 요금을 안내하는 밝은 가이드. 위 자료를 정확히 알고 있다.',x:0,z:0,quick:[L('What is the plan today?','오늘 일정 알려 주세요'),L('How do I pay for the subway?','지하철 요금은 어떻게 내요?')],lines:[L('Ask me anything about Seoul!','서울에 대해 무엇이든 물어보세요!')]},CREW));guide.follow=1;}
  meAv=rigPerson({cloth:'#e3b860',pants:'#2b3550',hat:'#2e5a86',hatBrim:'#2e5a86'});cur.g.add(meAv);
- placeAt(atT!==undefined?Math.round(atT*(SN-1)):0,true);
+ placeAt(atT!==undefined?Math.round(atT*(SN-1)):0,true);buildSolids();
  if(cur.mySeat){const q=cur.mySeat;sitAt(q.x,0,q.z,q.ry,'sit');camYaw=-Math.PI/2;camH=1.45;}
  updHead();ctxKey='';updCtx();say('');ambient();bgm(cur.bgm||null);if(auto)setAuto(false);}
 function updHead(){const d=DAYS[dayI];$('dayTag').textContent=d.tag+' · '+d.title;$('placeName').textContent=SCN[curId].name;const n=nextQ();$('placeSub').textContent=n?(L('Next: ','다음: ')+(n.q.t?n.q.t+' ':'')+n.q.n):L('All done today! Sleep at the hotel for the next day.','오늘 코스 완료! 호텔에서 자면 다음 날이에요.');$('wallet').textContent='₩'+G.eur.toLocaleString()+(G.chips?' · 칩 '+G.chips:'');}
@@ -1467,6 +1467,14 @@ function constrain(ox,oz,dt){const w=cur.walk;
  if(w&&w.box){const b=w.box;const z0=(cur.door&&!doorOpen)?w.doorZ:b[2];me.x=Math.max(b[0],Math.min(b[1],me.x));me.z=Math.max(z0,Math.min(b[3],me.z));me.ni=nearestIdx(me.x,me.z);me.y+=(w.y-me.y)*Math.min(1,dt*10);return;}
  const wd=(w&&w.w)||6;const i=nearestIdx(me.x,me.z,me.y),s=S[i];const dx=me.x-s.x,dz=me.z-s.z,d=Math.hypot(dx,dz);if(d>wd){me.x=s.x+dx*wd/d;me.z=s.z+dz*wd/d;}me.ni=i;me.y+=(s.y-me.y)*Math.min(1,dt*12);}
 
+/* 건물·사물에 막히기 */
+let SOL=[];const _cv=new T.Vector3(),_cb=new T.Box3();
+function buildSolids(){SOL=[];if(!cur||cur.rideTick)return;cur.g.updateMatrixWorld(true);cur.g.traverse(o=>{if(!o.isMesh||!o.geometry||/Plane/.test(o.geometry.type))return;for(let p=o;p&&p!==cur.g;p=p.parent){if(p.userData&&(p.userData.rig||p.userData.pass))return;}
+  if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();_cb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);const sx=_cb.max.x-_cb.min.x,sz=_cb.max.z-_cb.min.z,sy=_cb.max.y-_cb.min.y;if(Math.max(sx,sz)>80||sy<.25)return;
+  SOL.push({b:o.geometry.boundingBox,inv:new T.Matrix4().copy(o.matrixWorld).invert(),y0:_cb.min.y,y1:_cb.max.y,cx:(_cb.min.x+_cb.max.x)/2,cz:(_cb.min.z+_cb.max.z)/2,r:Math.hypot(sx,sz)/2+.6});});}
+function hitAt(x,z,out){for(const s of SOL){if(s.y1<me.y+.4||s.y0>me.y+1.5)continue;const dx=x-s.cx,dz=z-s.cz;if(dx*dx+dz*dz>s.r*s.r)continue;_cv.set(x,Math.min(s.y1-.05,Math.max(s.y0+.05,me.y+.9)),z).applyMatrix4(s.inv);const b=s.b,m=.3;if(_cv.x>b.min.x-m&&_cv.x<b.max.x+m&&_cv.z>b.min.z-m&&_cv.z<b.max.z+m&&_cv.y>b.min.y-m&&_cv.y<b.max.y+m)out.add(s);}}
+function collide(ox,oz){if(!SOL.length)return;const A=new Set();hitAt(ox,oz,A);const ok=(x,z)=>{const B=new Set();hitAt(x,z,B);for(const s of B)if(!A.has(s))return false;return true;};
+ if(ok(me.x,me.z))return;if(ok(me.x,oz)){me.z=oz;return;}if(ok(ox,me.z)){me.x=ox;return;}me.x=ox;me.z=oz;}
 /* ---------- 루프 ---------- */
 let last=performance.now(),gullT=4,nearT=0;const tmpQ=new T.Vector3();
 function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
@@ -1479,7 +1487,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;
    if(me.ride.t>=1){me.ride=null;setMode('idle');me.y=46;splashSnd();$('splash').style.opacity=1;setTimeout(()=>$('splash').style.opacity=0,700);say('슝— 풍덩! 한 번 더 탈까요?','안전요원 사라');markAct('slide');me.ni=nearestIdx(me.x,me.z);}}
   else if(mag>.08&&me.mode!=='sing'){if(auto)setAuto(false);if(me.sit)standUp();if(/dance|wave|standEat/.test(me.mode))setMode('idle');
    const s=Math.sin(camYaw),c=Math.cos(camYaw);let dx=-s*fx+c*sx,dz=-c*fx-s*sx;const d=Math.hypot(dx,dz);dx/=d;dz/=d;
-   const sp=(cur.walkSp||5)*mag*(inPool(me.x,me.z)?.5:1),ox=me.x,oz=me.z;me.x+=dx*sp*dt;me.z+=dz*sp*dt;constrain(ox,oz,dt);me.ry=Math.atan2(-dx,-dz);moving=true;}
+   const sp=(cur.walkSp||5)*mag*(inPool(me.x,me.z)?.5:1),ox=me.x,oz=me.z;me.x+=dx*sp*dt;me.z+=dz*sp*dt;constrain(ox,oz,dt);collide(ox,oz);me.ry=Math.atan2(-dx,-dz);moving=true;}
   else if(auto){aIdx+=(cur.walkSp||5)*.8*dt;if(cur.closed)aIdx=(aIdx+SN)%SN;else if(aIdx>=SN-1){aIdx=SN-1;setAuto(false);}
    const i0=Math.floor(aIdx),i1=cur.closed?(i0+1)%SN:Math.min(SN-1,i0+1),f=aIdx-i0,a=S[i0],b=S[i1];
    const nx=a.x+(b.x-a.x)*f,nz=a.z+(b.z-a.z)*f;if(Math.hypot(nx-me.x,nz-me.z)>.001)me.ry=Math.atan2(-(nx-me.x),-(nz-me.z));
