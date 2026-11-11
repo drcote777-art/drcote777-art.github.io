@@ -330,18 +330,18 @@ const NPC_RULES=LANG==='ko'?"규칙: 한국어 존댓말로, 맡은 사람다운
 
 /* ---------- 렌더러 ---------- */
 const canvas=document.getElementById('c');
-const R=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+const EXPO=1.55;const R=new T.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;
 R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75));
 const scene=new T.Scene();
 const cam=new T.PerspectiveCamera(66,1,0.1,5000);
 const hemi=new T.HemisphereLight(0xffffff,0x445566,0.8);scene.add(hemi);
-const sun=new T.DirectionalLight(0xffffff,0.9);scene.add(sun);
+const sun=new T.DirectionalLight(0xffffff,0.9);scene.add(sun);scene.add(sun.target);sun.shadow.mapSize.set(2048,2048);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;{const c=sun.shadow.camera;c.left=-70;c.right=70;c.top=70;c.bottom=-70;c.near=1;c.far=420;c.updateProjectionMatrix();}const SUND=new T.Vector3(.4,.75,-.5);
 function resize(){const w=innerWidth,h=innerHeight;R.setSize(w,h,false);cam.aspect=w/h;cam.fov=w<h?72:60;cam.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 
 /* ---------- 재질·텍스처 도우미 ---------- */
 const MC={},TC={};
-function M(c,o){const k=c+JSON.stringify(o||{});if(!MC[k]){MC[k]=new T.MeshLambertMaterial(Object.assign({color:c},o||{}));}return MC[k];}
+function M(c,o){const k=c+JSON.stringify(o||{});if(!MC[k]){MC[k]=new T.MeshStandardMaterial(Object.assign({color:c,roughness:.8,metalness:.02},o||{}));}return MC[k];}
 function tex(key,w,h,draw,rep){if(TC[key])return TC[key];const cv=document.createElement('canvas');cv.width=w;cv.height=h;const g=cv.getContext('2d');draw(g,w,h);const t=new T.CanvasTexture(cv);t.anisotropy=4;if(rep){t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(rep[0],rep[1]);}TC[key]=t;return t;}
 function TM(key,w,h,draw,o){const k='tm_'+key;if(!MC[k]){MC[k]=new T.MeshLambertMaterial(Object.assign({map:tex(key,w,h,draw)},o||{}));}return MC[k];}
 let RND=1;function rnd(){RND=(RND*16807)%2147483647;return RND/2147483647;}
@@ -445,7 +445,7 @@ sea.rotation.x=-Math.PI/2;scene.add(sea);
 let seaY=0;
 function setSky(k,seaLevel){const s=SKY[k];skyU.top.value.set(s.top);skyU.bot.value.set(s.bot);skyU.sunC.value.set(s.sunC);skyU.sunDir.value.set(...s.sun).normalize();
  scene.fog=new T.FogExp2(s.fog,s.dens);seaU.deep.value.set(s.deep);seaU.skyC.value.set(s.bot);seaU.sunC.value.set(s.sunC);seaU.fogC.value.set(s.fog);seaU.sunDir.value.copy(skyU.sunDir.value);seaU.fogD.value=s.dens;
- sun.color.set(k==='night'?'#8fa6d6':s.sunC);sun.intensity=s.li;sun.position.set(...s.sun).multiplyScalar(100);hemi.intensity=s.hemi;hemi.color.set(k==='night'?'#6f86b8':'#ffffff');
+ sun.color.set(k==='night'?'#8fa6d6':s.sunC);sun.intensity=s.li;sun.position.set(...s.sun).multiplyScalar(100);SUND.set(...s.sun).normalize();hemi.intensity=s.hemi;hemi.color.set(k==='night'?'#6f86b8':'#ffffff');
  stars.visible=k==='night';seaY=seaLevel;sea.position.y=seaLevel;sea.visible=seaLevel!==null;skyMesh.visible=true;}
 
 /* ---------- 배 ---------- */
@@ -1286,7 +1286,7 @@ function openPano(id){const p=PANOS[id];if(!p)return;closePanel();const m=new T.
  PV={m,yaw:0,pit:0};$('pvC').textContent=p[1]+' · '+p[2]+' · Wikimedia Commons';$('pv').hidden=false;$('top').style.visibility='hidden';$('bot').style.visibility='hidden';if(cur)cur.g.visible=false;sea.visible=false;skyMesh.visible=false;}
 function closePano(){if(!PV)return;scene.remove(PV.m);if(PV.m.material.map)PV.m.material.map.dispose();PV.m.geometry.dispose();PV=null;$('pv').hidden=true;$('top').style.visibility='';$('bot').style.visibility='';if(cur){cur.g.visible=true;setSky(cur.sky,cur.seaY);if(cur.light){hemi.intensity=cur.light.hemi;sun.intensity=cur.light.sun;}}}
 function panoFrame(){cam.position.set(0,0,0);const cp=Math.cos(PV.pit);cam.lookAt(Math.sin(PV.yaw)*cp,Math.sin(PV.pit),-Math.cos(PV.yaw)*cp);R.render(scene,cam);}
-const PANOS={};
+const PANOS={"st1": ["Mapillary_%281224151635836166%2C_OgxLe4TrJdMX3AR9qc68Ez%29_%28lisbethw1130%29_2025-06-15_04H42M41S000.jpg", "lisbethw1130", "CC BY-SA 4.0", "f/f3", 3840], "st2": ["Mapillary_%281353567775735573%2C_OgxLe4TrJdMX3AR9qc68Ez%29_%28lisbethw1130%29_2025-06-15_04H48M19S000.jpg", "lisbethw1130", "CC BY-SA 4.0", "c/cd", 3840], "st3": ["Mapillary_%282144303996074782%2C_OgxLe4TrJdMX3AR9qc68Ez%29_%28lisbethw1130%29_2025-06-15_04H43M49S000.jpg", "lisbethw1130", "CC BY-SA 4.0", "e/e7", 3840]};
 /* ---------- 상태 ---------- */
 let cur=null,curId='',curve=null,len=1,tPos=0,auto=false,aIdx=0,S=[],SN=0,firedN=new Set(),dayI=G.day||0,guide=null,meAv=null,clock=0,shoreV=0,showOn=false,doorOpen=false,coins=[],deckPoly=null,swimT=0;
 const me={x:0,y:0,z:0,ry:0,ni:0,sit:null,mode:'idle',modeUntil:0,zone:null,ride:null,plate:null};let camYaw=0,camH=2.6;
@@ -1307,7 +1307,7 @@ function go(id,atT){const sc=SCN[id];if(!sc)return;if(cur){scene.remove(cur.g);d
  if(cur.sky==='indoor'){hemi.intensity=1;}if(cur.light){hemi.intensity=cur.light.hemi;sun.intensity=cur.light.sun;}
  guide=null;if(cur.guide){guide=mkNpc(cur.g,cur.npcs,Object.assign({id:'crew',name:L('Guide Jia','가이드 지아'),role:L('Your Seoul tour guide','서울 여행 가이드'),p:'여행자를 따라다니며 서울 2박 3일 코스와 교통, 요금을 안내하는 밝은 가이드. 위 자료를 정확히 알고 있다.',x:0,z:0,quick:[L('What is the plan today?','오늘 일정 알려 주세요'),L('How do I pay for the subway?','지하철 요금은 어떻게 내요?')],lines:[L('Ask me anything about Seoul!','서울에 대해 무엇이든 물어보세요!')]},CREW));guide.follow=1;}
  meAv=rigPerson({cloth:'#e3b860',pants:'#2b3550',hat:'#2e5a86',hatBrim:'#2e5a86'});cur.g.add(meAv);
- placeAt(atT!==undefined?Math.round(atT*(SN-1)):0,true);buildSolids();
+ placeAt(atT!==undefined?Math.round(atT*(SN-1)):0,true);buildSolids();dressScene();
  if(cur.mySeat){const q=cur.mySeat;sitAt(q.x,0,q.z,q.ry,'sit');camYaw=-Math.PI/2;camH=1.45;}
  updHead();ctxKey='';updCtx();say('');ambient();bgm(cur.bgm||null);if(auto)setAuto(false);}
 function updHead(){const d=DAYS[dayI];$('dayTag').textContent=d.tag+' · '+d.title;$('placeName').textContent=SCN[curId].name;const n=nextQ();$('placeSub').textContent=n?(L('Next: ','다음: ')+(n.q.t?n.q.t+' ':'')+n.q.n):L('All done today! Sleep at the hotel for the next day.','오늘 코스 완료! 호텔에서 자면 다음 날이에요.');$('wallet').textContent='₩'+G.eur.toLocaleString()+(G.chips?' · 칩 '+G.chips:'');}
@@ -1457,7 +1457,7 @@ function openPlan(){openPanel(L('3-day plan','일정 · 관광 코스'),(b)=>{co
   DAYS.forEach((d,di)=>{const el=document.createElement('div');el.className='day'+(di===dayI?' cur':'');const n=d.q.filter((q,i)=>G.done[qKey(di,i)]).length;
    el.innerHTML='<div class="dh"><i>'+d.tag+'</i><b>'+d.title+'</b><span class="cnt">'+n+'/'+d.q.length+'</span></div><div class="dt">'+d.time+'</div>';const st=document.createElement('div');st.className='qs';
    d.q.forEach((q,i)=>{const bt=document.createElement('button');bt.type='button';const ok=G.done[qKey(di,i)];bt.className=ok?'ok':'';bt.innerHTML='<span class="qt">'+(ok?'✔':(q.t||'·'))+'</span>'+q.n;bt.onclick=()=>{closePanel();dayI=di;G.day=di;saveG();goQ(i);};if(q.r&&REAL[q.r]){const rw=document.createElement('div');rw.className='rw';const cb=document.createElement('button');cb.type='button';cb.className='cam';cb.textContent='📷';cb.title='실제 모습';cb.onclick=()=>openReal(q.r);rw.append(bt,cb);st.append(rw);}else st.append(bt);});el.append(st);b.append(el);});});}
-function openMap(){openPanel(L('Jump to an area','지역으로 바로 가기'),(b)=>{const p=document.createElement('p');p.className='lead';p.textContent=L('Skip the ride and go straight to an area.','탈것을 건너뛰고 바로 가요.');b.append(p);const rb=document.createElement('button');rb.type='button';rb.className='row';rb.innerHTML='<span>📷 '+REAL.subway.n+'</span><b>'+L('fares','요금')+'</b>';rb.onclick=()=>openReal('subway');b.append(rb);const gr=document.createElement('div');gr.className='grid';
+function openMap(){openPanel(L('Jump to an area','지역으로 바로 가기'),(b)=>{const p=document.createElement('p');p.className='lead';p.textContent=L('Skip the ride and go straight to an area.','탈것을 건너뛰고 바로 가요.');b.append(p);const rb=document.createElement('button');rb.type='button';rb.className='row';rb.innerHTML='<span>📷 '+REAL.subway.n+'</span><b>'+L('fares','요금')+'</b>';rb.onclick=()=>openReal('subway');b.append(rb);[['st1',L('Crossroads','네거리')],['st2',L('Market entrance','시장 입구')],['st3',L('Back alley','뒷골목')]].forEach(([k,n])=>{const x=document.createElement('button');x.type='button';x.className='row';x.innerHTML='<span>🌐 '+L('Real Seoul street in 360° · ','실제 서울 거리 360도 · ')+n+'</span><b>'+L('look around','둘러보기')+'</b>';x.onclick=()=>openPano(k);b.append(x);});const nt=document.createElement('p');nt.className='lead';nt.textContent=L('The 360° photos show ordinary Seoul streets (exact location not identified), not the landmarks.','360도 사진은 명소가 아니라 평범한 서울 거리예요(정확한 위치는 확인하지 못했어요).');b.append(nt);const gr=document.createElement('div');gr.className='grid';
   SHIPMAP.forEach(([id,nm,sub])=>{const bt=document.createElement('button');bt.type='button';bt.innerHTML='<b>'+nm+'</b><small>'+sub+'</small>';if(id===curId)bt.className='cur';bt.onclick=()=>{closePanel();fadeMsg('→ '+nm,()=>go(id));};gr.append(bt);});b.append(gr);});}
 function openBag(){openPanel('가방',(b)=>{const p=document.createElement('p');p.className='lead';p.textContent='게임 속 돈은 가상 유로예요.';b.append(p);
   const w=document.createElement('div');w.className='wal';w.innerHTML='<div><small>지갑</small><b>₩'+G.eur.toLocaleString()+'</b></div><div><small>카지노 칩</small><b>'+G.chips+'</b></div><div><small>스탬프</small><b>'+updStamps()+'/6</b></div>';b.append(w);
@@ -1508,6 +1508,11 @@ function constrain(ox,oz,dt){const w=cur.walk;
  if(w&&w.box){const b=w.box;const z0=(cur.door&&!doorOpen)?w.doorZ:b[2];me.x=Math.max(b[0],Math.min(b[1],me.x));me.z=Math.max(z0,Math.min(b[3],me.z));me.ni=nearestIdx(me.x,me.z);me.y+=(w.y-me.y)*Math.min(1,dt*10);return;}
  const wd=(w&&w.w)||6;const i=nearestIdx(me.x,me.z,me.y),s=S[i];const dx=me.x-s.x,dz=me.z-s.z,d=Math.hypot(dx,dz);if(d>wd){me.x=s.x+dx*wd/d;me.z=s.z+dz*wd/d;}me.ni=i;me.y+=(s.y-me.y)*Math.min(1,dt*12);}
 
+/* 그림자: 해를 따라 사람과 건물 그림자가 생겨요 */
+let fpsT=0,fpsN=0;
+const AMB=new T.AmbientLight(0xffffff,.1);scene.add(AMB);
+function dressScene(){const out=cur.sky!=='indoor'&&!cur.dark;AMB.intensity=cur.sky==='indoor'?.5:cur.sky==='night'?.3:.1;sun.castShadow=!!(G.hd!==false&&out);cur.g.traverse(o=>{if(!o.isMesh)return;const m=o.material,tr=m&&!Array.isArray(m)&&m.transparent;if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const big=o.geometry.boundingSphere.radius*Math.max(o.scale.x,o.scale.z)>260;o.castShadow=!tr&&!big&&!/Plane/.test(o.geometry.type);o.receiveShadow=!tr;});fpsT=0;fpsN=0;}
+function sunFollow(dt){sun.target.position.set(me.x,me.y,me.z);sun.position.set(me.x+SUND.x*160,me.y+Math.max(.25,SUND.y)*160,me.z+SUND.z*160);if(sun.castShadow&&fpsN>=0){fpsT+=dt;fpsN++;if(fpsT>5){if(fpsN/fpsT<20){G.hd=false;saveG();sun.castShadow=false;toast(L('Shadows turned off to keep it smooth','부드럽게 움직이도록 그림자를 껐어요'));}fpsN=-1;}}}
 /* 건물·사물에 막히기 */
 let SOL=[];const _cv=new T.Vector3(),_cb=new T.Box3();
 function buildSolids(){SOL=[];if(!cur||cur.rideTick)return;cur.g.updateMatrixWorld(true);cur.g.traverse(o=>{if(!o.isMesh||!o.geometry||/Plane/.test(o.geometry.type))return;for(let p=o;p&&p!==cur.g;p=p.parent){if(p.userData&&(p.userData.rig||p.userData.pass))return;}
@@ -1567,7 +1572,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;if
    cur.dancers.forEach((d,i)=>{d.position.y=-4.4;d.userData.mode=showOn?'dance'+(i%3):'idle';});}
   if(cur.tiles){cur.tiles.forEach((t,i)=>{const k=Math.floor(clock*2.07)+i*7;t.material.color.setHSL(((k*37)%360)/360,.8,(Math.sin(clock*4+i)*.5+.5)*.35+.15);});cur.ball.rotation.y+=dt*.8;cur.beams.forEach((b,i)=>{b.rotation.z=Math.sin(clock*1.6+i)*.6;b.rotation.x=Math.cos(clock*1.2+i)*.4;});}
   if(cur.wheel&&cur.wheelSpin>0){cur.wheelSpin-=dt;cur.wheel.rotation.z+=dt*cur.wheelSpin*4;}
-  if(cur.rideTick)cur.rideTick(dt);liveTick(dt);
+  if(cur.rideTick)cur.rideTick(dt);liveTick(dt);sunFollow(dt);
   if(cur.door){cur.door.position.x+=((doorOpen?-.85:.85)-cur.door.position.x)*dt*4;}
   coins=coins.filter(c=>{c.t+=dt;const k=Math.min(1,c.t/1.1);c.m.position.lerpVectors(c.a,c.b,k);c.m.position.y+=Math.sin(k*Math.PI)*4;c.m.rotation.x+=dt*14;if(k>=1){splashSnd();cur.g.remove(c.m);return false;}return true;});
   if(cur.seaY!==null&&!cur.dark&&cur.sky!=='indoor'){gullT-=dt;if(gullT<0){gullT=6+Math.random()*10;if(cur.city||cur.shore)gull();}}
