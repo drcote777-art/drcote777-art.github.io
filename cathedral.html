@@ -1400,7 +1400,7 @@ function buildSw(){const e=$("sws");e.innerHTML="";COLORS.forEach(c=>{const b=do
 $("nick").value=me.name;buildSw();
 $("setup").addEventListener("submit",e=>{e.preventDefault();{const v=($("nick").value||"").trim();if(!v||v==="순례자"||v==="손님"){$("nick").value="";$("nick").placeholder="이름을 꼭 적어 주세요 (예: 표주인)";$("nick").style.outline="2px solid #c0392b";$("nick").focus();try{toast("이름을 적어야 들어갈 수 있어요. 가족이 누가 왔는지 알아볼 수 있어요",true)}catch(x){}return}}const mode=(e.submitter&&e.submitter.dataset.mode)||"walk";me.name=($("nick").value||"").trim().slice(0,10)||"손님";ls.set("ct_name",me.name);me.look.tc=me.color;applyLook();
   $("sheet").hidden=true;initAudio();if(TTS){try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u)}catch(x){}}pushP(true);
-  if(location.hash==="#port"&&typeof portArrive==="function"){portArrive()}else if(mode==="quiet"){goTo("altar");setQuiet(true)}else showSub("빛의 숲 성당","광장에서 정문 현관을 지나 성당 안으로 들어가 보세요. 입구 양옆 성수대에서 성호를 긋고, 숲처럼 뻗은 기둥 사이로 쏟아지는 빛을 걸어 보세요.",8000);
+  if(location.hash==="#port"&&typeof portArrive==="function"){portArrive()}else if(location.hash==="#cruise"){showSub("크루즈 여행 출발","성당 광장에서 지하철을 타고 람블라스 거리, 콜럼버스 동상을 지나 크루즈 터미널까지 가요. 왼쪽 아래 파란 길잡이의 화살표를 따라가세요.",11000)}else if(mode==="quiet"){goTo("altar");setQuiet(true)}else showSub("빛의 숲 성당","광장에서 정문 현관을 지나 성당 안으로 들어가 보세요. 입구 양옆 성수대에서 성호를 긋고, 숲처럼 뻗은 기둥 사이로 쏟아지는 빛을 걸어 보세요.",8000);
   {let lv=0;try{lv=+localStorage.getItem("ct_lastvisit")||0}catch(x){}const since=lv;if(since)setTimeout(()=>{const nn=[...new Set(visits.filter(v=>v.ts>since&&v.nick!==me.name).map(v=>v.nick))];if(nn.length){const t=`지난번 이후 다녀간 분: ${nn.slice(0,6).join(", ")}${nn.length>6?` 외 ${nn.length-6}명`:""}`;addLog("알림","#2f7d63",t);toast("👣 "+t)}},4500);if(Date.now()-lv>10*60000){try{localStorage.setItem("ct_lastvisit",String(Date.now()))}catch(x){}setTimeout(()=>sharedAdd("visits",{nick:me.name||"손님",ts:Date.now(),u:VID,dv:DEV}),3000)}}});
 
 /* ================= 연결 ================= */
@@ -2114,6 +2114,30 @@ PLACES.push(["portstop","🚕 택시·셔틀 승차장",RX+57,-868,Math.PI,3],["
     for(let k=0;k<n;k++){const m=new T.Mesh(cg,cm);m.position.set(RX+x0+(x1-x0)*k/n,.09,z0+(z1-z0)*k/n);m.rotation.set(-Math.PI/2,0,th);RAM.add(m)}}})();
 INFO.push({n:"크루즈 터미널 가는 길",x:RX+10,z:-803,r:7,lv:3,d:"바닥의 파란 화살표를 따라가면 택시·셔틀버스 승차장(약 70m)이 나와요. 거기서 타거나, 화살표를 계속 따라 항구 도로를 걸으면 크루즈 터미널 D예요."});
 CTX.splice(CTX.length-1,0,{id:"toStand",lv:3,lab:()=>"🚢 크루즈 터미널 가는 길 (승차장으로)",when:()=>me.z<-790&&me.z>-860&&Math.abs(me.x-RX)<40&&Math.hypot(me.x-RX-57,me.z+866)>12,fn:()=>{placeMe(3,RX+55.5,-869,Math.PI);showSub("택시·셔틀버스 승차장","아래 🚕 택시 버튼을 누르면 타요. 오른쪽 BUS 표지판 쪽으로 몇 걸음 가면 🚌 셔틀버스 버튼이 나와요. 걸어가려면 바닥의 파란 화살표를 따라가세요.",9000)}});
+
+/* 크루즈 여행 길잡이: 성당 → 지하철 → 람블라스 → 콜럼버스 동상 → 터미널까지, 다음 갈 곳을 화살표와 거리로 알려 줘요 */
+const TGD=document.createElement("div");TGD.id="tripGuide";TGD.hidden=true;TGD.innerHTML='<i id="tgA">▲</i><div><b id="tgT"></b><span id="tgS"></span></div><button type="button" id="tgX" aria-label="길잡이 끄기">✕</button>';$("bui").insertBefore(TGD,$("bui").firstChild);
+{const st=document.createElement("style");st.textContent="#tripGuide{pointer-events:auto;align-self:flex-start;display:flex;gap:10px;align-items:center;background:rgba(29,79,145,.93);color:#fff;border-radius:14px;padding:7px 8px 7px 12px;max-width:min(92vw,430px);font-family:'Gowun Dodum',sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.28)}#tripGuide[hidden]{display:none}#tgA{font-style:normal;font-size:24px;line-height:1;color:#ffd23f;display:inline-block;width:26px;text-align:center;transition:transform .2s}#tripGuide b{font-family:'Jua',sans-serif;font-weight:400;font-size:15.5px;display:block;line-height:1.25}#tripGuide span{font-size:12.5px;opacity:.92;display:block;line-height:1.3}#tgX{border:0;background:rgba(255,255,255,.18);color:#fff;border-radius:999px;width:26px;height:26px;font-size:13px;flex:0 0 auto}#tripOnBtn{pointer-events:auto;align-self:flex-start;border:0;border-radius:999px;padding:7px 12px;background:rgba(29,79,145,.93);color:#fff;font:14px 'Jua',sans-serif;box-shadow:0 3px 12px rgba(0,0,0,.28)}#tripOnBtn[hidden]{display:none}";document.head.appendChild(st)}
+const TGB=document.createElement("button");TGB.type="button";TGB.id="tripOnBtn";TGB.hidden=true;TGB.textContent="🚢 크루즈 길잡이 켜기";$("bui").insertBefore(TGB,$("bui").firstChild);
+let tripOn=location.hash==="#cruise";try{if(sessionStorage.getItem("ct_trip")==="1")tripOn=true;if(sessionStorage.getItem("ct_trip")==="0"&&location.hash!=="#cruise")tripOn=false}catch(x){}
+$("tgX").onclick=()=>{tripOn=false;try{sessionStorage.setItem("ct_trip","0")}catch(x){}};TGB.onclick=()=>{tripOn=true;try{sessionStorage.setItem("ct_trip","1")}catch(x){}};
+function tripStep(){if(RIDE)return null;const lv=me.lv;
+  if(lv===1||lv===2)return{t:"⛪ 성당 밖 광장으로 나가요",s:"위쪽 📍 이동 → 성당 광장"};
+  if(lv===0){const d=Math.hypot(me.x-METRO0.x,me.z-(METRO0.z+2.6));if(d<3.4)return{t:"🚇 아래 '지하철 타고 람블라스로' 버튼",s:"L5 → Diagonal 환승 → L3 → Catalunya"};return{t:"🚇 지하철 Sagrada Família역 입구로",s:"빨간 M 표지판 · L5 → Diagonal 환승 → L3",x:METRO0.x,z:METRO0.z+2.6}}
+  if(lv===6)return{t:"🚇 지하철 타는 중",s:"L5 → Diagonal 환승 → L3 → Catalunya"};
+  if(lv===4)return{t:"🔭 전망대에서 내려가요",s:"내려가기 버튼 → 콜럼버스 동상 아래"};
+  if(lv!==3)return null;const lx=me.x-RX,z=me.z;
+  if(lx>1400)return{t:"🚪 가게 밖으로 나가요",s:"람블라스 거리로"};
+  if(z<-1516&&Math.abs(lx-TERM.x)<32)return{t:"🛂 아래 '체크인하고 크루즈 승선' 버튼",s:"누르면 터미널 안에서 체크인하고 배에 올라요"};
+  if(lx>140&&z<-1490)return{t:"🚢 크루즈 터미널 D 입구로",s:"노란 굴뚝 배 앞 유리 건물",x:RX+TERM.x,z:-1531};
+  if(lx>140)return{t:"🚶 항구 도로를 따라 크루즈 터미널로",s:"몬주익 언덕 아래 · 바닥의 파란 화살표",x:RX+160,z:-1506};
+  if(lx>40&&z<-858){if(Math.hypot(lx-57,z+866)<9)return{t:"🚕 택시나 🚌 셔틀버스 버튼을 눌러요",s:"걸어가려면 파란 화살표를 계속 따라가요",x:RX+160,z:-868};return{t:"🚕 택시·셔틀버스 승차장으로",s:"TAXI · BUS 표지판 앞",x:RX+57,z:-867.5}}
+  if(z<-790)return{t:"🚕 택시·셔틀버스 승차장으로",s:"동상 왼쪽으로 · 바닥의 파란 화살표",x:RX+57,z:-867.5};
+  if(z>1)return{t:"🚶 람블라스 거리로 들어가요",s:"카탈루냐 광장에서 바다 쪽으로",x:RX,z:-6};
+  return{t:"🚶 람블라스 거리를 따라 바다 쪽으로",s:"보케리아 시장 · 리세우 극장을 지나 콜럼버스 동상까지",x:RX,z:-800}}
+setInterval(()=>{const inn=$("sheet").hidden;const show=inn&&tripOn&&!me.solo;let st=show?tripStep():null;TGD.hidden=!st;TGB.hidden=!(inn&&!tripOn&&!RIDE&&(me.lv===0||me.lv===3)&&!me.solo);if(!st)return;
+  let s=st.s||"";const A=$("tgA");if(st.x!==undefined){const dx=st.x-me.x,dz=st.z-me.z,d=Math.hypot(dx,dz);const fx=-Math.sin(camYaw),fz=-Math.cos(camYaw),rx=Math.cos(camYaw),rz=-Math.sin(camYaw);const ang=Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz);A.textContent="▲";A.style.transform="rotate("+ang.toFixed(2)+"rad)";s="약 "+(d<10?Math.round(d):Math.round(d/5)*5)+"걸음 · "+s}else{A.textContent="●";A.style.transform=""}
+  $("tgT").textContent=st.t;$("tgS").textContent=s},250);
 
 /* 탈것 모양 */
 function mkTaxiG(){const g=new T.Group(),bk=rmat(0x161616),ye=rmat(0xf2c21a);const b=new T.Mesh(new T.BoxGeometry(1.8,.8,4.3),bk);b.position.y=.65;g.add(b);[-1,1].forEach(s=>{const d=new T.Mesh(new T.BoxGeometry(.04,.55,2.2),ye);d.position.set(s*.92,.7,.1);g.add(d)});
