@@ -3,6 +3,7 @@
 #   Cloudflare 설정 — 빌드 명령: bash tools/build_seoul_public.sh / 빌드 출력 디렉터리: dist-seoul
 #   seoul.html 을 고치고 main 에 올리면 Cloudflare 가 이 스크립트로 다시 만들어 자동 반영합니다.
 #   가족용 연결(config.js: 함께 걷기·AI 중계, claude-web.js)은 공개용에서 뺍니다.
+#   방문자 통계: Cloudflare Web Analytics 사용 중 (Pages 프로젝트 메트릭에서 켬, 배포할 때 Cloudflare가 자동으로 붙임).
 set -euo pipefail
 OUT=dist-seoul
 rm -rf "$OUT"
