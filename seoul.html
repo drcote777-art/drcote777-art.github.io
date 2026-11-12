@@ -1535,7 +1535,7 @@ async function fdDetails(box,id,compact){
  el.addEventListener('gmp-error',()=>{box.className='gbox off';box.textContent=L('Google Maps could not load this place.','구글 지도에서 이 가게를 불러오지 못했어요.');});box.append(el);}
 function fdMore(){if(!FD)return;const P=FD.place,f=FD.f,ko=fdKo(FD.ctr,f);
  openPanel(L('Menu · photos · reviews','메뉴·사진·후기'),b=>{
-  const p=document.createElement('p');p.className='lead';p.textContent=L('Google does not hand menus to apps as data, so menus open in Google Maps or Naver Map. The photos and reviews below come from Google Maps.','구글은 메뉴를 앱에 데이터로 넘겨주지 않아서, 메뉴는 구글 지도나 네이버 지도에서 열어요. 아래 사진·후기는 구글 지도 정보예요.');b.append(p);
+  const p=document.createElement('p');p.className='lead';p.textContent=L('Full menus are most accurate in Google Maps or Naver Map, so they open there. The photos and reviews below come from Google Maps.','메뉴판 전체는 구글 지도나 네이버 지도에서 보는 게 가장 정확해서 그쪽으로 열어요. 아래 사진·후기는 구글 지도 정보예요.');b.append(p);
   const r=document.createElement('div');r.className='ocb fdl';fdA(r,'📋 '+L('Menu on Google Maps','구글 지도에서 메뉴 보기'),'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(f.k)+'&query_place_id='+encodeURIComponent(P.id));fdA(r,'🟢 '+L('Menus & prices on Naver Map','네이버 지도에서 메뉴·가격'),'https://map.naver.com/p/search/'+encodeURIComponent(ko));b.append(r);
   const box=document.createElement('div');box.className='gbox';b.append(box);fdDetails(box,P.id,false);
   const bk=document.createElement('div');bk.className='ocb';const x=document.createElement('button');x.type='button';x.textContent='↩ '+L('Back','돌아가기');x.onclick=()=>fdArrive(true);bk.append(x);b.append(bk);});}
