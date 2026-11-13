@@ -16,3 +16,12 @@
   box(g,6,3,4,M('#f4f6f7'),-80,0,6);label(g,RGN.line,-80,4,3.95,Math.PI,14,'#fff',RGN.lineCol);
   P=pathFromXZ([[0,0,40],[0,0,0],[-40,0,-6],[-90,0,-6]]);ex=[[-40,-30,40],[-80,6,8]];
   notes=RGN.termNotes;}
+ if(city==='sar'){fac=modern;off=13;hh=[16,40];W=10;nP=40;words=['편의점 CVS','카페','약국','ATM','관광안내 INFO'];
+  const pf=new T.Group();pf.userData.pass=1;box(pf,150,1,8,M('#b9b4aa'),40,0,-18);box(pf,150,.06,.5,M('#f0c419'),40,1,-21.6);g.add(pf);
+  const kt=mkKTX(120);kt.position.set(40,1,-25.6);g.add(kt);
+  const hall=new T.Group();hall.userData.pass=1;box(hall,90,1,34,new T.MeshPhongMaterial({color:'#9fb8cc',specular:'#ffffff',shininess:80,transparent:true,opacity:.5}),-60,15,-10);
+  for(let x=-100;x<=-20;x+=11)for(const z of[-26,6])cyl(hall,.45,.45,15,M('#c9ced4'),x,0,z,8);g.add(hall);
+  label(g,RGN.arr,-14.6,17,-10,Math.PI/2,26,'#fff','#1f4f91');
+  box(g,6,3,4,M('#f4f6f7'),-110,0,9);label(g,RGN.arrLine,-110,4,6.95,Math.PI,14,'#fff',RGN.arrLineCol);
+  P=pathFromXZ([[100,1,-18],[40,1,-18],[0,1,-18],[-20,0,-10],[-60,0,-6],[-100,0,0],[-130,0,4]]);ex=[[40,-20,80],[-60,-10,60]];
+  notes=RGN.arrNotes;}

@@ -1236,6 +1236,15 @@ SC.seoul=(o)=>{const city=o.city,g=new T.Group(),list=[];RND=91+city.charCodeAt(
   box(g,6,3,4,M('#f4f6f7'),-80,0,6);label(g,RGN.line,-80,4,3.95,Math.PI,14,'#fff',RGN.lineCol);
   P=pathFromXZ([[0,0,40],[0,0,0],[-40,0,-6],[-90,0,-6]]);ex=[[-40,-30,40],[-80,6,8]];
   notes=RGN.termNotes;}
+ if(city==='sar'){fac=modern;off=13;hh=[16,40];W=10;nP=40;words=['편의점 CVS','카페','약국','ATM','관광안내 INFO'];
+  const pf=new T.Group();pf.userData.pass=1;box(pf,150,1,8,M('#b9b4aa'),40,0,-18);box(pf,150,.06,.5,M('#f0c419'),40,1,-21.6);g.add(pf);
+  const kt=mkKTX(120);kt.position.set(40,1,-25.6);g.add(kt);
+  const hall=new T.Group();hall.userData.pass=1;box(hall,90,1,34,new T.MeshPhongMaterial({color:'#9fb8cc',specular:'#ffffff',shininess:80,transparent:true,opacity:.5}),-60,15,-10);
+  for(let x=-100;x<=-20;x+=11)for(const z of[-26,6])cyl(hall,.45,.45,15,M('#c9ced4'),x,0,z,8);g.add(hall);
+  label(g,RGN.arr,-14.6,17,-10,Math.PI/2,26,'#fff','#1f4f91');
+  box(g,6,3,4,M('#f4f6f7'),-110,0,9);label(g,RGN.arrLine,-110,4,6.95,Math.PI,14,'#fff',RGN.arrLineCol);
+  P=pathFromXZ([[100,1,-18],[40,1,-18],[0,1,-18],[-20,0,-10],[-60,0,-6],[-100,0,0],[-130,0,4]]);ex=[[40,-20,80],[-60,-10,60]];
+  notes=RGN.arrNotes;}
  if(city==='bsn'){fac=modern;off=15;hh=[14,34];W=10;nP=40;words=['돼지국밥','어묵 EOMUK','카페','편의점','환전 EXCHANGE','밀면'];
   const pl=new T.Group();pl.userData.pass=1;box(pl,130,1,8,M('#b9b4aa'),-10,0,60);const kt=mkKTX(110);kt.position.set(-10,1,52.4);pl.add(kt);g.add(pl);
   const st=new T.Group();st.userData.pass=1;box(st,64,13,30,new T.MeshPhongMaterial({color:'#a9c4d8',specular:'#ffffff',shininess:90,transparent:true,opacity:.6}),-20,0,26);box(st,70,1.4,36,M('#e9edf0'),-20,13,26);g.add(st);
@@ -1948,7 +1957,7 @@ function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;clock+=dt;if
 /* 시작 */
 const FROMCITY=false;{const sw=()=>{try{localStorage.setItem('seoul_lang',LANG==='ko'?'en':'ko');}catch(e){}location.reload();};$('stLang').onclick=sw;$('langBtn').onclick=sw;
  $('stH').innerHTML=L('Virtual Busan<br>3 days','가상 부산·경남<br>2박 3일');$('stP').textContent=L('Leave Seoul Station by KTX. Eat at Jagalchi fish market, climb Busan Tower, wander the painted lanes of Gamcheon, ride the Beach Train at Haeundae, visit a temple on the sea rocks and watch Gwangan Bridge at night. Then take the bus to Tongyeong, ride the cable car up Mireuksan and come back to Seoul. Real fares, times and photos.','서울역에서 KTX로 출발해요. 자갈치시장에서 먹고, 부산타워에 오르고, 감천문화마을 골목을 걷고, 해운대 해변열차를 타고, 바다 바위 위 절에 가고, 광안대교 야경을 봐요. 버스로 통영에 가서 케이블카로 미륵산에 오른 뒤 서울로 돌아와요. 실제 요금·시간·사진을 담았어요.');
- $('stR').textContent=L('Seoul Station · KTX · Jagalchi · BIFF · Gukje Market · Busan Tower · Gamcheon · Haeundae · Blueline Park · Yonggungsa · Gwangalli · Tongyeong · Seoul Nambu','서울역 · KTX · 자갈치 · BIFF · 국제시장 · 부산타워 · 감천 · 해운대 · 블루라인파크 · 용궁사 · 광안리 · 통영 · 서울남부');const REG_ID='busan';const REGIONS=[['seoul','seoul.html',L('Seoul','서울')],['busan','busan.html',L('Busan · Gyeongnam','부산·경남')],['east','east.html',L('East coast','동해안')],['jnm','',L('Jeonnam · Gwangju','전남·광주')],['cbk','',L('Chungbuk','충북')],['cnm','',L('Chungnam · Daejeon','충남·대전')],['gbk','',L('Gyeongbuk · Daegu','경북·대구')],['jbk','',L('Jeonbuk','전북')],['ggi','',L('Gyeonggi','경기')]];
+ $('stR').textContent=L('Seoul Station · KTX · Jagalchi · BIFF · Gukje Market · Busan Tower · Gamcheon · Haeundae · Blueline Park · Yonggungsa · Gwangalli · Tongyeong · Seoul Nambu','서울역 · KTX · 자갈치 · BIFF · 국제시장 · 부산타워 · 감천 · 해운대 · 블루라인파크 · 용궁사 · 광안리 · 통영 · 서울남부');const REG_ID='busan';const REGIONS=[['seoul','seoul.html',L('Seoul','서울')],['busan','busan.html',L('Busan · Gyeongnam','부산·경남')],['east','east.html',L('East coast','동해안')],['jnm','jnm.html',L('Jeonnam · Gwangju','전남·광주')],['cbk','',L('Chungbuk','충북')],['cnm','',L('Chungnam · Daejeon','충남·대전')],['gbk','',L('Gyeongbuk · Daegu','경북·대구')],['jbk','',L('Jeonbuk','전북')],['ggi','',L('Gyeonggi','경기')]];
 {const r=$('stReg');if(r){const h=document.createElement('div');h.className='h';h.textContent=L('Choose a region','지역 고르기');r.append(h);REGIONS.forEach(([id,f,n])=>{let e;if(id===REG_ID){e=document.createElement('a');e.className='on';e.textContent=n;}else if(f){e=document.createElement('a');e.href=f;e.textContent=n;}else{e=document.createElement('span');e.textContent=n+' · '+L('soon','준비 중');}r.append(e);});}}
 $('enter').textContent=L('Start at Seoul Station','서울역에서 시작하기');$('loading').textContent='';
  $('planBtn').textContent=L('📋 Plan','📋 일정');$('stampBtn').textContent=L('Stamps','스탬프');$('voiceBtn').textContent=L('Voice','음성');$('hint').textContent=L('Drag on the left to walk · drag on the right to look around','왼쪽을 누른 채 끌면 걷기 · 오른쪽을 끌면 둘러보기');
