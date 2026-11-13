@@ -5,10 +5,10 @@
 #   가족용 연결(config.js: 함께 걷기·AI 중계, claude-web.js)은 공개용에서 뺍니다.
 #   방문자 통계: Cloudflare Web Analytics 사용 중 (Pages 프로젝트 메트릭에서 켬, 배포할 때 Cloudflare가 자동으로 붙임).
 #   측정 코드가 붙으려면 페이지에 <html><head>…</head><body>…</body></html> 틀이 있어야 함 (아래에서 확인).
-#   지역 페이지: 서울 = index.html, 부산·경남 = busan.html. 첫 화면 '지역 고르기'의 서울 링크는 공개용에서 ./ 로 바꿉니다.
+#   지역 페이지: 서울 = index.html, 부산·경남 = busan.html, 동해안 = east.html. 첫 화면 '지역 고르기'의 서울 링크는 공개용에서 ./ 로 바꿉니다.
 set -euo pipefail
 OUT=dist-seoul
-REGIONS="busan"
+REGIONS="busan east"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 cp -R assets3d "$OUT/"

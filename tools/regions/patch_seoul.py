@@ -383,12 +383,17 @@ rep("rs.textContent='처음부터 다시 시작';let arm=0;rs.onclick=()=>{if(!a
 rep("(n===STAMPS.length?'여섯 항구 스탬프를 모두 모았어요. 일주일 지중해 여행 끝!':'하선 완료. 스탬프 '+n+'/6 — 일정에서 빠진 항구로 다시 가 볼 수 있어요.'):'항구마다 명소 끝에서 스탬프를 찍어요. 이 기기에 저장돼요.'","(n===STAMPS.length?'스탬프를 모두 모았어요. 여행 끝! 실제 여행도 즐겁게 다녀오세요.':'여행 완료! 스탬프 '+n+'/'+STAMPS.length+' — 일정에서 빠진 곳에 다시 가 볼 수 있어요.'):'곳마다 끝에서 스탬프를 찍어요. 이 기기에 저장돼요.'")
 rep("say('가상 유로가 모자라요. 카지노에서 따거나, 가방에서 처음부터 다시 시작할 수 있어요.');","say(L('Not enough money. You can start over from the bag (🎒).','돈이 모자라요. 가방(🎒)에서 처음부터 다시 시작할 수 있어요.'));")
 rep("(stamped[s.id]?'':'<br>빈칸')","(stamped[s.id]?'':'<br>'+L('empty','빈칸'))")
+# ---- 가게 버튼 · 가게 주인 말: 크루즈 시절 '젤라토' · '유로' 문구 정리 (음식 노점 버튼이 '젤라토 주문'으로 보이던 것) ----
+rep("s:s.k==='gelato'?'젤라토 주문':'구경하고 사기'","s:s.k==='gelato'?'주문하기':'구경하고 사기'")
+rep("['젤라토 주문','Order']","['주문하기','Order']")
+rep("손님에게 물건이나 젤라토를 권하고 동네 이야기를 해 준다.","손님에게 메뉴와 물건을 권하고 동네 이야기를 해 준다.")
+s=s.replace("가격은 게임 속 가상 유로.","가격은 게임 속 가상 원화.")
 # ---- 날씨: 맑은 밤에는 해 대신 달 ----
 rep("current=temperature_2m,weather_code&timezone","current=temperature_2m,weather_code,is_day&timezone")
 rep("c>=2?'☁':'☀';","c>=2?'☁':WX.is_day===0?'🌙':'☀';")
 # ---- 지역 고르기 (첫 화면): 서울 · 부산·경남 · 준비 중인 지역 ----
 rep('<p class="route" id="stR"></p>','<p class="route" id="stR"></p><div id="stReg" class="reg"></div>\n<style>.reg{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 16px}.reg .h{width:100%;font-size:12px;opacity:.75}.reg a,.reg span{font-size:12.5px;line-height:1.2;padding:6px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.35);color:#fff;text-decoration:none}.reg a.on{background:var(--brass);color:var(--navy);border-color:var(--brass);font-weight:700}.reg span{opacity:.45}</style>')
-REGJS=r"""const REG_ID='seoul';const REGIONS=[['seoul','seoul.html',L('Seoul','서울')],['busan','busan.html',L('Busan · Gyeongnam','부산·경남')],['east','',L('East coast','동해안')],['jnm','',L('Jeonnam · Gwangju','전남·광주')],['cbk','',L('Chungbuk','충북')],['cnm','',L('Chungnam · Daejeon','충남·대전')],['gbk','',L('Gyeongbuk · Daegu','경북·대구')],['jbk','',L('Jeonbuk','전북')],['ggi','',L('Gyeonggi','경기')]];
+REGJS=r"""const REG_ID='seoul';const REGIONS=[['seoul','seoul.html',L('Seoul','서울')],['busan','busan.html',L('Busan · Gyeongnam','부산·경남')],['east','east.html',L('East coast','동해안')],['jnm','',L('Jeonnam · Gwangju','전남·광주')],['cbk','',L('Chungbuk','충북')],['cnm','',L('Chungnam · Daejeon','충남·대전')],['gbk','',L('Gyeongbuk · Daegu','경북·대구')],['jbk','',L('Jeonbuk','전북')],['ggi','',L('Gyeonggi','경기')]];
 {const r=$('stReg');if(r){const h=document.createElement('div');h.className='h';h.textContent=L('Choose a region','지역 고르기');r.append(h);REGIONS.forEach(([id,f,n])=>{let e;if(id===REG_ID){e=document.createElement('a');e.className='on';e.textContent=n;}else if(f){e=document.createElement('a');e.href=f;e.textContent=n;}else{e=document.createElement('span');e.textContent=n+' · '+L('soon','준비 중');}r.append(e);});}}
 """
 _m=re.search(r"\$\('stR'\)\.textContent=L\('(?:[^'\\]|\\.)*','(?:[^'\\]|\\.)*'\);",s);assert _m

@@ -1,0 +1,11 @@
+/* ---------- 가상 동해안: 3D 소품 ---------- */
+Object.assign(BSEA,{gyp:1,anm:1,jdj:1,skc:1});
+function mkPavilion(){const g=new T.Group();box(g,14,1.2,10,M('#b8b0a0'),0,0,0);for(const x of[-6,-2,2,6])for(const z of[-4,4])cyl(g,.3,.3,3.4,KRED,x,1.2,z,8);box(g,13,.4,9,M('#7a2a1e'),0,1.2,0);hanokRoof(g,13,9,0,4.6,0);return g;}
+function bamboo(g,x,z,n,r){const m=M('#2a2a26'),lf=M('#4f7a3a'),lf2=M('#5f8a44');n=Math.round(n*.7);for(let i=0;i<n;i++){const a=rnd()*6.28,d=rnd()*r,h=8+rnd()*4,px=x+Math.cos(a)*d,pz=z+Math.sin(a)*d;cyl(g,.08,.1,h,m,px,0,pz,5);}for(let k=0;k<4;k++){const a=rnd()*6.28,d=rnd()*r*.5;sph(g,r*.55,k&1?lf:lf2,x+Math.cos(a)*d,7.5+rnd()*2.5,z+Math.sin(a)*d,1,1.5,1);}}
+function abaiH(g,x,z,w,h,d,i){const W=['#d9d2c3','#c9c2b4','#e6dfcf','#cfc6b3','#bfc8cc'],R=['#2e6a9a','#b8473a','#3f7a5a','#5f6670'];box(g,w,h,d,M(W[i%5]),x,0,z);box(g,w+.5,.4,d+.5,M(R[i%4]),x,h,z);box(g,1,1.7,.1,M('#5a4a3a'),x-w*.2,0,z+(z>45?-d/2-.05:d/2+.05));box(g,1.1,.9,.1,M('#2c3a46',{emissive:'#0c141c'}),x+w*.22,1.3,z+(z>45?-d/2-.05:d/2+.05));}
+function hourglass(g,x,z){const s=new T.Group();s.userData.pass=1;const gl=new T.MeshPhongMaterial({color:'#cfe6ef',transparent:true,opacity:.55,specular:'#ffffff',shininess:90});
+ const a=new T.Mesh(new T.CylinderGeometry(4,.4,6,20),gl);a.position.y=9;s.add(a);const b=new T.Mesh(new T.CylinderGeometry(.4,4,6,20),gl);b.position.y=3;s.add(b);cone(s,3,2.4,M('#e8cf8a'),0,0,0,20);
+ const ring=new T.Mesh(new T.TorusGeometry(7,.5,8,40),M('#b8862a'));ring.position.y=6;s.add(ring);box(s,1,6,1,M('#8a8f96'),0,-6,0);s.position.set(x,6,z);g.add(s);}
+function granite(g,x,z,h,w){const m=new T.Mesh(new T.DodecahedronGeometry(1,1),M(['#b9b4ab','#a8a39a','#c4bfb5'][(x|0)&1?1:0]));m.scale.set(w,h,w*.8);m.position.set(x,h*.6,z);m.rotation.y=rnd()*3;g.add(m);}
+function bronzeBuddha(g,x,z){const b=new T.Group();b.userData.pass=1;const br=M('#8a6a3a',{emissive:'#1a1006'});box(b,9,2,7,M('#b8b0a0'),0,0,0);cyl(b,4.2,4.8,4,br,0,2,0,16);cone(b,3.2,7,br,0,6,0,16);sph(b,1.7,br,0,13.6,0);sph(b,.55,br,0,15.4,0);b.position.set(x,0,z);g.add(b);}
+function canopy(g,x0,x1,z,w,y){const c=new T.Group();c.userData.pass=1;box(c,Math.abs(x1-x0),.4,w,M('#d8dde2',{transparent:true,opacity:.55}),(x0+x1)/2,y,z);for(let x=Math.min(x0,x1);x<=Math.max(x0,x1);x+=8){box(c,.3,y,.3,M('#5a6068'),x,0,z-w/2);box(c,.3,y,.3,M('#5a6068'),x,0,z+w/2);}g.add(c);}
