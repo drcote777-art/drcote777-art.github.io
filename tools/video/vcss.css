@@ -1,0 +1,19 @@
+#top,#acts,#rail,#auto,#hint,#sub{visibility:hidden!important}
+.panel{align-items:flex-start!important;padding-top:25vh!important;background:rgba(6,12,24,.55)!important}
+.panel .in{transform:scale(.86) translateX(-2.5%);transform-origin:top center;border-radius:18px!important;max-height:none!important}
+.panel .close{display:none!important}
+#pan:not([hidden]) ~ #talk{visibility:hidden!important}
+.talk{bottom:auto!important;top:25vh!important;transform:scale(.88) translateX(-2.5%);transform-origin:top center;border-radius:18px!important}
+.real .lk a:not(.sv){display:none!important}
+#vcap .loc{display:inline-block;margin-top:7px;background:rgba(9,15,28,.7);color:#fff;font-weight:700;font-size:14px;padding:5px 11px;border-radius:999px}
+#vcap{position:fixed;left:50%;top:13%;transform:translateX(-50%);width:90%;z-index:2147483647;text-align:center;pointer-events:none;font-family:Inter,"Noto Sans",system-ui,sans-serif}
+#vcap b{display:inline-block;background:rgba(9,15,28,.82);color:#fff;font-weight:800;font-size:24px;line-height:1.28;padding:9px 15px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#vcap small{display:inline-block;margin-top:7px;background:#f2c14e;color:#13233d;font-weight:800;font-size:16px;padding:6px 13px;border-radius:999px}
+#vtap{position:fixed;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.45);border:3px solid #fff;transform:translate(-50%,-50%);z-index:2147483646;pointer-events:none;display:none;box-shadow:0 0 0 6px rgba(255,255,255,.18)}
+#vend{position:fixed;inset:0;z-index:2147483647;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(120% 80% at 50% 30%,#1d3a63 0%,#0f1d33 60%,#0a1424 100%);font-family:Inter,"Noto Sans",system-ui,sans-serif;color:#fff;text-align:center;padding:0 26px}
+#vend .k{color:#f2c14e;letter-spacing:.18em;font-size:12px;font-weight:700}
+#vend h1{margin:0;font-size:44px;line-height:1.05;font-weight:900}
+#vend p{margin:0;font-size:18px;opacity:.92;font-weight:600}
+#vend .chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#vend .chips span{border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
+#vend .url{margin-top:10px;background:#f2c14e;color:#13233d;font-weight:900;font-size:22px;padding:12px 18px;border-radius:14px}
