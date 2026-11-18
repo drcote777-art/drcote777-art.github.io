@@ -6,3 +6,4 @@
 
 먼저 `bash tools/build_seoul_public.sh`로 `dist-seoul`을 만든 뒤 돌립니다.
 스크립트 안의 경로(`/opt/npm-tools/node_modules/playwright`, `/root/cruise/node_modules/three/build/three.min.js`)는 만들던 컴퓨터 기준이라, 다른 곳에서는 맞게 바꿔야 합니다.
+- `cbk_flow.js`: 가상 충북 3일 일정 전체를 눌러 보는 시험 (LOC=en-US 로 영어 화면). `cbk_probe.js`: 충북 장면별 화면·스팟 확인.
