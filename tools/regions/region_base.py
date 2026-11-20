@@ -19,7 +19,7 @@ class Region:
         rep,cut,sub1,S=self.rep,self.cut,self.sub1,self.S
         rid=R['id']
         # 이름 · 저장 칸 · 시작 돈
-        rep("<title>Virtual Seoul · 가상 서울 3일</title>","<title>%s</title>"%R['title'])
+        rep("<title>Virtual Korea · 가상 한국</title>","<title>%s</title>"%R['title'])
         rep('<link rel="manifest" href="seoul.webmanifest">','')
         for k in ['seoul_game1','seoul_stamps','seoul_wallet']:
             self.s=self.s.replace("'"+k+"'","'"+k.replace('seoul_',rid+'_')+"'")
@@ -69,7 +69,7 @@ class Region:
         rep("go('myd',.33);const n=cur.npcs.find(x=>x.id==='cit0')","go(%r,%s);const n=cur.npcs.find(x=>x.id==='cit0')"%(R['deep'][0],R['deep'][1]))
         # 시작 화면 · 지금 날씨 · 안내 문구
         rep('INCHEON AIRPORT → SEOUL',R['eyebrow'])
-        rep("$('stH').innerHTML=L('Virtual Seoul<br>3 days','가상 서울<br>2박 3일');","$('stH').innerHTML=L(%r,%r);"%R['stH'])
+        rep("$('stH').innerHTML=L('Virtual Korea<br>Seoul · 3 days','가상 한국<br>서울 2박 3일');","$('stH').innerHTML=L(%r,%r);"%R['stH'])
         sub1(r"\$\('stP'\)\.textContent=L\('(?:[^'\\]|\\.)*','(?:[^'\\]|\\.)*'\);",R['stP'])
         sub1(r"\$\('stR'\)\.textContent=L\('(?:[^'\\]|\\.)*','(?:[^'\\]|\\.)*'\);",R['stR'])
         rep("latitude=37.5665&longitude=126.978","latitude=%s&longitude=%s"%R['wx'])

@@ -13,7 +13,7 @@ s=s.replace('€','₩').replace('.toFixed(2)','.toLocaleString()').replace('.to
 rep("const G0={eur:300,","const G0={eur:300000,skyMode:'live',")
 s=s.replace("cruise_game3","seoul_game1").replace("cruise_stamps","seoul_stamps")
 rep('<script>window.WEB_SITE="cruise";</script>','<script>window.WEB_SITE="seoul";</script>')
-rep("<title>지중해 크루즈 8일</title>","<title>Virtual Seoul · 가상 서울 3일</title>")
+rep("<title>지중해 크루즈 8일</title>","<title>Virtual Korea · 가상 한국</title>")
 # ---- 언어 ----
 rep("/* ---------- 여행 자료 (10/2 최종 일정표 기준) ---------- */",r"""const LANG=(()=>{try{const v=localStorage.getItem('seoul_lang');if(v)return v;}catch(e){}return (navigator.language||'en').toLowerCase().indexOf('ko')===0?'ko':'en';})();
 const L=(e,k)=>LANG==='ko'?k:e;
@@ -222,7 +222,7 @@ cut('<div id="start"><div class="card">','<script>window.WEB_SITE',r"""<div id="
 
 """)
 rep("const FROMCITY=location.hash==='#board';$('enterCath').onclick=()=>{location.href='cathedral.html#cruise';};",r"""const FROMCITY=false;{const sw=()=>{try{localStorage.setItem('seoul_lang',LANG==='ko'?'en':'ko');}catch(e){}location.reload();};$('stLang').onclick=sw;$('langBtn').onclick=sw;
- $('stH').innerHTML=L('Virtual Seoul<br>3 days','가상 서울<br>2박 3일');$('stP').textContent=L('Land at Incheon Airport, clear immigration, buy a T-money card and ride the airport train into the city. Walk Myeongdong, ride the cable car up Namsan, enter Gyeongbokgung, eat at Gwangjang Market, picnic by the Han River and go up Lotte World Tower. The sky follows the real time and weather in Seoul, and every sight has real facts, photos and Street View.','인천공항에 내려 입국심사를 받고, 티머니 카드를 사서 공항철도로 서울에 들어가요. 명동을 걷고, 케이블카로 남산에 오르고, 경복궁에 들어가고, 광장시장에서 먹고, 한강에서 소풍하고, 롯데월드타워에 올라가요. 하늘은 지금 서울의 실제 시각과 날씨를 따르고, 명소마다 확인한 설명과 사진, 거리뷰가 있어요.');
+ $('stH').innerHTML=L('Virtual Korea<br>Seoul · 3 days','가상 한국<br>서울 2박 3일');$('stP').textContent=L('Land at Incheon Airport, clear immigration, buy a T-money card and ride the airport train into the city. Walk Myeongdong, ride the cable car up Namsan, enter Gyeongbokgung, eat at Gwangjang Market, picnic by the Han River and go up Lotte World Tower. The sky follows the real time and weather in Seoul, and every sight has real facts, photos and Street View.','인천공항에 내려 입국심사를 받고, 티머니 카드를 사서 공항철도로 서울에 들어가요. 명동을 걷고, 케이블카로 남산에 오르고, 경복궁에 들어가고, 광장시장에서 먹고, 한강에서 소풍하고, 롯데월드타워에 올라가요. 하늘은 지금 서울의 실제 시각과 날씨를 따르고, 명소마다 확인한 설명과 사진, 거리뷰가 있어요.');
  $('stR').textContent=L('Airport · Myeongdong · Namsan · Gyeongbokgung · Bukchon · Insadong · Gwangjang Market · DDP · Hongdae · Han River · COEX · Lotte World Tower','공항 · 명동 · 남산 · 경복궁 · 북촌 · 인사동 · 광장시장 · DDP · 홍대 · 한강 · 코엑스 · 롯데월드타워');$('enter').textContent=L('Start at the airport','공항에서 시작하기');$('loading').textContent='';
  $('planBtn').textContent=L('📋 Plan','📋 일정');$('stampBtn').textContent=L('Stamps','스탬프');$('voiceBtn').textContent=L('Voice','음성');$('hint').textContent=L('Drag on the left to walk · drag on the right to look around','왼쪽을 누른 채 끌면 걷기 · 오른쪽을 끌면 둘러보기');
  document.querySelectorAll('[data-close]').forEach(b=>b.textContent=L('Close','닫기'));$('talkIn').placeholder=L('Say something','말을 걸어 보세요');$('talkSend').textContent=L('Send','보내기');document.querySelector('#pass h2').textContent=L('Seoul stamps','서울 스탬프');
@@ -305,7 +305,7 @@ rep("L('Meal and shop prices in this app are examples. Check opening hours befor
 rep("function disposeG(g){g.traverse(o=>{if(o.geometry)o.geometry.dispose();});}","function disposeG(g){const keep=new Set(Object.values(MC)),kt=new Set(Object.values(TC));g.traverse(o=>{if(o.geometry)o.geometry.dispose();const ms=o.material?(Array.isArray(o.material)?o.material:[o.material]):[];ms.forEach(m=>{if(keep.has(m))return;if(m.map&&!kt.has(m.map)&&m.map!==GRAD)m.map.dispose();m.dispose();});});try{R.renderLists.dispose();}catch(e){}}")
 rep("ld.load(phU(p,p[4]),t=>{","ld.load(phU(p,PHONE?1920:p[4]),t=>{")
 rep("let PV=null;","let PV=null;const PHONE=!!(window.matchMedia&&matchMedia('(pointer:coarse)').matches);if(PHONE)sun.shadow.mapSize.set(1024,1024);")
-rep("<title>Virtual Seoul · 가상 서울 3일</title>",'<title>Virtual Seoul · 가상 서울 3일</title>\n<link rel="manifest" href="seoul.webmanifest">\n<meta name="theme-color" content="#0f1d33">\n<link rel="icon" href="assets3d/seoul-192.png">\n<link rel="apple-touch-icon" href="assets3d/seoul-192.png">')
+rep("<title>Virtual Korea · 가상 한국</title>",'<title>Virtual Korea · 가상 한국</title>\n<link rel="manifest" href="seoul.webmanifest">\n<meta name="theme-color" content="#0f1d33">\n<link rel="icon" href="assets3d/seoul-192.png">\n<link rel="apple-touch-icon" href="assets3d/seoul-192.png">')
 
 # ---- 거리뷰·지도를 새 탭이 아니라 화면 안에서 열기 ----
 rep("const SV=ll=>'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+ll[0]+','+ll[1];","const SV=ll=>'https://www.google.com/maps/@?api=1&map_action=pano&viewpoint='+ll[0]+','+ll[1];const SVE=ll=>'https://maps.google.com/maps?q=&layer=c&cbll='+ll[0]+','+ll[1]+'&cbp=11,0,0,0,0&output=svembed&hl='+LANG;const MAPE=q=>'https://maps.google.com/maps?q='+encodeURIComponent(q)+'&z=16&output=embed&hl='+LANG;\nfunction openEmbed(src,full){$('emF').src=src;$('emL').href=full;$('em').hidden=false;}\nfunction closeEmbed(){$('em').hidden=true;$('emF').src='about:blank';}")
