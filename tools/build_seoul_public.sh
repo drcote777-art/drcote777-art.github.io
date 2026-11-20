@@ -8,7 +8,7 @@
 #   지역 페이지: 서울 = index.html, 부산·경남 = busan.html, 동해안 = east.html, 전남·광주 = jnm.html, 충북 = cbk.html. 첫 화면 '지역 고르기'의 서울 링크는 공개용에서 ./ 로 바꿉니다.
 set -euo pipefail
 OUT=dist-seoul
-REGIONS="busan east jnm cbk"
+REGIONS="busan east jnm cbk jej"
 rm -rf "$OUT"
 mkdir -p "$OUT"
 cp -R assets3d "$OUT/"

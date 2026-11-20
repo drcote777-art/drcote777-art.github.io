@@ -1,0 +1,70 @@
+// 가상 제주: 실제로 눌러 보는 시험 — 지역 고르기, 3일 일정 전체(비행기·버스·퀴즈·가게·스탬프·호텔·성산일출봉 오르기·여행 마치기)
+const {chromium}=require('/opt/npm-tools/node_modules/playwright');const fs=require('fs');
+const S='/tmp/claude-0/-home-claude/488bc777-032c-51f3-86bf-b1b9a3a466f3/scratchpad/',REPO='/home/claude/drcote777-art.github.io',D=S+'doc/jf/';fs.mkdirSync(D,{recursive:true});
+const three=fs.readFileSync('/root/cruise/node_modules/three/build/three.min.js','utf8');const LOC=process.env.LOC||'ko-KR';
+(async()=>{const b=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,deviceScaleFactor:1,locale:LOC,timezoneId:'Asia/Seoul'});
+ const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e.stack||e).slice(0,500)));
+ await p.route('**/*',r=>{const u=r.request().url();if(u.includes('three.min.js'))return r.fulfill({body:three,contentType:'application/javascript'});
+  if(u.startsWith('http://site.test/')){let pa=new URL(u).pathname;let f=pa==='/'?REPO+'/tools/regions/seoul.html':pa==='/jej.html'?REPO+'/tools/regions/jej.html':REPO+'/dist-seoul'+pa;
+   if(fs.existsSync(f))return r.fulfill({body:fs.readFileSync(f),contentType:f.endsWith('.html')?'text/html; charset=utf-8':f.endsWith('.js')?'application/javascript':'application/octet-stream'});return r.fulfill({status:404,body:''});}
+  return r.abort();});
+ const log=[];const say=(...a)=>{log.push(a.join(' '));};
+ const place=()=>p.evaluate(()=>document.getElementById('placeName').textContent);
+ const st=()=>p.evaluate(()=>window.__st());
+ const clickText=async(re,sel)=>p.evaluate(([src,sel])=>{const re=new RegExp(src);const bs=[...document.querySelectorAll(sel||'button')].filter(x=>x.offsetParent&&re.test(x.textContent));if(bs[0]){bs[0].click();return bs[0].textContent.trim().slice(0,40);}return null;},[re.source,sel||'button']);
+ const cont=async()=>{await p.waitForTimeout(500);return clickText(/계속 ▸|Continue ▸/);};
+ const quiz=async(ans)=>{await p.waitForTimeout(700);const a=await clickText(new RegExp(ans.replace(/[.*+?^${}()|[\]\\₩]/g,'\\$&')),'#pan button');const c=await cont();return a?('answered '+a+(c?' +continue':'')):'no quiz';};
+ const ride=async(spotRe,ans,dest)=>{await p.evaluate((s)=>window.__spot(new RegExp(s)),spotRe.source);let q='';if(ans)q=await quiz(ans);const from=await place();await p.waitForFunction((f)=>document.getElementById('placeName').textContent!==f,from,{timeout:15000}).catch(()=>{});await p.waitForTimeout(1500);
+  await p.evaluate(()=>window.__act('skipride'));await p.waitForFunction((d)=>document.getElementById('placeName').textContent===d,dest,{timeout:60000}).catch(()=>{});
+  await p.waitForTimeout(1200);const pl=await place();const s=await st();say('RIDE',spotRe.source,'|',q,'| →',pl,pl===dest?'OK':'**EXPECTED '+dest+'**','| ₩'+s.eur,'| done',s.done,'| next:',s.next);};
+ const link=async(spotRe,ans,dest)=>{await p.evaluate((s)=>window.__spot(new RegExp(s)),spotRe.source);let q='';if(ans)q=await quiz(ans);await p.waitForFunction((d)=>document.getElementById('placeName').textContent===d,dest,{timeout:20000}).catch(()=>{});await p.waitForTimeout(1500);const pl=await place();const s=await st();say('LINK',spotRe.source,'|',q,'| →',pl,pl===dest?'OK':'**EXPECTED '+dest+'**','| done',s.done,'| next:',s.next);};
+ const shop=async(go,spotRe,ans,item)=>{await p.evaluate(([id,t])=>window.__go(id,t),go);await p.waitForTimeout(1300);const r=await p.evaluate((s)=>window.__spot(new RegExp(s)),spotRe.source);let q='';if(ans)q=await quiz(ans);await p.waitForTimeout(800);
+  const c=await clickText(new RegExp(item),'#pan button');await p.waitForTimeout(900);await clickText(/닫기|Close/);const s=await st();say('SHOP',r,'|',q,'→',c,'| ₩'+s.eur,'| done',s.done,'| next:',s.next);};
+ const stamp=async(go)=>{await p.evaluate(([id,t])=>window.__go(id,t),go);await p.waitForTimeout(1200);const r=await p.evaluate(()=>{const b=[...document.querySelectorAll('#acts button')].find(x=>/스탬프|Stamp/.test(x.textContent));if(b){b.click();return 'ok';}return 'NO STAMP BUTTON';});await p.waitForTimeout(900);await cont();await clickText(/닫기|Close/);const s=await st();say('STAMP',go[0],r,'| done',s.done,'| next:',s.next);};
+ const near=async(go)=>{await p.evaluate(([id,t])=>window.__go(id,t),go);await p.waitForTimeout(1500);const s=await st();say('NEAR',go.join(':'),'| done',s.done,'| next:',s.next);};
+ const lift=async(go,spotRe,ans,shot)=>{await p.evaluate(([id,t])=>window.__go(id,t),go);await p.waitForTimeout(1300);const r=await p.evaluate((s)=>window.__spot(new RegExp(s)),spotRe.source);const q=ans?await quiz(ans):'';await p.waitForTimeout(4200);await clickText(/닫기|Close/);
+  const y=await p.evaluate(()=>Math.round(window.__me.y));const s=await st();say('LIFT',r,'|',q,'| y',y,'| ₩'+s.eur,'| done',s.done,'| next:',s.next);await p.screenshot({path:D+shot});};
+ const sleep=async(id,t,doorRe,shot)=>{await p.evaluate(([id,t])=>window.__go(id,t),[id,t]);await p.waitForTimeout(1200);await p.evaluate((s)=>window.__spot(new RegExp(s)),doorRe.source);await p.waitForTimeout(2600);say('HOTEL',await place());await p.screenshot({path:D+shot});
+  await p.evaluate(()=>window.__act('sleep'));await p.waitForTimeout(3000);await cont();await p.waitForTimeout(1500);say('NEXT DAY',await place(),JSON.stringify(await st()));};
+ // 서울 첫 화면 지역 고르기 → 제주
+ await p.goto('http://site.test/');await p.waitForTimeout(2000);
+ say('SEOUL chips',JSON.stringify(await p.evaluate(()=>[...document.querySelectorAll('#stReg a,#stReg span')].map(a=>a.textContent+(a.getAttribute('href')?'→'+a.getAttribute('href'):'')))));
+ await p.click('#stReg a[href="jej.html"]');await p.waitForTimeout(2500);say('TITLE',await p.title());
+ await p.waitForSelector('#enter:not([disabled])',{timeout:20000});say('ENTER',await p.textContent('#enter'));await p.click('#enter');await p.waitForTimeout(2500);say('START',await place(),JSON.stringify(await st()));
+ const K=LOC.startsWith('ko');
+ // DAY 1
+ await near(['gmp',.45]);await p.screenshot({path:D+'0_gmp.png'});await p.evaluate(()=>window.__go('gmp',.82));await p.waitForTimeout(1200);
+ await p.evaluate((s)=>window.__spot(new RegExp(s)),(K?/제주 가는 비행기/:/Flight to Jeju/).source);say('FLT quiz',await quiz(K?'약 1시간 10분':'About 1 h 10 min'));
+ await p.waitForFunction(()=>/비행기|Flight/.test(document.getElementById('placeName').textContent),{timeout:15000}).catch(()=>{});await p.waitForTimeout(2500);await p.screenshot({path:D+'1_flight.png'});
+ await p.evaluate(()=>window.__act('skipride'));await p.waitForFunction((d)=>document.getElementById('placeName').textContent===d,K?'제주국제공항':'Jeju International Airport',{timeout:60000}).catch(()=>{});await p.waitForTimeout(1500);
+ {const s=await st();say('ARRIVE',await place(),'| ₩'+s.eur,'| done',s.done,'| next:',s.next);}await p.screenshot({path:D+'2_cju.png'});
+ await near(['cju',.4]);
+ await p.evaluate(()=>window.__go('cju',.92));await p.waitForTimeout(1200);
+ await link(K?/용두암까지 택시/:/Taxi to Yongduam/,K?'돌하르방':'Dol hareubang',K?'용두암':'Yongduam');
+ await near(['ydm',.45]);await stamp(['ydm',.97]);await p.screenshot({path:D+'3_ydm.png'});
+ await p.evaluate(()=>window.__go('ydm',.9));await p.waitForTimeout(1200);
+ await link(K?/동문시장까지/:/to Dongmun Market/,K?'용':'A dragon',K?'동문재래시장':'Dongmun Market');
+ await shop(['dmm',.75],K?/야시장 노점/:/Night market stall/,null,K?'흑돼지 꼬치':'Black pork');await stamp(['dmm',.97]);await p.screenshot({path:D+'4_dmm.png'});
+ await sleep('dmm',.2,K?/제주시 호텔/:/Hotel in Jeju City/,'5_hotel.png');
+ // DAY 2
+ await p.evaluate(()=>window.__go('dmm',.04));await p.waitForTimeout(1200);
+ await ride(K?/성산 가는 급행버스/:/Express bus to Seongsan/,K?'저녁 6시쯤':'About 18:00',K?'성산일출봉':'Seongsan Ilchulbong');
+ await lift(['ssi',.5],K?/⛰ 성산/:/⛰ Seongsan/,'5,000','6_ssi_top.png');await stamp(['ssi',.99]);
+ await p.evaluate(()=>window.__go('ssi',.04));await p.waitForTimeout(1200);
+ await ride(K?/201번 버스/:/Bus 201/,null,K?'서귀포 · 천지연폭포':'Seogwipo · Cheonjiyeon Falls');
+ await near(['cjy',.9]);await stamp(['cjy',.97]);await p.screenshot({path:D+'7_cjy.png'});
+ await sleep('cjy',.03,K?/서귀포 호텔/:/Hotel in Seogwipo/,'8_hotel.png');
+ // DAY 3
+ await p.evaluate(()=>window.__go('cjy',.08));await p.waitForTimeout(1200);
+ await link(K?/외돌개까지 택시/:/Taxi to Oedolgae/,'22:00',K?'서귀포 · 외돌개':'Seogwipo · Oedolgae');
+ await near(['odg',.45]);await stamp(['odg',.97]);await p.screenshot({path:D+'9_odg.png'});
+ await p.evaluate(()=>window.__go('odg',.06));await p.waitForTimeout(1200);
+ await ride(K?/공항리무진 600번/:/Airport limousine 600/,K?'7코스':'Route 7',K?'제주국제공항':'Jeju International Airport');
+ await p.evaluate(()=>window.__go('cju',.12));await p.waitForTimeout(1200);
+ await ride(K?/김포 가는 비행기/:/Flight back to Gimpo/,null,K?'김포공항 · 도착':'Gimpo Airport · Arrivals');
+ await p.evaluate(()=>window.__go('gmpa',.85));await p.waitForTimeout(1500);
+ await p.evaluate(()=>window.__spot(/여행 마치기|Finish the trip/));await p.waitForTimeout(2500);
+ say('END',await p.evaluate(()=>{const e=document.querySelector('#passLead');return e?e.textContent:'(no passLead)';}),JSON.stringify(await st()));
+ await p.screenshot({path:D+'10_end.png'});
+ console.log(log.join('\n'));console.log('ERRORS',JSON.stringify(errs,null,1));await b.close();})();

@@ -1,6 +1,6 @@
-# 지역 페이지 만드는 곳 (가상 서울 · 부산·경남 · 동해안 · 전남·광주 · 충북 …)
+# 지역 페이지 만드는 곳 (가상 서울 · 부산·경남 · 동해안 · 전남·광주 · 충북 · 제주 …)
 
-`seoul.html`, `busan.html`, `east.html`, `jnm.html`, `cbk.html`은 여기 있는 생성기로 만듭니다. 손으로 고치지 말고 생성기를 고친 뒤 다시 만드세요.
+`seoul.html`, `busan.html`, `east.html`, `jnm.html`, `cbk.html`, `jej.html`은 여기 있는 생성기로 만듭니다. 손으로 고치지 말고 생성기를 고친 뒤 다시 만드세요.
 
 ```bash
 GEN_DIR=tools/regions/ python3 tools/regions/patch_seoul.py   # → tools/regions/seoul.html
@@ -8,7 +8,8 @@ GEN_DIR=tools/regions/ python3 tools/regions/patch_busan.py   # → tools/region
 GEN_DIR=tools/regions/ python3 tools/regions/patch_east.py    # → tools/regions/east.html
 GEN_DIR=tools/regions/ python3 tools/regions/patch_jnm.py     # → tools/regions/jnm.html
 GEN_DIR=tools/regions/ python3 tools/regions/patch_cbk.py     # → tools/regions/cbk.html
-cp tools/regions/seoul.html tools/regions/busan.html tools/regions/east.html tools/regions/jnm.html tools/regions/cbk.html .
+GEN_DIR=tools/regions/ python3 tools/regions/patch_jej.py     # → tools/regions/jej.html
+cp tools/regions/seoul.html tools/regions/busan.html tools/regions/east.html tools/regions/jnm.html tools/regions/cbk.html tools/regions/jej.html .
 bash tools/build_seoul_public.sh                              # 공개용(dist-seoul) 확인
 ```
 
