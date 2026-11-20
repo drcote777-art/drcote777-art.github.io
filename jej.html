@@ -1685,7 +1685,7 @@ function batDam(g,a,b,y){y=y||0;const dx=b[0]-a[0],dz=b[1]-a[1],L=Math.hypot(dx,
 /* 성산일출봉: 바닷가 응회구 (아래 절벽 · 위 풀밭 · 가운데 분화구) */
 function tuffCone(g,x,z,R,H){const c=new T.Group();c.userData.pass=1;const V=(r,y)=>new T.Vector2(r*R,y*H);
  const lo=new T.Mesh(new T.LatheGeometry([V(1.04,-.05),V(1,0),V(.97,.25),V(.95,.4)],28),M('#8a7658',{side:T.DoubleSide}));c.add(lo);
- const hi=new T.Mesh(new T.LatheGeometry([V(.95,.4),V(.82,.85),V(.78,1),V(.68,1.02),V(.6,.92),V(.3,.86),V(0,.86)],28),M('#6f9a4a',{side:T.DoubleSide}));c.add(hi);
+ const hi=new T.Mesh(new T.LatheGeometry([V(.95,.4),V(.82,.85),V(.78,1),V(.7,1.03),V(.6,.85),V(.35,.62),V(0,.6)],28),M('#6f9a4a',{side:T.DoubleSide}));c.add(hi);
  for(let i=0;i<14;i++){const a=i/14*Math.PI*2+.1;box(c,3+rnd()*4,6+rnd()*8,3,M('#7a6648'),Math.cos(a)*R*.96,H*.08,Math.sin(a)*R*.96,-a);}
  c.position.set(x,0,z);g.add(c);return c;}
 /* 용두암: 용 머리 모양 바위 */
