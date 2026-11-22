@@ -47,12 +47,12 @@
   box(g,.4,5,.4,M('#5a4a3a'),-8,0,-44);label(g,'꽃지해수욕장 · KKOTJI BEACH',-8,5.6,-43.7,0,16,'#fff','#c8553d');
   P=pathFromXZ([[80,0,-48],[50,0,-40],[20,0,-30],[0,0,-22],[-20,0,-16],[-50,0,-18],[-90,0,-24]]);ex=[];
   notes=[[0,L('Kkotji Beach, Anmyeon-eup, Taean: the largest beach on Anmyeondo, always open and famous for its sunsets.','태안 안면읍 꽃지해수욕장이에요. 안면도에서 가장 큰 해변으로, 늘 열려 있고 해넘이로 유명해요.')],[.35,L('The two rocky islets are Halmi (grandma) and Halabi (grandpa) Rocks, a national Scenic Site (No. 69, 2009).','두 바위섬은 할미바위와 할아비바위예요. 명승 제69호(2009년)예요.')],[.6,L('Legend: when Jang Bogo’s commander Seungeon never came back, his wife Mido waited on the rock until she turned to stone; later a second rock rose beside her.','전설: 장보고의 부하 승언이 돌아오지 않자 아내 미도가 바위에서 기다리다 돌이 됐고, 뒤에 그 곁에 바위가 하나 더 생겼대요.')]];}
- if(city==='dcb'){seaY=-1.2;W=8;nP=40;ground(g,700,220,0,-150,'#b9b4aa');ground(g,700,70,0,-14,'#efe0b8',-.6);
+ if(city==='dcb'){seaY=-1.2;W=8;nP=40;ground(g,700,220,0,-150,'#b9b4aa');ground(g,700,70,0,-14,'#cdb07a',-.6);
   seaRail(g,[-260,40],[60,40],9);
   box(g,30,12,18,M('#8a6a4a'),120,0,-70);label(g,'머드체험관 · MUD EXPERIENCE',120,13.4,-60.8,0,20,'#fff','#5a3a26');
   cyl(g,1.6,2,30,M('#c9ced4'),-150,0,-56,10);label(g,'집트랙 · ZIP TRACK',-150,31,-54,0,10,'#fff','#c8202a');
   for(let x=-280;x<260;x+=16){if(Math.abs(x-120)<24)continue;box(g,10,6+rnd()*14,10,M(['#e8e1d4','#c9ced4','#d8d2c6'][(rnd()*3)|0]),x,0,-80-rnd()*20);}
-  for(let i=0;i<20;i++){const p=person(g,-200+rnd()*360,0,-4-rnd()*16,CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=rnd()*6;}
+  for(let i=0;i<16;i++){const p=person(g,-200+rnd()*360,-.6,-4+rnd()*10,CLOTH[(rnd()*9)|0],SKIN[(rnd()*4)|0],1);p.rotation.y=rnd()*6;}
   box(g,.4,5,.4,M('#5a4a3a'),0,0,-44);label(g,'대천해수욕장 · DAECHEON BEACH',0,5.6,-43.7,0,16,'#fff','#2e8fd0');
   box(g,3,2.6,1,M('#2e5a86'),-36,0,-52);label(g,'대천역 가는 버스 · BUS',-36,3.2,-51.4,0,8,'#fff','#2e5a86');
   P=pathFromXZ([[120,0,-46],[80,0,-40],[40,0,-34],[0,0,-30],[-40,0,-30],[-80,0,-34],[-120,0,-40]]);ex=[];
